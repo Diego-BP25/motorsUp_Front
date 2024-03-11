@@ -1,7 +1,6 @@
 import React from 'react'
 
-const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
-const Colors = React.lazy(() => import('./views/theme/colors/Colors.proyecto'))
+const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard.proyecto'))
 const Compras = React.lazy(() => import('./views/Compras/compra/compra.proyecto'))
 const Productos = React.lazy(() => import('./views/Compras/productos/productos.proyecto'))
 const Empleado = React.lazy(() => import('./views/Configuracion/empleados/empleados.proyecto'))
@@ -11,7 +10,6 @@ const cotizaciones = React.lazy(() => import('./views/cotizaciones/cotizaciones.
 const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
-  { path: '/theme', name: 'Theme', element: Colors, exact: true },
   { path: '/Configuracion/rol', name: 'Rol', element: Rol, exact: true },
   { path: '/Configuracion/empleado', name: 'Empleado', element: Empleado, exact: true },
   { path: '/compras', name: 'Compras', element: Compras, exact: true },

@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard'))
+const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard.proyecto'))
 const Compras = React.lazy(() => import('./views/Compras/compra/compra.proyecto'))
 const Productos = React.lazy(() => import('./views/Compras/productos/productos.proyecto'))
 
