@@ -31,8 +31,8 @@ import {
 import { CChartBar, CChartLine } from '@coreui/react-chartjs'
 import { DocsExample } from 'src/components'
 
-import WidgetsBrand from './WidgetsBrand'
-import WidgetsDropdown from './WidgetsDropdown'
+import WidgetsBrand from './WidgetsBrand.proyecto'
+import WidgetsDropdown from './WidgetsDropdown.proyecto'
 
 const Widgets = () => {
   const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + min)
