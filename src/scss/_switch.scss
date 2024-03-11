@@ -1,0 +1,22 @@
+.lbl::after {
+    content: '';
+    display: block;
+    width: 15px;
+    height: 15px;
+    border-radius: 100px;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    background-color: white;
+    transition: .5s;
+  }
+  
+  .checkInput:checked ~ .lbl::after {
+    left: 22px;
+    background-color: black;
+  }
+  
+  .checkInput:checked ~ .lbl {
+    transition: .2s;
+    background-color: blue !important;
+   }
