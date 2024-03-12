@@ -1,9 +1,6 @@
 import React from 'react'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import Swal from 'sweetalert2'
-import withReactContent from 'sweetalert2-react-content'
-import { CRow } from '@coreui/react'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faTruckField, faCalendar, faToggleOff, faCircleInfo, faComment, faCheck, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
@@ -20,7 +17,7 @@ const Cotizaciones = () => {
   const url = 'http://localhost:8081/api/cotizacion'
   const [cotizacion, setCotizacion] = useState([])
   const [descripcion, setDescripcion] = useState('')
-  const [estado, setEstado] = useState()
+  const [estado, setEstado] = useState(true)
   const [fecha, setFecha] = useState('')
   const [vehiculos_placa, setPlacaVehiculo] = useState('')
 
@@ -88,13 +85,20 @@ const Cotizaciones = () => {
     estadoActualizar(`$ ${valor}`);
   }
 
-  const deleteDetalleCoServicio = (codigoObjetoBorrar, tablaDetalleCotizacion) => {
-    const newTable = tablaDetalleCotizacion.deleteObjeto(codigoObjetoBorrar);
+  const deleteDetalleCotizacion = (codigoObjetoBorrar, tablaDetalleCotizacion) => {
+    tablaDetalleCotizacion.deleteObjeto(codigoObjetoBorrar);
     setTablaDetalleActual(true);
   }
 
-  const mainTablaDetalleCotizacionServicio = (tablaDetalleCotizacion) => {
+  const actualizarPrecioCotizacion = (tablaDetalleCotizacion, estadoPrecio, valorDescontar) => {
+    tablaDetalleCotizacion(
+      `$ ${(parseInt(estadoPrecio.substring(1, estadoPrecio.length)) - valorDescontar).toString()}`
+    )
+  }
+
+  const mainTablaDetalleCotizacionServicio = (tablaDetalleCotizacion, estadoPrecio, setEstadoPrecio) => {
     if (!tablaDetalleCotizacion) return;
+
     return tablaDetalleCotizacion.getAObjetos().map((c) => (
       <tr key={c.codigo}>
         <td>{c.codigo}</td>
@@ -103,7 +107,10 @@ const Cotizaciones = () => {
         <td>{c.cantidad}</td>
         <td>{c.subTotal}</td>
         <td>
-          <button onClick={() => deleteDetalleCoServicio(c.codigo, tablaDetalleCotizacion)} className='btn btn-danger'>
+          <button onClick={() => {
+            deleteDetalleCotizacion(c.codigo, tablaDetalleCotizacion);
+            actualizarPrecioCotizacion(setEstadoPrecio, estadoPrecio, (parseInt(c.precio.substring(1, c.precio.length)) * parseInt(c.cantidad)))
+          }} className='btn btn-danger'>
             <FontAwesomeIcon icon={faTrash} />
           </button>
         </td>
@@ -175,7 +182,7 @@ const Cotizaciones = () => {
           <ContentDoble key="fechaCotizacionYButtonSwitch" componentes={[
             <ContentIndividual key="fechaYHora" componentes={[
               <span key="title">Fecha y hora</span>,
-              <input key="componente" className="form-control" type='datetime-local' readOnly='true' id='fechaCotizacion' value={formatDate(new Date())} onChange={(e) => setFecha(e.target.value)}></input>
+              <input key="componente" className="form-control" type='datetime-local' readOnly={true} id='fechaCotizacion' value={formatDate(new Date())} onChange={(e) => setFecha(e.target.value)}></input>
             ]} />,
             <ContentIndividual key="estado" componentes={[
               <span key="title"> Estado</span>,
@@ -186,11 +193,11 @@ const Cotizaciones = () => {
           <ContentDoble key="valorManoObraYValorInsumos" componentes={[
             <ContentIndividual key="valorManoObra" componentes={[
               <span key="title">Mano de obra</span>,
-              <input key="componente" className="form-control" type='text' readOnly='true' id='valorManoObra' value={valorManoObra} onChange={(e) => setValorManoObra(e.target.value)}></input>
+              <input key="componente" className="form-control" type='text' readOnly={true} id='valorManoObra' value={valorManoObra} onChange={(e) => setValorManoObra(e.target.value)}></input>
             ]} />,
             <ContentIndividual key="valorInsumos" componentes={[
               <span key="title">Valor insumos</span>,
-              <input key="componente" className="form-control" type='text' readOnly='true' id='valorInsumos' value={valorCotizacion} onChange={(e) => setValorCotizacion(e.target.value)}></input>
+              <input key="componente" className="form-control" type='text' readOnly={true} id='valorInsumos' value={valorCotizacion} onChange={(e) => setValorCotizacion(e.target.value)}></input>
             ]} />
           ]} />,
           <ContentDoble key="vehiculoOpcionesCotizacion" componentes={[
@@ -203,7 +210,7 @@ const Cotizaciones = () => {
               </select>
 
             ]} />,
-            <ContentIndividual key="vehiculo" componentes={[
+            <ContentIndividual key="options" componentes={[
               <span key="title">opciones</span>,
               <ContentIndividual key="opcionesButton" componentes={[
                 <ButtonNormal key="buttonCoServivcio" idComponent="buttonCoServivcio" idModal='#modalCotizacionServicio' title="Cotizar Servicio" />,
@@ -235,7 +242,7 @@ const Cotizaciones = () => {
           <ContentDoble key="fechaCotizacionYButtonSwitch" componentes={[
             <ContentIndividual key="vehiculo" componentes={[
               <span key="title">Nombre servicio</span>,
-              <select key="componente" className="form-control" id='vehiculos' onChange={(e) => { setIdServicio(e.target.value) }}>
+              <select key="componente" className="form-control" id='idServicios' onChange={(e) => { setIdServicio(e.target.value) }}>
                 <option value="defaut">Selecione un servicio</option>
                 <SeletedOption key='options' tabla='servicios' columna='idServicio, nombreServicio' />
               </select>
@@ -295,34 +302,7 @@ const Cotizaciones = () => {
             {/* ref={tableRef} */}
             <tbody className='table-group-divider'>
               {
-                mainTablaDetalleCotizacionServicio(tablaDetalleCotizacionServicio)
-              }
-            </tbody>
-          </table>
-        ]} widthContents='550px' />
-
-      <ModalProyecto
-        title='Servicios cotizados'
-        idModal='modalServiciosCotizados'
-        inputs={[
-          <button key="volver" className='btn' data-bs-toggle='modal' data-bs-target='#modalCotizacionServicio'>
-            <FontAwesomeIcon icon={faArrowLeft} />
-          </button>,
-          <table key="tableDetalles" className='table table-bordered'>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Nombre servicio</th>
-                <th>Precio servicio</th>
-                <th>Cantidad</th>
-                <th>SubTotal</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            {/* ref={tableRef} */}
-            <tbody className='table-group-divider'>
-              {
-                mainTablaDetalleCotizacionServicio()
+                mainTablaDetalleCotizacionServicio(tablaDetalleCotizacionServicio, valorManoObra, setValorManoObra)
               }
             </tbody>
           </table>
@@ -372,7 +352,6 @@ const Cotizaciones = () => {
 
         ]} widthContents='650px' />
 
-
       <ModalProyecto
         title='Productos cotizados'
         idModal='modalProductosCotizados'
@@ -394,7 +373,7 @@ const Cotizaciones = () => {
             {/* ref={tableRef} */}
             <tbody className='table-group-divider'>
               {
-                mainTablaDetalleCotizacionServicio(tablaDetalleCotizacionProducto)
+                mainTablaDetalleCotizacionServicio(tablaDetalleCotizacionProducto, valorCotizacion, setValorCotizacion)
               }
             </tbody>
           </table>

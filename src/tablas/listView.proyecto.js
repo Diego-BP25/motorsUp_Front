@@ -33,9 +33,9 @@ export class ListView {
 
     deleteObjeto(codigoObjeto) {
         const objeto = this.searchObjeto(codigoObjeto)
-        if (objeto === -1) return null;
-
-        this.list.splice(objeto)
+        if (objeto === -1) return;
+        
+        this.list.splice(objeto,1)
 
         return this.list;
     }
