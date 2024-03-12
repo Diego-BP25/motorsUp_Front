@@ -10,9 +10,7 @@ const loading = (
 
 // Containers
 const DefaultLayout = React.lazy(() => import('./layout/DefaultLayout.proyecto'))
-
-// Pages
-const Login = React.lazy(() => import('./views/pages/login/Login.proyecto'))
+const Login = React.lazy(() => import('./views/Login/login.proyecto'))
 const Register = React.lazy(() => import('./views/pages/register/Register.proyecto'))
 const Page404 = React.lazy(() => import('./views/pages/page404/Page404.proyecto'))
 const Page500 = React.lazy(() => import('./views/pages/page500/Page500.proyecto'))
