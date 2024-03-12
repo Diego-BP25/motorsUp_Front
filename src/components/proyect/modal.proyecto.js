@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { ButtonSwitch } from './switch.proyecto'
-
 export const ModalProyecto = ({ title, inputs, widthContents, idModal }) => {
     return (
         <div id={idModal} className='modal fade' aria-hidden='true'>
