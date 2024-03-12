@@ -118,7 +118,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Propietario',
-        to: '/Servicios/propietarios',
+        to: '/Servicios/propietario',
       },
     ],
   },
