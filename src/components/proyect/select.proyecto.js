@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types';
-import axios from 'axios';
 import { peticionPost } from 'src/https/peticiones.proyecto';
 
 export const SeletedOption = ({ tabla, columna }) => {
   const [datos, setDatos] = useState([]);
 
   useEffect(() => {
-    const getDatos = (async () => {
+    (async () => {
       try {
-        const response = await peticionPost('global/seachId', { "nombreTabla": tabla, "nombreColumna": columna })
+        const response = await peticionPost(['global/seachId'], [{ "nombreTabla": tabla, "nombreColumna": columna }])
         setDatos(response)
       } catch (error) {
-        console.error('Error al obtener los datos:', error.message)
+        console.error('Error al obtener los datos:', error)
       }
     })()
   }, [tabla, columna]);
