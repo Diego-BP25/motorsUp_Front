@@ -1,8 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { ButtonSwitch } from './switch.proyecto'
-
 export const ModalProyecto = ({ title, inputs, widthContents, idModal }) => {
     return (
         <div id={idModal} className='modal fade' aria-hidden='true'>
@@ -70,18 +68,18 @@ export const ContentIndividual = ({ componentes, flexDirectionContents = 'column
 
 ModalProyecto.propTypes = {
     title: PropTypes.string.isRequired,
-    inputs: PropTypes.object,
+    inputs: PropTypes.array,
     widthContents: PropTypes.string,
     idModal: PropTypes.string.isRequired,
 };
 
 ContentDoble.propTypes = {
-    componentes: PropTypes.object,
+    componentes: PropTypes.array,
     widthConten: PropTypes.string
 }
 
 ContentIndividual.propTypes = {
-    componentes: PropTypes.object,
+    componentes: PropTypes.array,
     flexDirectionContents: PropTypes.string,
     widthContents: PropTypes.string,
     justifyContents: PropTypes.string,

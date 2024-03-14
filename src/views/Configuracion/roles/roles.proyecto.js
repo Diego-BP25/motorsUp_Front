@@ -3,11 +3,11 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
-import { CRow } from '@coreui/react'
 import { show_alerta } from 'src/fuctions.proyecto'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faTruckField, faCalendar, faToggleOff, faCircleInfo, faComment } from '@fortawesome/free-solid-svg-icons'
+import MUIDataTable from "mui-datatables";
+import { faEdit, faTrash, faPlusCircle, faFloppyDisk,faComment } from '@fortawesome/free-solid-svg-icons'
 
 const Roles = () => {
 
@@ -31,6 +31,7 @@ const Roles = () => {
     try {
       const respuesta = await axios.get(url, {})
       setRol(await respuesta.data)
+
     } catch (error) {
       console.error('Error al obtener los roles:', error.message)
     }
@@ -136,52 +137,124 @@ const Roles = () => {
   }
 
 
+
+  const columns = [
+    {
+      name: "idRol",
+      label: "ID",
+      options: {
+        filter: true,
+        sort: true,
+      }
+    },
+    {
+      name: "nombre",
+      label: "Nombre",
+      options: {
+        filter: true,
+        sort: false,
+      }
+    },
+    {
+      name: 'Acciones',
+      options: {
+        filter: false,
+        sort: false,
+        customBodyRender: (value, tableMeta, updateValue) => {
+          const row = tableMeta.rowData;
+          return (
+            <>
+              <button onClick={() => openModal(2, row[0], row[1])} className='btn btn-warning' data-bs-toggle='modal' data-bs-target='#modalRoles'>
+                <FontAwesomeIcon icon={faEdit} />
+              </button>
+              &nbsp;
+              <button onClick={() => deleteRol(row[0])} className='btn btn-danger'>
+                <FontAwesomeIcon icon={faTrash} />
+              </button>
+            </>
+          );
+        }
+      }
+    },
+  ];
+
+
+
+
+  // const columns = [
+  //   { name: 'ID', selector: row => row.idRol, sortable: true },
+  //   { name: 'Nombre', selector: row => row.nombre, sortable: true },
+  //   {
+  //     name: 'Acciones',
+  //     cell: row => (
+  //       <>
+  //         <button onClick={() => openModal(2, row.idRol, row.nombre)} className='btn btn-warning' data-bs-toggle='modal' data-bs-target='#modalRoles'>
+  //           <FontAwesomeIcon icon={faEdit} />
+  //         </button>
+  //         &nbsp;
+  //         <button onClick={() => deleteRol(row.idRol)} className='btn btn-danger'>
+  //           <FontAwesomeIcon icon={faTrash} />
+  //         </button>
+  //       </>
+  //     ),
+  //   },
+  // ];
+
+  // const customStyles = {
+  //   headCells: {
+  //     style: {
+  //       border: '1px solid #000000',
+  //       fontWeight: 'bold',
+  //     },
+  //   },
+  //   cells: {
+  //     style: {
+  //       border: '1px solid #dee2e6',
+  //     },
+  //   },
+  // };
+
+  const options = {
+    selectableRows: false
+  };
+
+
+
   return (
 
     <div className='App'>
       <div className='container-fluid'>
-        <div className='row mt-3'>
-          <div className='col-md-4 offset-md-4'>
-            <h1>Roles</h1>
-          </div>
-            <div className='d-grid gap-8 col-md-4 offset-md-4'>
-              <button onClick={() => openModal(1)} className='btn btn-success btn-custom ms-auto' data-bs-toggle='modal' data-bs-target='#modalRoles'>
+        <div className='row mt-4'>
+          <div style={{ display: 'flex', alignItems: 'center' }} id="Container">
+            <div className='col-md-4 offset-md-5' >
+              <h1>Roles</h1>
+            </div>
+
+            <div style={{ marginRight: 'auto' }}>
+              <button onClick={() => openModal(1)} className='btn btn-success btn-custom' data-bs-toggle='modal' data-bs-target='#modalRoles'>
                 <FontAwesomeIcon icon={faPlusCircle} /> Añadir
               </button>
             </div>
-        </div>
-        <div className='row mt-3'>
-          <div className='col-12 col-lg-8 offset-0 offset-lg-2'>
-            <div className='table-responsive'>
-              <table className='table table-bordered'>
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
-                    <th>Acciones</th>
+          </div>
 
-                  </tr>
-                </thead>
-                <tbody className='table-group-divider'>
-                  {rol.map((r) => (
-                    <tr key={r.idRol}>
-                      <td >{r.idRol}</td>
-                      <td >{r.nombre}</td>
-                      <td >
-                        <button onClick={() => openModal(2, r.idRol, r.nombre)} className='btn btn-warning'
-                          data-bs-toggle='modal' data-bs-target='#modalRoles'>
-                          <FontAwesomeIcon icon={faEdit} />
-                        </button>
-                        &nbsp;
-                        <button onClick={() => deleteRol(r.idRol)} className='btn btn-danger'>
-                          <FontAwesomeIcon icon={faTrash} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+
+          <div className='col-12 col-lg-8 offset-0 offset-lg-2'>
+            <MUIDataTable
+              data={rol}
+              columns={columns}
+              options={options}
+            />
+            {/* <DataTable
+              title=""
+              columns={columns}
+              data={rol}
+              pagination
+              paginationPerPage={5}
+              paginationRowsPerPageOptions={[5, 10, 15]}
+              striped
+              highlightOnHover
+
+            /> */}
           </div>
         </div>
       </div>
