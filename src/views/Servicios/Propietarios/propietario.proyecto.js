@@ -8,7 +8,6 @@ import { show_alerta } from 'src/fuctions.proyecto'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faToggleOff, faIdCardClip, faUser, faPhone, faEnvelope} from '@fortawesome/free-solid-svg-icons'
-import { ButtonSwitch } from 'src/components/proyect/switch.proyecto'
 const Propietarios = () => {
     const url = 'http://localhost:8081/api/propietarios'
     const [propietario, setPropietario] = useState([])
@@ -55,7 +54,7 @@ const Propietarios = () => {
 
         setOperation(op)
     window.setTimeout(function () {
-      document.getElementById('idPropietario').focus();
+      document.getElementById('id').focus();
     }, 500);
     }
 
@@ -81,7 +80,7 @@ const Propietarios = () => {
                 Swal.fire({
                     position: "center",
                     icon: "success",
-                    title: "Propietario agregada con exito",
+                    title: "Propietario agregado con exito",
                     showConfirmButton: false,
                     timer: 1500
         });
@@ -126,7 +125,7 @@ const deletePropietario = (idPropietario) =>{
         setIdPropietario(idPropietario);
         enviarSolicitud('DELETE', { idPropietario: idPropietario });
       } else {
-        show_alerta('El Rol no fue eliminad0', 'info')
+        show_alerta('El propietario no fue eliminad0', 'info')
       }
     });
 
@@ -198,7 +197,7 @@ const deletePropietario = (idPropietario) =>{
               <input type='hidden' id='id' ></input>
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faIdCardClip} /></span>
-                <input type='text' id='idPropietario' className='form-control' placeholder='ID' value={idPropietario} onChange={(e)=> setIdPropietario(e.target.value)}></input>
+                <input type='text' id='Cedula' className='form-control' placeholder='ID' value={idPropietario} onChange={(e)=> setIdPropietario(e.target.value)}></input>
               </div>
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faUser} /></span>

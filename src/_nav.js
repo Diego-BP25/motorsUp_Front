@@ -131,7 +131,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Gestion Ventas',
-        to: '/buttons/buttons',
+        to: '/Ventas/venta',
       },
     ],
   },
