@@ -1,12 +1,9 @@
 import React from 'react'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import Swal from 'sweetalert2'
-import withReactContent from 'sweetalert2-react-content'
-import { CRow } from '@coreui/react'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faTruckField, faCalendar, faToggleOff, faCircleInfo, faComment, faCheck, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faCheck, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 
 import { actualizarCamposConsultas, formatDate } from '../funcionesExtras.proyecto'
 import { ContentDoble, ContentIndividual, ModalProyecto } from 'src/components/proyect/modal.proyecto'

@@ -198,7 +198,7 @@ const deletePropietario = (idPropietario) =>{
               <input type='hidden' id='id' ></input>
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faIdCardClip} /></span>
-                <input type='text' id='idPropietario' className='form-control' placeholder='ID' value={idPropietario} onChange={(e)=> setIdPropietario(e.target.value)}></input>
+                <input type='text' id='idPropietario' className='form-control' placeholder='ID' value={idPropietario} onChange={(e)=> setIdPropietario(e.target.value)} required></input>
               </div>
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faUser} /></span>
