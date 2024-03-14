@@ -3,12 +3,11 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
+import { CRow } from '@coreui/react'
 import { show_alerta } from 'src/fuctions.proyecto'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faComment } from '@fortawesome/free-solid-svg-icons'
-import 'bootstrap/dist/css/bootstrap.min.css'
-import { CSmartTable, CButton, CCardBody, CCollapse, CAvatar, CBadge } from '@coreui/react-pro'
+import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faTruckField, faCalendar, faToggleOff, faCircleInfo, faComment } from '@fortawesome/free-solid-svg-icons'
 
 const Roles = () => {
 
@@ -26,14 +25,12 @@ const Roles = () => {
     setActualizacion(false)
   }, [actualizacion ? rol : null])
 
-  const [details, setDetails] = useState([])
 
 
   const getRoles = async () => {
     try {
       const respuesta = await axios.get(url, {})
       setRol(await respuesta.data)
-
     } catch (error) {
       console.error('Error al obtener los roles:', error.message)
     }
@@ -139,87 +136,52 @@ const Roles = () => {
   }
 
 
-
-  const columns = [
-    {
-      key: 'idRol',
-      label: 'ID',
-      sortable: true
-    },
-    {
-      key: 'nombre',
-      label: 'Nombre',
-      sortable: true
-    },
-    {
-      key: 'show_details',
-      label: 'Acciones',
-      _style: { width: '1%' },
-      filter: false,
-      sorter: false,
-    },
-  ];
-
-  const toggleDetails = (index) => {
-    const position = details.indexOf(index)
-    let newDetails = details.slice()
-    if (position !== -1) {
-      newDetails.splice(position, 1)
-    } else {
-      newDetails = [...details, index]
-    }
-    setDetails(newDetails)
-  }
-
-
   return (
 
     <div className='App'>
       <div className='container-fluid'>
-        <div className='row mt-4'>
-          <div style={{ display: 'flex', alignItems: 'center' }} id="Container">
-            <div className='col-md-4 offset-md-5' >
-              <h1>Roles</h1>
-            </div>
-
-            <div style={{ marginRight: 'auto' }}>
-              <button onClick={() => openModal(1)} className='btn btn-success btn-custom' data-bs-toggle='modal' data-bs-target='#modalRoles'>
+        <div className='row mt-3'>
+          <div className='col-md-4 offset-md-4'>
+            <h1>Roles</h1>
+          </div>
+            <div className='d-grid gap-8 col-md-4 offset-md-4'>
+              <button onClick={() => openModal(1)} className='btn btn-success btn-custom ms-auto' data-bs-toggle='modal' data-bs-target='#modalRoles'>
                 <FontAwesomeIcon icon={faPlusCircle} /> Añadir
               </button>
             </div>
-          </div>
-
-
+        </div>
+        <div className='row mt-3'>
           <div className='col-12 col-lg-8 offset-0 offset-lg-2'>
-            <CSmartTable className='table-group-divider'
+            <div className='table-responsive'>
+              <table className='table table-bordered'>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Acciones</th>
 
-              items={rol}
-              pagination
-              itemsPerPage={4}
-              itemsPerPageSelect
-              tableFilter
-              columns={columns}
-              columnSorter
-              scopedColumns={{
-                show_details: (items) => {
-                  return (
-                    <td className="py-2">
-                      <button onClick={() => openModal(2)} className='btn btn-warning'
-                        data-bs-toggle='modal' data-bs-target='#modalRoles'>
-                        <FontAwesomeIcon icon={faEdit} />
-                      </button>
-                      &nbsp;
-                      <button onClick={() => deleteRol()} className='btn btn-danger'>
-                        <FontAwesomeIcon icon={faTrash} />
-                      </button>
-                    </td>
-                  )
-                },
-
-
-              }}
-
-            />
+                  </tr>
+                </thead>
+                <tbody className='table-group-divider'>
+                  {rol.map((r) => (
+                    <tr key={r.idRol}>
+                      <td >{r.idRol}</td>
+                      <td >{r.nombre}</td>
+                      <td >
+                        <button onClick={() => openModal(2, r.idRol, r.nombre)} className='btn btn-warning'
+                          data-bs-toggle='modal' data-bs-target='#modalRoles'>
+                          <FontAwesomeIcon icon={faEdit} />
+                        </button>
+                        &nbsp;
+                        <button onClick={() => deleteRol(r.idRol)} className='btn btn-danger'>
+                          <FontAwesomeIcon icon={faTrash} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
