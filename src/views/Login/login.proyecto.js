@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
 import { show_alerta } from 'src/fuctions.proyecto';
 
 const Login = () => {
@@ -12,8 +11,22 @@ const Login = () => {
         e.preventDefault();
 
         if (!correo || !password) {
-            show_alerta('No se permiten campos vacios', 'info')
-            return;
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                  toast.onmouseenter = Swal.stopTimer;
+                  toast.onmouseleave = Swal.resumeTimer;
+                }
+              });
+              Toast.fire({
+                icon: "info",
+                title: "No se permiten campos vacios"
+              });;
+              return;
         }
 
         try {
@@ -22,16 +35,62 @@ const Login = () => {
                 contrasena: password
             });
 
-            console.log(response.data); 
-            window.location.href = '/dashboard';
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 1500,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                  toast.onmouseenter = Swal.stopTimer;
+                  toast.onmouseleave = Swal.resumeTimer;
+                }
+              });
+              Toast.fire({
+                icon: "success",
+                title: "Bienvenido.."
+              });;
+              setTimeout(() => {
+                window.location.href = '/dashboard';
+            }, 1500);
         } catch (error) {
             console.error('Error al iniciar sesión:', error.response.data.msg);
             if (error.response.data.msg === 'Correo/Password no son correctos') {
-                show_alerta('Correo o Contraseña no válidos');
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                      toast.onmouseenter = Swal.stopTimer;
+                      toast.onmouseleave = Swal.resumeTimer;
+                    }
+                  });
+                  Toast.fire({
+                    icon: "error",
+                    title: "Correo / Contraseña no validos.."
+                  });;
             }
             if(error.response.data.msg== 'Usuario no encontrado en la base de datos'){
-                show_alerta('Usuario no encontrado en la base de datos')
-
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "top-end",
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                      toast.onmouseenter = Swal.stopTimer;
+                      toast.onmouseleave = Swal.resumeTimer;
+                    }
+                  });
+                  Toast.fire({
+                    icon: "error",
+                    title: "Correo / Contraseña no validos.."
+                  });;
+            }
+            if(error.response.data.msg=='El usuario esta inactivo'){
+                show_alerta('Usuario inactivo - Comunicarse con el administrador')
             }
         }
     };
