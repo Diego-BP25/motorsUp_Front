@@ -6,8 +6,9 @@ import withReactContent from 'sweetalert2-react-content'
 import { show_alerta } from 'src/fuctions.proyecto'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import MUIDataTable from "mui-datatables";
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk,faComment } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faComment } from '@fortawesome/free-solid-svg-icons'
+import 'bootstrap/dist/css/bootstrap.min.css'
+import { CSmartTable, CButton, CCardBody, CCollapse, CAvatar, CBadge } from '@coreui/react-pro'
 
 const Roles = () => {
 
@@ -25,6 +26,7 @@ const Roles = () => {
     setActualizacion(false)
   }, [actualizacion ? rol : null])
 
+  const [details, setDetails] = useState([])
 
 
   const getRoles = async () => {
@@ -140,84 +142,34 @@ const Roles = () => {
 
   const columns = [
     {
-      name: "idRol",
-      label: "ID",
-      options: {
-        filter: true,
-        sort: true,
-      }
+      key: 'idRol',
+      label: 'ID',
+      sortable: true
     },
     {
-      name: "nombre",
-      label: "Nombre",
-      options: {
-        filter: true,
-        sort: false,
-      }
+      key: 'nombre',
+      label: 'Nombre',
+      sortable: true
     },
     {
-      name: 'Acciones',
-      options: {
-        filter: false,
-        sort: false,
-        customBodyRender: (value, tableMeta, updateValue) => {
-          const row = tableMeta.rowData;
-          return (
-            <>
-              <button onClick={() => openModal(2, row[0], row[1])} className='btn btn-warning' data-bs-toggle='modal' data-bs-target='#modalRoles'>
-                <FontAwesomeIcon icon={faEdit} />
-              </button>
-              &nbsp;
-              <button onClick={() => deleteRol(row[0])} className='btn btn-danger'>
-                <FontAwesomeIcon icon={faTrash} />
-              </button>
-            </>
-          );
-        }
-      }
+      key: 'show_details',
+      label: 'Acciones',
+      _style: { width: '1%' },
+      filter: false,
+      sorter: false,
     },
   ];
 
-
-
-
-  // const columns = [
-  //   { name: 'ID', selector: row => row.idRol, sortable: true },
-  //   { name: 'Nombre', selector: row => row.nombre, sortable: true },
-  //   {
-  //     name: 'Acciones',
-  //     cell: row => (
-  //       <>
-  //         <button onClick={() => openModal(2, row.idRol, row.nombre)} className='btn btn-warning' data-bs-toggle='modal' data-bs-target='#modalRoles'>
-  //           <FontAwesomeIcon icon={faEdit} />
-  //         </button>
-  //         &nbsp;
-  //         <button onClick={() => deleteRol(row.idRol)} className='btn btn-danger'>
-  //           <FontAwesomeIcon icon={faTrash} />
-  //         </button>
-  //       </>
-  //     ),
-  //   },
-  // ];
-
-  // const customStyles = {
-  //   headCells: {
-  //     style: {
-  //       border: '1px solid #000000',
-  //       fontWeight: 'bold',
-  //     },
-  //   },
-  //   cells: {
-  //     style: {
-  //       border: '1px solid #dee2e6',
-  //     },
-  //   },
-  // };
-
-  const options = {
-    selectableRows: false
-  };
-
+  const toggleDetails = (index) => {
+    const position = details.indexOf(index)
+    let newDetails = details.slice()
+    if (position !== -1) {
+      newDetails.splice(position, 1)
+    } else {
+      newDetails = [...details, index]
+    }
+    setDetails(newDetails)
+  }
 
 
   return (
@@ -239,22 +191,35 @@ const Roles = () => {
 
 
           <div className='col-12 col-lg-8 offset-0 offset-lg-2'>
-            <MUIDataTable
-              data={rol}
-              columns={columns}
-              options={options}
-            />
-            {/* <DataTable
-              title=""
-              columns={columns}
-              data={rol}
-              pagination
-              paginationPerPage={5}
-              paginationRowsPerPageOptions={[5, 10, 15]}
-              striped
-              highlightOnHover
+            <CSmartTable className='table-group-divider'
 
-            /> */}
+              items={rol}
+              pagination
+              itemsPerPage={4}
+              itemsPerPageSelect
+              tableFilter
+              columns={columns}
+              columnSorter
+              scopedColumns={{
+                show_details: (items) => {
+                  return (
+                    <td className="py-2">
+                      <button onClick={() => openModal(2)} className='btn btn-warning'
+                        data-bs-toggle='modal' data-bs-target='#modalRoles'>
+                        <FontAwesomeIcon icon={faEdit} />
+                      </button>
+                      &nbsp;
+                      <button onClick={() => deleteRol()} className='btn btn-danger'>
+                        <FontAwesomeIcon icon={faTrash} />
+                      </button>
+                    </td>
+                  )
+                },
+
+
+              }}
+
+            />
           </div>
         </div>
       </div>
