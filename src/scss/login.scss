@@ -21,7 +21,18 @@ html{
   align-items: center;
   height: 100vh;
 }
+.olvideC {
+  display: inline;
+  color: blue; 
+  text-decoration: underline; 
+  cursor: pointer; 
+}
 
+
+.olvideC:hover {
+  text-decoration: none;
+  color: darkblue; 
+}
 .contenedor {
   margin: 50px auto; /* Márgenes superior e inferior de 50px, y automáticamente centrará el contenedor horizontalmente */
   max-width: 800px; /* Ancho máximo del contenedor reducido */

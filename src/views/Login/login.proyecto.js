@@ -2,10 +2,17 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { show_alerta } from 'src/fuctions.proyecto';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faEdit, faTrash, faPlusCircle, faFloppyDisk,  faComment } from '@fortawesome/free-solid-svg-icons'
 
 const Login = () => {
     const [correo, setCorreo] = useState('');
     const [password, setContrasena] = useState('');
+    const [operation, setOperation] = useState(1)
+    const [title, setTitle] = useState('')
+    const [correoRecuperacion, setCorreoRecuperacion] = useState('')
+    const [contrasenaNueva, setContrasenaNueva] = useState('')
+
 
     const validarDatos = async (e) => {
         e.preventDefault();
@@ -95,6 +102,46 @@ const Login = () => {
         }
     };
 
+    const openModal = (op, correoRecuperacion, contrasenaNueva) => {
+        setCorreoRecuperacion('');
+        setContrasenaNueva('');
+    
+        if (op === 1) {
+          setTitle('Recuperar Contraseña')
+        }
+        setOperation(op)
+        window.setTimeout(function () {
+          document.getElementById('correo').focus();
+        }, 500);
+      }
+
+      const validar = () => {
+        var parametros;
+        var metodo;
+    
+    
+        if (operation === 1) {
+          parametros = { correoEmpleado: correoRecuperacion};
+          metodo = 'POST';
+        } 
+        enviarSolicitud(metodo, parametros);
+      }
+
+
+      const enviarSolicitud = async (metodo, parametros) => {
+        await axios({ method: metodo, url: 'http://localhost:8081/api/recuperar', data: parametros }).then(function (respuesta) {
+          if (metodo === 'POST') {
+            console.log('Correo ENVIADO')
+
+          }
+        })
+        .catch(function (error) {
+          show_alerta('Error en la solicitud', 'error');
+          console.log(error);
+        });
+    }
+
+
     return (
         <div className='bodyLogin'>
             <div className="contenedor-formulario contenedor">
@@ -116,13 +163,40 @@ const Login = () => {
                         <input type="password" id="contrasena" value={password} onChange={(e) => setContrasena(e.target.value)}></input>
                     </div>
                     <div className="password-olvidada">
-                        <a href="#">¿Olvidaste tu contraseña?</a>
+                        <p className="olvideC" onClick={() => openModal(1)} data-bs-toggle='modal' data-bs-target='#modalRecuperar'>¿Olvidaste tu contraseña?</p>
                     </div>
                     <div className="input">
                         <input type="submit" value="Iniciar Sesión"></input>
                     </div>
                 </form>
             </div>
+
+
+
+
+            {/* MODAL RECUPERAR CONTRASEÑA */}
+            <div id='modalRecuperar' className='modal fade' aria-hidden='true'>
+        <div className='modal-dialog'>
+          <div className='modal-content'>
+            <div className='modal-header'>
+              <label className='h5'>{title}</label>
+              <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
+            </div>
+            <div className='modal-body'>
+              <input type='hidden' id='id' ></input>
+              <div className='input-group mb-3'>
+                <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
+                <input type='text' id='correoRecuperacion' className='form-control' placeholder='Correo' value={correoRecuperacion} onChange={(e) => setCorreoRecuperacion(e.target.value)}></input>
+              </div>
+              <div className='d-grid col-6 mx-auto'>
+                <button onClick={() => validar()} className='btn btn-success'>
+                  <FontAwesomeIcon icon={faFloppyDisk} /> Enviar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
         </div>
     );
 };
