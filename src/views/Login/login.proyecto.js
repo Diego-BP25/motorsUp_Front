@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+import { show_alerta } from 'src/fuctions.proyecto';
 
 const Login = () => {
     const [correo, setCorreo] = useState('');
@@ -7,6 +10,11 @@ const Login = () => {
 
     const validarDatos = async (e) => {
         e.preventDefault();
+
+        if (!correo || !password) {
+            show_alerta('No se permiten campos vacios', 'info')
+            return;
+        }
 
         try {
             const response = await axios.post('http://localhost:8081/api/auth/login', {
@@ -18,6 +26,13 @@ const Login = () => {
             window.location.href = '/dashboard';
         } catch (error) {
             console.error('Error al iniciar sesión:', error.response.data.msg);
+            if (error.response.data.msg === 'Correo/Password no son correctos') {
+                show_alerta('Correo o Contraseña no válidos');
+            }
+            if(error.response.data.msg== 'Usuario no encontrado en la base de datos'){
+                show_alerta('Usuario no encontrado en la base de datos')
+
+            }
         }
     };
 
