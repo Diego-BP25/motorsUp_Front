@@ -7,7 +7,8 @@ import { CRow } from '@coreui/react'
 import { show_alerta } from 'src/fuctions.proyecto'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faToggleOff, faIdCardClip, faUser, faPhone, faEnvelope} from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faToggleOff, faIdCardClip, faUser, faPhone, faEnvelope, faSearch} from '@fortawesome/free-solid-svg-icons'
+
 const Propietarios = () => {
     const url = 'http://localhost:8081/api/propietarios'
     const [propietario, setPropietario] = useState([])
@@ -19,6 +20,8 @@ const Propietarios = () => {
     const [operation, setOperation] = useState(1)
     const [title, setTitle] = useState('')
     const [actualizacion, setActualizacion] = useState(false)
+    const [busqueda, setBusqueda]= useState("");
+
     useEffect(() => {
         getPropietarios()
         setActualizacion(false)
@@ -131,6 +134,20 @@ const deletePropietario = (idPropietario) =>{
 
   }
 
+  const handleChange=e=>{
+    setBusqueda(e.target.value);
+    filtrar(e.target.value);
+  }
+
+  const filtrar=(terminoBusqueda)=>{
+    var resultadosBusqueda=propietario.filter((elemento)=>{
+      if(elemento.nombrePropietario.toString().toLowerCase().includes(terminoBusqueda.toLowerCase())
+      ){
+        return elemento;
+      }
+    });
+    setPropietario(resultadosBusqueda);
+  }
 
   return ( 
     
@@ -145,7 +162,18 @@ const deletePropietario = (idPropietario) =>{
             </div>
            </div>
           </div>
+
           <div className='row mt-3'>
+            <div className='containerinput'>
+                <input className='form-control inputBuscador'
+                 value={busqueda}
+                 placeholder='Buscar'
+                onChange={handleChange}
+                />
+                <button className='btn btn-success'>
+                    <FontAwesomeIcon icon={faSearch}/>
+                </button>
+            </div>
             <div className='col-12 col-lg-8 offset-0 offset-lg-2'>
               <div className='table-responsive'>
                 <table className='table table-bordered'>
@@ -197,7 +225,7 @@ const deletePropietario = (idPropietario) =>{
               <input type='hidden' id='id' ></input>
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faIdCardClip} /></span>
-                <input type='text' id='Cedula' className='form-control' placeholder='ID' value={idPropietario} onChange={(e)=> setIdPropietario(e.target.value)}></input>
+                <input type='text' id='Cedula' className='form-control' placeholder='Cedula' value={idPropietario} onChange={(e)=> setIdPropietario(e.target.value)}></input>
               </div>
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faUser} /></span>
