@@ -11,8 +11,8 @@ import { ButtonSwitch } from 'src/components/proyect/switch.proyecto'
 import { ButtonNormal } from 'src/components/proyect/buttons.proyecto'
 import { SeletedOption } from 'src/components/proyect/select.proyecto'
 import { getDataRouterId, peticionPost } from 'src/https/peticiones.proyecto'
-import { ListView } from 'src/clases/listView.proyecto'
-
+import { ListView } from 'src/clases/tables/listView.proyecto'
+import { addTablaDetalle, mainTablaDetalleCotizacion } from 'src/clases/tables/fucionesListView.proyecto'
 const Cotizaciones = () => {
   const url = 'http://localhost:8081/api/cotizacion'
   const [cotizacion, setCotizacion] = useState([])
@@ -78,53 +78,13 @@ const Cotizaciones = () => {
     }
   }
 
-  const addTablaDetalle = (tablaDetalle, objeto, estadoActualizar, subTotal) => {
-    tablaDetalle.setObjeto(objeto)
-
-    estadoActualizar(`$ ${subTotal}`);
-  }
-
-  const deleteDetalleCotizacion = (codigoObjetoBorrar, tablaDetalleCotizacion) => {
-    tablaDetalleCotizacion.deleteObjeto(codigoObjetoBorrar);
-    setTablaDetalleActual(true);
-  }
-
-  const actualizarPrecioCotizacion = (tablaDetalleCotizacion, estadoPrecio, valorDescontar) => {
-    tablaDetalleCotizacion(
-      `$ ${(parseInt(estadoPrecio.substring(1, estadoPrecio.length)) - valorDescontar).toString()}`
-    )
-  }
-
-  const mainTablaDetalleCotizacion = (tablaDetalleCotizacion, estadoPrecio, setEstadoPrecio) => {
-    if (!tablaDetalleCotizacion) return;
-
-    return tablaDetalleCotizacion.getAObjetos().map((c) => (
-      <tr key={c.codigo}>
-        <td>{c.codigo}</td>
-        <td>{c.nombre}</td>
-        <td>{c.precio}</td>
-        <td>{c.cantidad}</td>
-        <td>{c.subTotal}</td>
-        <td>{c.identificador}</td>
-        <td>
-          <button onClick={() => {
-            deleteDetalleCotizacion(c.codigo, tablaDetalleCotizacion);
-            actualizarPrecioCotizacion(setEstadoPrecio, estadoPrecio, (parseInt(c.precio.substring(1, c.precio.length)) * parseInt(c.cantidad)))
-          }} className='btn btn-danger'>
-            <FontAwesomeIcon icon={faTrash} />
-          </button>
-        </td>
-      </tr>
-    ))
-  }
-
   return (
     <div className='App'>
       <div className='container-fluid'>
         <div className='row mt-3'>
           <div className='col-md-4 offset-md-4'>
             <div className='d-grid mx-auto'>
-              <button className='btn btn-dark' data-bs-toggle='modal' data-bs-target='#modalCotizaciones' onClick={()=>{setFecha(formatDate(new Date()))}}>
+              <button className='btn btn-dark' data-bs-toggle='modal' data-bs-target='#modalCotizaciones' onClick={() => { setFecha(formatDate(new Date())) }}>
                 <FontAwesomeIcon icon={faPlusCircle} /> Nueva cotización
               </button>
             </div>
@@ -144,6 +104,8 @@ const Cotizaciones = () => {
                     <th>Metodo de pago</th>
                     <th>Fecha</th>
                     <th>Vehiculo</th>
+                    <th>Servicios</th>
+                    <th>productos</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -159,6 +121,12 @@ const Cotizaciones = () => {
                       <td>{c.metodoPago}</td>
                       <td>{c.fecha}</td>
                       <td>{c.vehiculos_placa}</td>
+                      <td>
+                        <button className='btn' style={{ color: "blue", cursor: "pointer" }}>Ver</button>
+                      </td>
+                      <td>
+                        <button className='btn' style={{ color: "blue", cursor: "pointer" }}>Ver</button>
+                      </td>
                       <td>
                         <button className='btn btn-warning'>
                           <FontAwesomeIcon icon={faEdit} />
@@ -236,7 +204,7 @@ const Cotizaciones = () => {
                 [{ "descripcion": descripcion, "estado": estado, "valorManoObra": parseInt(valorManoObra.substring(1, valorManoObra.length)), "valorCotizacion": parseInt(valorCotizacion.substring(1, valorCotizacion.length)), "metodoPago": "Efectivo", "fecha": fecha, "vehiculos_placa": vehiculos_placa },
                 tablaDetalleCotizacionServicio.getAObjetos(), tablaDetalleCotizacionProducto.getAObjetos()],
                 ["max(idCotizacion)", "cotizaciones"]
-                )
+              )
             }}>
               <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
             </button>
@@ -311,7 +279,7 @@ const Cotizaciones = () => {
             {/* ref={tableRef} */}
             <tbody className='table-group-divider'>
               {
-                mainTablaDetalleCotizacion(tablaDetalleCotizacionServicio, valorManoObra, setValorManoObra)
+                mainTablaDetalleCotizacion(tablaDetalleCotizacionServicio, valorManoObra, setValorManoObra, setTablaDetalleActual)
               }
             </tbody>
           </table>
@@ -383,7 +351,7 @@ const Cotizaciones = () => {
             {/* ref={tableRef} */}
             <tbody className='table-group-divider'>
               {
-                mainTablaDetalleCotizacion(tablaDetalleCotizacionProducto, valorCotizacion, setValorCotizacion)
+                mainTablaDetalleCotizacion(tablaDetalleCotizacionProducto, valorCotizacion, setValorCotizacion, setTablaDetalleActual)
               }
             </tbody>
           </table>
