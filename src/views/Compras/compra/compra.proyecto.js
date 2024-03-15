@@ -8,9 +8,7 @@ import { show_alerta } from 'src/fuctions.proyecto'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faTruckField, faCalendar, faToggleOff, faIdCardClip, faComment, faXmark } from '@fortawesome/free-solid-svg-icons'
-import { ButtonSwitch } from 'src/components/proyect/switch.proyecto'
-import { ContentIndividual } from 'src/components/proyect/modal.proyecto'
-import { formatDate } from 'src/views/funcionesExtras.proyecto'
+
 
 const Compras = () => {
   //api de compras
@@ -210,7 +208,7 @@ const Compras = () => {
       console.log(parametros)
       metodo = 'POST';
     } else {
-      parametros = { idCompra: id, descripcionCompra: descripcion, estadoCompra: (estado == 0 ? 'false' : 'true'), fechaCompra: fechaCompra, proveedores_idProveedor: proveedores };
+      parametros = { idCompra: id, descripcionCompra: descripcion, estadoCompra: (estado === 0 ? 'false' : 'true'), fechaCompra: fechaCompra, proveedores_idProveedor: proveedores };
       metodo = 'PUT';
     }
     enviarSolicitud(metodo, parametros);
@@ -259,16 +257,8 @@ const Compras = () => {
       })
   }
 
-  var idFinal;
-  const obtenerId = () => {
-    for (var i = 0; i < compra.length; ++i) {
-      if (i.idCompra > idFinal) {
-        idFinal = i.idCompra
-      }
-    }
-    return
-  }
 
+    
   const deleteCompra = (id) => {
     const MySwal = withReactContent(Swal);
     MySwal.fire({
@@ -317,7 +307,7 @@ const Compras = () => {
                     <tr key={c.idCompra}>
                       <td>{c.idCompra}</td>
                       <td>{c.descripcionCompra}</td>
-                      <td>{c.estadoCompra == 0 ? 'Suspendido' : 'Activo'}</td>
+                      <td>{c.estadoCompra === 0 ? 'Suspendido' : 'Activo'}</td>
                       <td>{c.fechaCompra}</td>
                       <td>{c.proveedores_idProveedor}</td>
                       <td>
@@ -343,7 +333,7 @@ const Compras = () => {
           <div className='modal-content'>
             <div className='modal-header'>
               <label className='h5'>{title}</label>
-              <button id='btnCerrar' onClick={() => { setDescripcionError(''); setIdError(''); obtenerId() }} type='button' data-bs-dismiss='modal'><FontAwesomeIcon icon={faXmark} /></button>
+              <button id='btnCerrar' onClick={() => { setDescripcionError(''); setIdError('')}} type='button' data-bs-dismiss='modal'><FontAwesomeIcon icon={faXmark} /></button>
             </div>
             <div className='modal-body'>
               <input type='hidden' id='id' ></input>
