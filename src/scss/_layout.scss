@@ -4,3 +4,8 @@
   will-change: auto;
   @include transition(padding .15s);
 }
+
+// Color del menu
+.sidebar {
+  --cui-sidebar-bg: linear-gradient(#0073B9,#015c95,#001725);
+}
