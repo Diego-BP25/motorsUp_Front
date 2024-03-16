@@ -1,13 +1,9 @@
 import React from 'react'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import Swal from 'sweetalert2'
-import withReactContent from 'sweetalert2-react-content'
-import { CRow } from '@coreui/react'
-import { show_alerta } from 'src/fuctions.proyecto'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faTruckField, faCalendar, faToggleOff, faCircleInfo, faComment } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faTruckField,  faToggleOff, faComment } from '@fortawesome/free-solid-svg-icons'
 
 const Empleados = () => {
 

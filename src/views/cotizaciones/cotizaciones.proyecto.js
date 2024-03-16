@@ -3,16 +3,16 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faTruckField, faCalendar, faToggleOff, faCircleInfo, faComment, faCheck, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faCheck, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 
 import { actualizarCamposConsultas, formatDate } from '../funcionesExtras.proyecto'
 import { ContentDoble, ContentIndividual, ModalProyecto } from 'src/components/proyect/modal.proyecto'
 import { ButtonSwitch } from 'src/components/proyect/switch.proyecto'
 import { ButtonNormal } from 'src/components/proyect/buttons.proyecto'
 import { SeletedOption } from 'src/components/proyect/select.proyecto'
-import { getDataRouterId } from 'src/https/peticiones.proyecto'
-import { ListView } from 'src/tablas/listView.proyecto'
-
+import { getDataRouterId, peticionPost } from 'src/https/peticiones.proyecto'
+import { ListView } from 'src/clases/tables/listView.proyecto'
+import { addTablaDetalle, mainTablaDetalleCotizacion } from 'src/clases/tables/fucionesListView.proyecto'
 const Cotizaciones = () => {
   const url = 'http://localhost:8081/api/cotizacion'
   const [cotizacion, setCotizacion] = useState([])
@@ -57,15 +57,15 @@ const Cotizaciones = () => {
   }, [idProducto])
 
   useEffect(() => {
-    if (idservicio != undefined) actualizarCamposConsultas([setPrecioServicio, setNombreServicio], servicio, ['precioServicio', 'nombreServicio']);
+    if (idservicio !== undefined) actualizarCamposConsultas([setPrecioServicio, setNombreServicio], servicio, ['precioServicio', 'nombreServicio']);
   }, [servicio])
 
   useEffect(() => {
-    if (idProducto != undefined) actualizarCamposConsultas([setPrecioProducto, setNombreProducto], producto, ['precioVenta', 'nombreProducto']);
+    if (idProducto !== undefined) actualizarCamposConsultas([setPrecioProducto, setNombreProducto], producto, ['precioVenta', 'nombreProducto']);
   }, [producto])
 
   useEffect(() => {
-    mainTablaDetalleCotizacionServicio();
+    mainTablaDetalleCotizacion();
     setTablaDetalleActual(false)
   }, [tablaDetalleActul])
 
@@ -78,53 +78,13 @@ const Cotizaciones = () => {
     }
   }
 
-  const addTablaDetalle = (tablaDetalle, objeto, estadoActualizar, subTotal) => {
-    tablaDetalle.setObjeto(objeto)
-
-    const valor = subTotal;
-    estadoActualizar(`$ ${valor}`);
-  }
-
-  const deleteDetalleCotizacion = (codigoObjetoBorrar, tablaDetalleCotizacion) => {
-    tablaDetalleCotizacion.deleteObjeto(codigoObjetoBorrar);
-    setTablaDetalleActual(true);
-  }
-
-  const actualizarPrecioCotizacion = (tablaDetalleCotizacion, estadoPrecio, valorDescontar) => {
-    tablaDetalleCotizacion(
-      `$ ${(parseInt(estadoPrecio.substring(1, estadoPrecio.length)) - valorDescontar).toString()}`
-    )
-  }
-
-  const mainTablaDetalleCotizacionServicio = (tablaDetalleCotizacion, estadoPrecio, setEstadoPrecio) => {
-    if (!tablaDetalleCotizacion) return;
-
-    return tablaDetalleCotizacion.getAObjetos().map((c) => (
-      <tr key={c.codigo}>
-        <td>{c.codigo}</td>
-        <td>{c.nombre}</td>
-        <td>{c.precio}</td>
-        <td>{c.cantidad}</td>
-        <td>{c.subTotal}</td>
-        <td>
-          <button onClick={() => {
-            deleteDetalleCotizacion(c.codigo, tablaDetalleCotizacion);
-            actualizarPrecioCotizacion(setEstadoPrecio, estadoPrecio, (parseInt(c.precio.substring(1, c.precio.length)) * parseInt(c.cantidad)))
-          }} className='btn btn-danger'>
-            <FontAwesomeIcon icon={faTrash} />
-          </button>
-        </td>
-      </tr>
-    ))
-  }
-
   return (
     <div className='App'>
       <div className='container-fluid'>
         <div className='row mt-3'>
           <div className='col-md-4 offset-md-4'>
             <div className='d-grid mx-auto'>
-              <button className='btn btn-dark' data-bs-toggle='modal' data-bs-target='#modalCotizaciones'>
+              <button className='btn btn-dark' data-bs-toggle='modal' data-bs-target='#modalCotizaciones' onClick={() => { setFecha(formatDate(new Date())) }}>
                 <FontAwesomeIcon icon={faPlusCircle} /> Nueva cotización
               </button>
             </div>
@@ -141,8 +101,11 @@ const Cotizaciones = () => {
                     <th>Estado</th>
                     <th>Mano de obra</th>
                     <th>Valor insumos</th>
+                    <th>Metodo de pago</th>
                     <th>Fecha</th>
                     <th>Vehiculo</th>
+                    <th>Servicios</th>
+                    <th>productos</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -155,8 +118,15 @@ const Cotizaciones = () => {
                       <td>{c.estado ? "activo" : "desactivado"}</td>
                       <td>{c.valorManoObra}</td>
                       <td>{c.valorCotizacion}</td>
+                      <td>{c.metodoPago}</td>
                       <td>{c.fecha}</td>
                       <td>{c.vehiculos_placa}</td>
+                      <td>
+                        <button className='btn' style={{ color: "blue", cursor: "pointer" }}>Ver</button>
+                      </td>
+                      <td>
+                        <button className='btn' style={{ color: "blue", cursor: "pointer" }}>Ver</button>
+                      </td>
                       <td>
                         <button className='btn btn-warning'>
                           <FontAwesomeIcon icon={faEdit} />
@@ -182,7 +152,7 @@ const Cotizaciones = () => {
           <ContentDoble key="fechaCotizacionYButtonSwitch" componentes={[
             <ContentIndividual key="fechaYHora" componentes={[
               <span key="title">Fecha y hora</span>,
-              <input key="componente" className="form-control" type='datetime-local' readOnly={true} id='fechaCotizacion' value={formatDate(new Date())} onChange={(e) => setFecha(e.target.value)}></input>
+              <input key="componente" className="form-control" type='datetime-local' readOnly={true} id='fechaCotizacion' value={fecha} onChange={(e) => setFecha(e.target.value)}></input>
             ]} />,
             <ContentIndividual key="estado" componentes={[
               <span key="title"> Estado</span>,
@@ -229,7 +199,13 @@ const Cotizaciones = () => {
             ]} widthContents='600px' />
           ]} />,
           <div key="buttonGuardar" className='d-grid col-6 mx-auto'>
-            <button className='btn btn-success'>
+            <button className='btn btn-success' onClick={() => {
+              peticionPost(['cotizacion', 'detalleCotizacionServicio', 'detalleCotizacionProducto'],
+                [{ "descripcion": descripcion, "estado": estado, "valorManoObra": parseInt(valorManoObra.substring(1, valorManoObra.length)), "valorCotizacion": parseInt(valorCotizacion.substring(1, valorCotizacion.length)), "metodoPago": "Efectivo", "fecha": fecha, "vehiculos_placa": vehiculos_placa },
+                tablaDetalleCotizacionServicio.getAObjetos(), tablaDetalleCotizacionProducto.getAObjetos()],
+                ["max(idCotizacion)", "cotizaciones"]
+              )
+            }}>
               <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
             </button>
           </div>
@@ -262,7 +238,7 @@ const Cotizaciones = () => {
                 <ButtonNormal key="buttonAddServivcio" idComponent="buttonAddServivcio" funcionButton={
                   () => {
                     addTablaDetalle(tablaDetalleCotizacionServicio,
-                      { codigo: countServicio, nombre: nombreservicio, precio: precioservicio, cantidad: cantidad, subTotal: (parseInt(precioservicio.substring(1, precioservicio.length)) * parseInt(cantidad)) },
+                      { codigo: countServicio, nombre: nombreservicio, precio: precioservicio, cantidad: cantidad, subTotal: (parseInt(precioservicio.substring(1, precioservicio.length)) * parseInt(cantidad)), identificador: idservicio },
                       setValorManoObra, (parseInt(valorManoObra.substring(1, valorManoObra.length)) + (parseInt(precioservicio.substring(1, precioservicio.length)) * parseInt(cantidad))).toString())
                     setcountServicio(countServicio + 1)
                     setPrecioServicio("$ 0")
@@ -296,17 +272,18 @@ const Cotizaciones = () => {
                 <th>Precio servicio</th>
                 <th>Cantidad</th>
                 <th>SubTotal</th>
+                <th>Identificador</th>
                 <th>Acciones</th>
               </tr>
             </thead>
             {/* ref={tableRef} */}
             <tbody className='table-group-divider'>
               {
-                mainTablaDetalleCotizacionServicio(tablaDetalleCotizacionServicio, valorManoObra, setValorManoObra)
+                mainTablaDetalleCotizacion(tablaDetalleCotizacionServicio, valorManoObra, setValorManoObra, setTablaDetalleActual)
               }
             </tbody>
           </table>
-        ]} widthContents='550px' />
+        ]} widthContents='630px' />
 
       <ModalProyecto
         title='Agregar producto a cotizar'
@@ -334,7 +311,7 @@ const Cotizaciones = () => {
               <ContentIndividual key="opcionesButton" componentes={[
                 <ButtonNormal key="buttonAddProducto" idComponent="buttonAddProducto" funcionButton={() => {
                   addTablaDetalle(tablaDetalleCotizacionProducto,
-                    { codigo: countProducto, nombre: nombreProducto, precio: precioProducto, cantidad: cantidadProducto, subTotal: (parseInt(precioProducto.substring(1, precioProducto.length)) * parseInt(cantidadProducto)) },
+                    { codigo: countProducto, nombre: nombreProducto, precio: precioProducto, cantidad: cantidadProducto, subTotal: (parseInt(precioProducto.substring(1, precioProducto.length)) * parseInt(cantidadProducto)), identificador: idProducto },
                     setValorCotizacion, (parseInt(valorCotizacion.substring(1, valorCotizacion.length)) + (parseInt(precioProducto.substring(1, precioProducto.length)) * parseInt(cantidadProducto))).toString())
                   setcountProducto(countProducto + 1)
                   setPrecioProducto("$ 0")
@@ -367,17 +344,18 @@ const Cotizaciones = () => {
                 <th>Precio producto</th>
                 <th>Cantidad</th>
                 <th>SubTotal</th>
+                <th>Identificador</th>
                 <th>Acciones</th>
               </tr>
             </thead>
             {/* ref={tableRef} */}
             <tbody className='table-group-divider'>
               {
-                mainTablaDetalleCotizacionServicio(tablaDetalleCotizacionProducto, valorCotizacion, setValorCotizacion)
+                mainTablaDetalleCotizacion(tablaDetalleCotizacionProducto, valorCotizacion, setValorCotizacion, setTablaDetalleActual)
               }
             </tbody>
           </table>
-        ]} widthContents='550px' />
+        ]} widthContents='630px' />
 
     </div>
   )
