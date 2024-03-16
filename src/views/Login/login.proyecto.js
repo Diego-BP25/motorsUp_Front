@@ -3,7 +3,8 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { show_alerta } from 'src/fuctions.proyecto';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faComment } from '@fortawesome/free-solid-svg-icons'
+import {faFloppyDisk, faComment } from '@fortawesome/free-solid-svg-icons'
+
 
 const Login = () => {
   const [correo, setCorreo] = useState('');
@@ -13,6 +14,7 @@ const Login = () => {
   const [correoRecuperacion, setCorreoRecuperacion] = useState('')
   const [contrasenaNueva, setContrasenaNueva] = useState('')
   const [mensaje, setMensaje] = useState('');
+  const [codigo, setCodigo] = useState('')
 
 
   const validarDatos = async (e) => {
@@ -194,9 +196,9 @@ const Login = () => {
                 <input type='text' id='correoRecuperacion' className='form-control' placeholder='Correo' value={correoRecuperacion} onChange={(e) => setCorreoRecuperacion(e.target.value)}></input>
               </div>
               <div className='d-grid col-6 mx-auto'>
-              <button onClick={() => { validar(); openModal(2); }}data-bs-toggle='modal' data-bs-target='#modalCodigo' className='btn btn-success'>
-  <FontAwesomeIcon icon={faFloppyDisk} /> Enviar
-</button>
+                <button onClick={() => { validar(); openModal(2); }} data-bs-toggle='modal' data-bs-target='#modalCodigo' className='btn btn-success'>
+                  <FontAwesomeIcon icon={faFloppyDisk} /> Enviar
+                </button>
               </div>
             </div>
           </div>
@@ -209,15 +211,15 @@ const Login = () => {
           <div className='modal-content'>
             <div className='modal-header'>
               <label className='h5'>{title}</label>
-              
+
               <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
             </div>
             <div className='modal-body'>
-            <p>{mensaje}</p>
+              <p>{mensaje}</p>
               <input type='hidden' id='id' ></input>
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
-                <input type='text' id='correoRecuperacion' className='form-control' placeholder='Codigo' value={correoRecuperacion} onChange={(e) => setCorreoRecuperacion(e.target.value)}></input>
+                <input type='text' id='codigo' className='form-control' placeholder='Codigo' value={codigo} onChange={(e) => setCodigo(e.target.value)}></input>
               </div>
               <div className='d-grid col-6 mx-auto'>
                 <button onClick={() => validar()} className='btn btn-success'>

@@ -1,13 +1,11 @@
-import React from 'react'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
-import { CRow } from '@coreui/react'
-import { show_alerta } from 'src/fuctions.proyecto'
-import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEdit, faTrash, faPlusCircle, faFloppyDisk,  faComment } from '@fortawesome/free-solid-svg-icons'
+import { CSmartPagination } from '@coreui/react-pro'
+import { show_alerta } from 'src/fuctions.proyecto'
 
 const Roles = () => {
 
@@ -18,14 +16,12 @@ const Roles = () => {
   const [operation, setOperation] = useState(1)
   const [title, setTitle] = useState('')
   const [actualizacion, setActualizacion] = useState(false)
-
+  const [currentPage, setCurrentPage] = useState(1)
 
   useEffect(() => {
     getRoles()
     setActualizacion(false)
   }, [actualizacion ? rol : null])
-
-
 
   const getRoles = async () => {
     try {
@@ -135,20 +131,25 @@ const Roles = () => {
 
   }
 
+  // Función para obtener los roles de la página actual
+  const getCurrentPageRoles = () => {
+    const startIndex = (currentPage - 1) * 5;
+    const endIndex = startIndex + 5;
+    return rol.slice(startIndex, endIndex);
+  }
 
   return (
-
     <div className='App'>
       <div className='container-fluid'>
         <div className='row mt-3'>
           <div className='col-md-4 offset-md-4'>
             <h1>Roles</h1>
           </div>
-            <div className='d-grid gap-8 col-md-4 offset-md-4'>
-              <button onClick={() => openModal(1)} className='btn btn-success btn-custom ms-auto' data-bs-toggle='modal' data-bs-target='#modalRoles'>
-                <FontAwesomeIcon icon={faPlusCircle} /> Añadir
-              </button>
-            </div>
+          <div className='d-grid gap-8 col-md-4 offset-md-4'>
+            <button onClick={() => openModal(1)} className='btn btn-success btn-custom ms-auto' data-bs-toggle='modal' data-bs-target='#modalRoles'>
+              <FontAwesomeIcon icon={faPlusCircle} /> Añadir
+            </button>
+          </div>
         </div>
         <div className='row mt-3'>
           <div className='col-12 col-lg-8 offset-0 offset-lg-2'>
@@ -159,17 +160,15 @@ const Roles = () => {
                     <th>ID</th>
                     <th>Nombre</th>
                     <th>Acciones</th>
-
                   </tr>
                 </thead>
                 <tbody className='table-group-divider'>
-                  {rol.map((r) => (
+                  {getCurrentPageRoles().map((r) => (
                     <tr key={r.idRol}>
-                      <td >{r.idRol}</td>
-                      <td >{r.nombre}</td>
-                      <td >
-                        <button onClick={() => openModal(2, r.idRol, r.nombre)} className='btn btn-warning'
-                          data-bs-toggle='modal' data-bs-target='#modalRoles'>
+                      <td>{r.idRol}</td>
+                      <td>{r.nombre}</td>
+                      <td>
+                        <button onClick={() => openModal(2, r.idRol, r.nombre)} className='btn btn-warning' data-bs-toggle='modal' data-bs-target='#modalRoles'>
                           <FontAwesomeIcon icon={faEdit} />
                         </button>
                         &nbsp;
@@ -182,6 +181,16 @@ const Roles = () => {
                 </tbody>
               </table>
             </div>
+          </div>
+        </div>
+        {/* Paginación */}
+        <div className='row mt-3'>
+          <div className='col-12 col-lg-8 offset-0 offset-lg-2'>
+            <CSmartPagination
+              activePage={currentPage}
+              pages={Math.ceil(rol.length / 5)} 
+              onActivePageChange={setCurrentPage}
+            />
           </div>
         </div>
       </div>

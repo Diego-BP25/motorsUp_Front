@@ -4,3 +4,15 @@
   will-change: auto;
   @include transition(padding .15s);
 }
+
+.sidebar {
+  --cui-sidebar-bg: linear-gradient(#0073B9,#015c95,#001725);
+}
+
+.pagination{
+  --cui-pagination-color: black;
+  --cui-pagination-active-bg: #0073B9;
+  --cui-pagination-active-border-color: #0073B9;
+
+
+}
