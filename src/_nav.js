@@ -135,12 +135,6 @@ const _nav = [
       },
     ],
   },
-  {
-    component: CNavItem,
-    name: 'Login',
-    to: '/login',
-    icon: <CIcon icon={cilHome} customClassName='nav-icon' />,
-  },
   // {
   //   component: CNavGroup,
   //   name: 'Base',
