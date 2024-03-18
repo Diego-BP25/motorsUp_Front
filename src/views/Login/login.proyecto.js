@@ -125,21 +125,28 @@ const Login = () => {
   const validar = () => {
     var parametros;
     var metodo;
-
+    var url
 
     if (operation === 1) {
       parametros = { correoEmpleado: correoRecuperacion };
       metodo = 'POST';
+      url='http://localhost:8081/api/recuperar';
+    }else if(operation === 2){
+      parametros={token:codigo};
+      metodo='POST';
+      url='http://localhost:8081/api/recuperar/validarCodigo'
     }
-    enviarSolicitud(metodo, parametros);
+    enviarSolicitud(metodo, parametros, url);
   }
 
 
-  const enviarSolicitud = async (metodo, parametros) => {
-    await axios({ method: metodo, url: 'http://localhost:8081/api/recuperar', data: parametros }).then(function (respuesta) {
-      if (metodo === 'POST') {
+  const enviarSolicitud = async (metodo, parametros, url) => {
+    await axios({ method: metodo, url:url, data: parametros }).then(function (respuesta) {
+      if (operation==1) {
         console.log('Correo ENVIADO')
 
+      }else if(operation==2){
+        console.log('Codigo Validado')
       }
     })
       .catch(function (error) {
