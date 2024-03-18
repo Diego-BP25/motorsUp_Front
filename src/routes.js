@@ -5,6 +5,7 @@ const Compras = React.lazy(() => import('./views/Compras/compra/compra.proyecto'
 const Productos = React.lazy(() => import('./views/Compras/productos/productos.proyecto'))
 const Empleado = React.lazy(() => import('./views/Configuracion/empleados/empleados.proyecto'))
 const Rol = React.lazy(() => import('./views/Configuracion/roles/roles.proyecto'))
+const Agendamiento = React.lazy(() => import('./views/Servicios/agendamiento/agendamiento.proyecto'))
 const cotizaciones = React.lazy(() => import('./views/cotizaciones/cotizaciones.proyecto'))
 const Propietarios = React.lazy(() => import('./views/Servicios/Propietarios/propietario.proyecto'))
 
@@ -20,6 +21,7 @@ const routes = [
   { path: '/compras/productos', name: 'Productos', element: Productos, exact: true },
   { path: '/compras/proveedores', name: 'Proveedores', element: Compras },
   { path: '/Servicios/propietario', name: 'Propietario', element: Propietarios },
+  { path: '/Servicios/agendamiento', name: 'Agendamiento', element: Agendamiento },
 ]
 
 export default routes

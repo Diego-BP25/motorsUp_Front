@@ -74,7 +74,7 @@ const Roles = () => {
         Swal.fire({
           position: "center",
           icon: "success",
-          title: "Rol agregada con exito",
+          title: "Rol agregado con exito",
           showConfirmButton: false,
           timer: 1500
         });
@@ -146,7 +146,7 @@ const Roles = () => {
             <h1>Roles</h1>
           </div>
           <div className='d-grid gap-8 col-md-4 offset-md-4'>
-            <button onClick={() => openModal(1)} className='btn btn-success btn-custom ms-auto' data-bs-toggle='modal' data-bs-target='#modalRoles'>
+            <button onClick={() => openModal(1)} className='btn btn-primary btn-custom ms-auto' data-bs-toggle='modal' data-bs-target='#modalRoles'>
               <FontAwesomeIcon icon={faPlusCircle} /> Añadir
             </button>
           </div>
