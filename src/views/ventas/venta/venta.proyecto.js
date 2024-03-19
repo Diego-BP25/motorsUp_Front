@@ -22,6 +22,8 @@ const Ventas = () => {
     const [operation, setOperation] = useState(1)
     const [title, setTitle] = useState('')
     const [actualizacion, setActualizacion] = useState(false)
+
+  
     useEffect(() => {
         getVentas()
         setActualizacion(false)
