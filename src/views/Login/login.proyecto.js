@@ -3,7 +3,7 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { show_alerta } from 'src/fuctions.proyecto';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {faFloppyDisk, faComment } from '@fortawesome/free-solid-svg-icons'
+import { faCheck, faEnvelope, faPaperPlane, faLock } from '@fortawesome/free-solid-svg-icons'
 
 
 const Login = () => {
@@ -111,10 +111,15 @@ const Login = () => {
 
     if (op === 1) {
       setTitle('Recuperar Contraseña')
+
     }
     else if (op == 2) {
       setTitle('Codigo de Verificacion')
       setMensaje('Se ha enviado un código de verificación a tu correo electrónico.');
+    }
+    else if (op === 3) {
+      setTitle('Nueva Contraseña')
+      setMensaje('Introduzca su nueva contraseña..');
     }
     setOperation(op)
     window.setTimeout(function () {
@@ -125,21 +130,34 @@ const Login = () => {
   const validar = () => {
     var parametros;
     var metodo;
-
+    var url
 
     if (operation === 1) {
       parametros = { correoEmpleado: correoRecuperacion };
       metodo = 'POST';
+      url = 'http://localhost:8081/api/recuperar';
+    } else if (operation === 2) {
+      parametros = { token: codigo };
+      metodo = 'POST';
+      url = 'http://localhost:8081/api/recuperar/validarCodigo'
+    } else if (operation === 3) {
+      parametros = { token: codigo, nuevaContrasena: contrasenaNueva };
+      metodo = 'POST';
+      url = 'http://localhost:8081/api/recuperar/restablecerContra';
     }
-    enviarSolicitud(metodo, parametros);
+    enviarSolicitud(metodo, parametros, url);
   }
 
 
-  const enviarSolicitud = async (metodo, parametros) => {
-    await axios({ method: metodo, url: 'http://localhost:8081/api/recuperar', data: parametros }).then(function (respuesta) {
-      if (metodo === 'POST') {
+  const enviarSolicitud = async (metodo, parametros, url) => {
+    await axios({ method: metodo, url: url, data: parametros }).then(function (respuesta) {
+      if (operation == 1) {
         console.log('Correo ENVIADO')
 
+      } else if (operation == 2) {
+        console.log('Codigo Validado')
+      } else {
+        console.log('Contraseña restablecida')
       }
     })
       .catch(function (error) {
@@ -181,23 +199,23 @@ const Login = () => {
 
 
 
-      {/* MODAL CORREO CONTRASEÑA */}
+      {/* MODAL CORREO */}
       <div id='modalCorreo' className='modal fade' aria-hidden='true'>
         <div className='modal-dialog'>
           <div className='modal-content'>
             <div className='modal-header'>
-              <label className='h5'>{title}</label>
+              <label className='h4'>{title}</label>
               <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
             </div>
             <div className='modal-body'>
               <input type='hidden' id='id' ></input>
               <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
+                <span className='input-group-text'><FontAwesomeIcon icon={faEnvelope} /></span>
                 <input type='text' id='correoRecuperacion' className='form-control' placeholder='Correo' value={correoRecuperacion} onChange={(e) => setCorreoRecuperacion(e.target.value)}></input>
               </div>
               <div className='d-grid col-6 mx-auto'>
-                <button onClick={() => { validar(); openModal(2); }} data-bs-toggle='modal' data-bs-target='#modalCodigo' className='btn btn-success'>
-                  <FontAwesomeIcon icon={faFloppyDisk} /> Enviar
+                <button onClick={() => { validar(); openModal(2); }} data-bs-toggle='modal' data-bs-target='#modalCodigo' className='btn btn-primary'>
+                  <FontAwesomeIcon icon={faPaperPlane} /> Enviar
                 </button>
               </div>
             </div>
@@ -210,6 +228,41 @@ const Login = () => {
         <div className='modal-dialog'>
           <div className='modal-content'>
             <div className='modal-header'>
+              <label className='h4'>{title}</label>
+
+              <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
+            </div>
+            <div className='modal-body'>
+              <p>{mensaje}</p>
+              <input type='hidden' id='id' ></input>
+              <div className='input-group mb-3 justify-content-center align-items-center'>
+                {/* <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
+                <input type='text' id='codigo' className='form-control' placeholder='Codigo' value={codigo} onChange={(e) => setCodigo(e.target.value)}></input> */}
+                <div className='otp_inputs'>
+
+                <input type="text" placeholder='' maxLength='1' className='otp_input'></input>
+                <input type="text" placeholder='' maxLength='1' className='otp_input'></input>
+                <input type="text" placeholder='' maxLength='1' className='otp_input'></input>
+                <input type="text" placeholder='' maxLength='1' className='otp_input'></input>
+                <input type="text" placeholder='' maxLength='1' className='otp_input'></input>
+                <input type="text" placeholder='' maxLength='1' className='otp_input'></input>
+                </div>
+
+              </div>
+              <div className='d-grid col-6 mx-auto'>
+                <button onClick={() => { validar(); openModal(3); }} data-bs-toggle='modal' data-bs-target='#modalContrasena' className='btn btn-primary'>
+                  <FontAwesomeIcon icon={faCheck} /> Verificar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id='modalContrasena' className='modal fade' aria-hidden='true'>
+        <div className='modal-dialog'>
+          <div className='modal-content'>
+            <div className='modal-header'>
               <label className='h5'>{title}</label>
 
               <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
@@ -218,12 +271,12 @@ const Login = () => {
               <p>{mensaje}</p>
               <input type='hidden' id='id' ></input>
               <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
-                <input type='text' id='codigo' className='form-control' placeholder='Codigo' value={codigo} onChange={(e) => setCodigo(e.target.value)}></input>
+                <span className='input-group-text'><FontAwesomeIcon icon={faLock} /></span>
+                <input type='password' id='contrasenaNueva' className='form-control' placeholder='Contraseña' value={contrasenaNueva} onChange={(e) => setContrasenaNueva(e.target.value)}></input>
               </div>
               <div className='d-grid col-6 mx-auto'>
-                <button onClick={() => validar()} className='btn btn-success'>
-                  <FontAwesomeIcon icon={faFloppyDisk} /> Enviar
+                <button onClick={() => validar()} className='btn btn-primary'>
+                  <FontAwesomeIcon icon={faPaperPlane} /> Enviar
                 </button>
               </div>
             </div>

@@ -1,9 +1,12 @@
-import React from 'react'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import axios from 'axios'
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faTruckField,  faToggleOff, faComment } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faTruckField, faToggleOff, faComment } from '@fortawesome/free-solid-svg-icons'
+import { CSmartPagination } from '@coreui/react-pro'
+import { show_alerta } from 'src/fuctions.proyecto'
 
 const Empleados = () => {
 
@@ -21,13 +24,17 @@ const Empleados = () => {
   const [operation, setOperation] = useState(1)
   const [title, setTitle] = useState('')
 
+  const [actualizacion, setActualizacion] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+
   const [roles, setRoles] = useState([])
   const [selectedRoleId, setSelectedRoleId] = useState('')
 
   useEffect(() => {
-    getRoles()
     getEmpleados()
-  }, [])
+    getRoles()
+    setActualizacion(false)
+  }, [actualizacion ? empleado : null])
 
 
 
@@ -80,18 +87,107 @@ const Empleados = () => {
     }, 500);
   }
 
+  const validar = () => {
+    var parametros;
+    var metodo;
+
+
+    if (operation === 1) {
+      parametros = { idEmpleado: idEmpleado, nombreEmpleado: nombreEmpleado, direccionEmpleado: direccionEmpleado, telefonoEmpleado: telefonoEmpleado, estado: estado, correoEmpleado: correoEmpleado, usuario: usuario, contrasena: contrasena, roles_idRol: roles_idRol };
+      metodo = 'POST';
+    } else {
+      parametros = { idEmpleado: idEmpleado, nombreEmpleado: nombreEmpleado, direccionEmpleado: direccionEmpleado, telefonoEmpleado: telefonoEmpleado, estado: estado, correoEmpleado: correoEmpleado, usuario: usuario, contrasena: contrasena, roles_idRol: roles_idRol };
+      metodo = 'PUT';
+    }
+    enviarSolicitud(metodo, parametros);
+  }
+
+  const enviarSolicitud = async (metodo, parametros) => {
+    await axios({ method: metodo, url: url, data: parametros }).then(function (respuesta) {
+      var tipo = respuesta.data[0];
+      if (metodo === 'POST') {
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Empleado agregado con exito",
+          showConfirmButton: false,
+          timer: 1500
+        });
+        document.getElementById('btnCerrar').click();
+      } else if (metodo === 'PUT') {
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Empleado editado con exito",
+          showConfirmButton: false,
+          timer: 1500
+        });
+        document.getElementById('btnCerrar').click();
+      }
+      if (metodo === 'DELETE') {
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Empleado eliminado con exito",
+          showConfirmButton: false,
+          timer: 1500
+        });
+        document.getElementById('btnCerrar').click();
+      }
+
+      setActualizacion(true)
+
+      if (tipo === 'success') {
+        document.getElementById('btnCerrar').click();
+        getRoles();
+      }
+    })
+      .catch(function (error) {
+        show_alerta('Error en la solicitud', 'error');
+        console.log(error);
+      });
+  }
+
+  const deleteEmpleado = (idEmpleado) => {
+
+    const MySwal = withReactContent(Swal);
+    MySwal.fire({
+      title: '¿Seguro de eliminar este Empleado?',
+      icon: 'question', text: 'No podra activar nuevamente el Empleado',
+      showCancelButton: true, confirmButtonText: 'Aceptar', cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setIdEmpleado(idEmpleado);
+        enviarSolicitud('DELETE', { idEmpleado: idEmpleado });
+      } else {
+        show_alerta('El Empleado no fue eliminad0', 'info')
+      }
+    });
+
+  }
+
+
+  const getCurrentPageEmpleados = () => {
+    const startIndex = (currentPage - 1) * 5;
+    const endIndex = startIndex + 5;
+    return empleado.slice(startIndex, endIndex);
+  }
+
+
   return (
 
     <div className='App'>
       <div className='container-fluid'>
         <div className='row mt-3'>
           <div className='col-md-4 offset-md-4'>
-            <div className='d-grid mx-auto'>
-              <button onClick={() => openModal(1)} className='btn btn-dark' data-bs-toggle='modal' data-bs-target='#modalEmpleados'>
-                <FontAwesomeIcon icon={faPlusCircle} /> Añadir
-              </button>
-            </div>
+            <h1>Empleados</h1>
           </div>
+          <div className='d-grid gap-8 col-md-4 offset-md-4'>
+            <button onClick={() => openModal(1)} className='btn btn-primary btn-custom ms-auto' data-bs-toggle='modal' data-bs-target='#modalEmpleados'>
+              <FontAwesomeIcon icon={faPlusCircle} /> Añadir
+            </button>
+          </div>
+
         </div>
         <div className='row mt-3'>
           <div className='col-12 col-lg-8 offset-0 offset-lg-2'>
@@ -111,7 +207,7 @@ const Empleados = () => {
                   </tr>
                 </thead>
                 <tbody className='table-group-divider'>
-                  {empleado.map((e) => (
+                  {getCurrentPageEmpleados().map((e) => (
                     <tr key={e.idEmpleado}>
                       <td>{e.idEmpleado}</td>
                       <td>{e.nombreEmpleado}</td>
@@ -126,7 +222,7 @@ const Empleados = () => {
                           <FontAwesomeIcon icon={faEdit} />
                         </button>
                         &nbsp;
-                        <button className='btn btn-danger'>
+                        <button onClick={() => deleteEmpleado(e.idEmpleado)} className='btn btn-danger'>
                           <FontAwesomeIcon icon={faTrash} />
                         </button>
                       </td>
@@ -137,7 +233,18 @@ const Empleados = () => {
             </div>
           </div>
         </div>
+
+        <div className='row mt-3'>
+          <div className='col-12 col-lg-8 offset-0 offset-lg-2'>
+            <CSmartPagination
+              activePage={currentPage}
+              pages={Math.ceil(empleado.length / 5)}
+              onActivePageChange={setCurrentPage}
+            />
+          </div>
+        </div>
       </div>
+
       <div id='modalEmpleados' className='modal fade' aria-hidden='true'>
         {/* Inicio Modal */}
         <div className='modal-dialog'>
@@ -191,7 +298,7 @@ const Empleados = () => {
 
 
               <div className='d-grid col-6 mx-auto'>
-                <button className='btn btn-success'>
+                <button onClick ={()=> validar()}className='btn btn-success'>
                   <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
                 </button>
               </div>
@@ -201,8 +308,6 @@ const Empleados = () => {
             </div>
           </div>
         </div>
-
-        {/* Fin Modal */}
       </div>
     </div>
   )

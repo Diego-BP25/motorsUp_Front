@@ -215,7 +215,8 @@ const Compras = () => {
 
   }
 
-  const enviarSolicitud = async (metodo, parametros) => { await axios({ method: metodo, url: url, data: parametros }).then(function (respuesta) {
+  const enviarSolicitud = async (metodo, parametros) => {
+    await axios({ method: metodo, url: url, data: parametros }).then(function (respuesta) {
       if (metodo === 'POST') {
         Swal.fire({
           position: "center",
@@ -258,7 +259,7 @@ const Compras = () => {
   }
 
 
-    
+
   const deleteCompra = (id) => {
     const MySwal = withReactContent(Swal);
     MySwal.fire({
@@ -333,13 +334,13 @@ const Compras = () => {
           <div className='modal-content'>
             <div className='modal-header'>
               <label className='h5'>{title}</label>
-              <button id='btnCerrar' onClick={() => { setDescripcionError(''); setIdError('')}} type='button' data-bs-dismiss='modal'><FontAwesomeIcon icon={faXmark} /></button>
+              <button id='btnCerrar' onClick={() => { setDescripcionError(''); setIdError('') }} type='button' data-bs-dismiss='modal'><FontAwesomeIcon icon={faXmark} /></button>
             </div>
             <div className='modal-body'>
               <input type='hidden' id='id' ></input>
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faIdCardClip} /></span>
-                <input type='number' id='id' className='form-control' placeholder='id' value={operation === 1 ? consecutivo : id}/>
+                <input type='number' id='id' className='form-control' placeholder='id' value={operation === 1 ? consecutivo : id} />
               </div>
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
