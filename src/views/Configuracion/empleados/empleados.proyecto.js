@@ -27,34 +27,36 @@ const Empleados = () => {
   const [actualizacion, setActualizacion] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
 
-  const [roles, setRoles] = useState([])
-  const [selectedRoleId, setSelectedRoleId] = useState('')
+  // const [roles, setRoles] = useState([])
+  // const [selectedRoleId, setSelectedRoleId] = useState('')
 
   useEffect(() => {
     getEmpleados()
-    getRoles()
+    // getRoles()
     setActualizacion(false)
   }, [actualizacion ? empleado : null])
 
 
 
   const getEmpleados = async () => {
+    console.log('fuera')
     try {
       const respuesta = await axios.get(url, {})
       setEmpleado(await respuesta.data)
+      console.log('hh')
     } catch (error) {
       console.error('Error al obtener los Empleados:', error.message)
     }
   }
 
-  const getRoles = async () => {
-    try {
-      const response = await axios.get('http://localhost:8081/api/roles')
-      setRoles(response.data)
-    } catch (error) {
-      console.error('Error al obtener los roles:', error.message)
-    }
-  }
+  // const getRoles = async () => {
+  //   try {
+  //     const response = await axios.get('http://localhost:8081/api/roles')
+  //     setRoles(response.data)
+  //   } catch (error) {
+  //     console.error('Error al obtener los roles:', error.message)
+  //   }
+  // }
 
   const openModal = (op, idEmpleado, nombreEmpleado, direccionEmpleado, telefonoEmpleado, estado, correoEmpleado, usuario, contrasena, roles_idRol) => {
     setIdEmpleado('');
@@ -93,11 +95,15 @@ const Empleados = () => {
 
 
     if (operation === 1) {
-      parametros = { idEmpleado: idEmpleado, nombreEmpleado: nombreEmpleado, direccionEmpleado: direccionEmpleado, telefonoEmpleado: telefonoEmpleado, estado: estado, correoEmpleado: correoEmpleado, usuario: usuario, contrasena: contrasena, roles_idRol: roles_idRol };
+      parametros = { idEmpleado: idEmpleado, nombreEmpleado: nombreEmpleado, direccionEmpleado: direccionEmpleado, telefonoEmpleado: telefonoEmpleado, estado: estado, correoEmpleado: correoEmpleado, usuario: usuario, contrasena: contrasena, roles_idRol: roles_idRol};
+
+      console.log(parametros)
       metodo = 'POST';
-    } else {
+    } else if(operation ===2 ) {
       parametros = { idEmpleado: idEmpleado, nombreEmpleado: nombreEmpleado, direccionEmpleado: direccionEmpleado, telefonoEmpleado: telefonoEmpleado, estado: estado, correoEmpleado: correoEmpleado, usuario: usuario, contrasena: contrasena, roles_idRol: roles_idRol };
       metodo = 'PUT';
+
+      console.log(parametros)
     }
     enviarSolicitud(metodo, parametros);
   }
@@ -113,7 +119,7 @@ const Empleados = () => {
           showConfirmButton: false,
           timer: 1500
         });
-        document.getElementById('btnCerrar').click();
+        //document.getElementById('btnCerrar').click();
       } else if (metodo === 'PUT') {
         Swal.fire({
           position: "center",
@@ -122,7 +128,7 @@ const Empleados = () => {
           showConfirmButton: false,
           timer: 1500
         });
-        document.getElementById('btnCerrar').click();
+        //document.getElementById('btnCerrar').click();
       }
       if (metodo === 'DELETE') {
         Swal.fire({
@@ -132,14 +138,14 @@ const Empleados = () => {
           showConfirmButton: false,
           timer: 1500
         });
-        document.getElementById('btnCerrar').click();
+        //document.getElementById('btnCerrar').click();
       }
 
       setActualizacion(true)
 
       if (tipo === 'success') {
-        document.getElementById('btnCerrar').click();
-        getRoles();
+        // document.getElementById('btnCerrar').click();
+        // getRoles();
       }
     })
       .catch(function (error) {
@@ -272,7 +278,7 @@ const Empleados = () => {
 
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
-                <input type='text' id='estado' className='form-control' placeholder='Estado' value={estado ? 'true' : 'false'} onChange={(e) => setEstado(e.target.value)}></input>
+                <input type='text' id='estado' className='form-control' placeholder='Estado' value={estado} onChange={(e) => setEstado(e.target.value)}></input>
                 <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
                 <input type='text' id='correoEmpleado' className='form-control' placeholder='Correo' value={correoEmpleado} onChange={(e) => setCorreoEmpleado(e.target.value)}></input>
               </div>
@@ -287,18 +293,21 @@ const Empleados = () => {
 
 
               <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faTruckField} /></span>
+                {/* <span className='input-group-text'><FontAwesomeIcon icon={faTruckField} /></span>
                 <select id='roles_idRol' className='form-select' value={selectedRoleId} onChange={(e) => setSelectedRoleId(e.target.value)}>
                   <option value='' disabled>Seleccione un rol</option>
                   {roles.map((rol) => (
                     <option key={rol.id} value={rol.id}>{rol.nombre}</option>
                   ))}
-                </select>
+                </select> */}
+                <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
+                <input type='text' id='roles_idRol' className='form-control' placeholder='Roles' value={roles_idRol} onChange={(e) => setRoles_idRol(e.target.value)}></input>
+
               </div>
 
 
               <div className='d-grid col-6 mx-auto'>
-                <button onClick ={()=> validar()}className='btn btn-success'>
+                <button onClick={() => validar()} className='btn btn-success'>
                   <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
                 </button>
               </div>
