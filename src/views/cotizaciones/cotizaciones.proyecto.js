@@ -13,6 +13,7 @@ import { SeletedOption } from 'src/components/proyect/select.proyecto'
 import { getDataRouterId, peticionPost } from 'src/https/peticiones.proyecto'
 import { ListView } from 'src/clases/tables/listView.proyecto'
 import { addTablaDetalle, mainTablaDetalleCotizacion } from 'src/clases/tables/fucionesListView.proyecto'
+
 const Cotizaciones = () => {
   const url = 'http://localhost:8081/api/cotizacion'
   const [cotizacion, setCotizacion] = useState([])

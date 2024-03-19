@@ -7,8 +7,10 @@ import withReactContent from 'sweetalert2-react-content'
 import { show_alerta } from 'src/fuctions.proyecto'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faTruckField, faCalendar, faToggleOff, faIdCardClip, faComment, faXmark } from '@fortawesome/free-solid-svg-icons'
-
+import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faCalendar, faToggleOff, faEye } from '@fortawesome/free-solid-svg-icons'
+import { ContentDoble, ContentIndividual, ModalProyecto } from 'src/components/proyect/modal.proyecto'
+import { ButtonNormal } from 'src/components/proyect/buttons.proyecto'
+import { formatDate } from 'src/views/funcionesExtras.proyecto'
 
 const Compras = () => {
   //api de compras
@@ -22,36 +24,29 @@ const Compras = () => {
   const [operation, setOperation] = useState(1)
   const [title, setTitle] = useState('')
   const [actualizacion, setActualizacion] = useState(false)
-  const [idError, setIdError] = useState('');
+
+  //const [idError, setIdError] = useState('');
   const [descripcionError, setDescripcionError] = useState('');
   const [consecutivo, setConsecutivo] = useState(0);
 
-  //api de productos
-  // const urlProducto = 'http://localhost:8081/api/productos'
-  // const [productos, setProductos] = useState([])
-  // const [idProducto, setIdProducto] = useState('')
-  // const [nombreProducto, setNombreProducto] = useState('')
-  // const [precioCompra, setPrecioCompra] = useState(new Float32Array)
-  // const [estadoProducto, setEstadoProducto] = useState('')
-  // const [precioVenta, setPrecioVenta] = useState(new Float32Array)
-  // const [saldoExistencias, setSaldoExistencias] = useState(new Int32Array)
-  // const [categoriaProducto_idCategoriaProducto, setCategoriaProducto_idCategoriaProducto] = useState('')
-  // const [stockMinimo, setStockMinimo] = useState(new Int32Array)
-  // const [stockMaximo, setStockMaximo] = useState(new Int32Array)
-  // const [titleP, setTitleP] = useState('')
-  // const [actualizacion2, setActualizacion2] = useState(false)
-  // const [idErrorP, setIdErrorP] = useState('');
-  // const [descripcionErrorP, setDescripcionErrorP] = useState('');
-  // const [consecutivoP, setConsecutivoP] = useState(0);
+  //estado para el boton info
+  const [showProductosModal, setShowProductosModal] = useState(false); // Estado para mostrar/ocultar la modal de productos
+  const [productosAsociados, setProductosAsociados] = useState([]); // Estado para almacenar los productos asociados a la compra seleccionada
+
+
 
 
   //proveedor
   const [proveedor, setProveedor] = useState([])
   const [proveedores, setProveedores] = useState('')
 
+  //productos
+  const [producto, setProducto] = useState([])
+  const [productos, setProductos] = useState('')
+
   useEffect(() => {
     getCompras()
-    //getProductos()
+    getProductos()
     getProveedores()
     setActualizacion(false)
   }, [actualizacion ? compra : null])
@@ -83,14 +78,7 @@ const Compras = () => {
     getProveedores()
   }, [])
 
-  // const getProductos = async () => {
-  //   try {
-  //     const respuesta = await axios.get(urlProducto, {})
-  //     setProductos(await respuesta.data)
-  //   } catch (error) {
-  //     console.error('Error al obtener los productos:', error.message)
-  //   }
-  // }
+
 
   const getProveedores = async () => {
     try {
@@ -98,6 +86,15 @@ const Compras = () => {
       setProveedor(await respuesta.data)
     } catch (error) {
       console.error('Error al obtener los proveedores:', error.message)
+    }
+  }
+
+  const getProductos = async () => {
+    try {
+      const respuesta = await axios.get('http://localhost:8081/api/productos', {})
+      setProducto(await respuesta.data)
+    } catch (error) {
+      console.error('Error al obtener los productos:', error.message)
     }
   }
 
@@ -137,36 +134,41 @@ const Compras = () => {
     }, 500);
   }
 
-  // const openModalProducto = (op, idProducto, descripcion, estado_, fechaCompra, proveedores_idProveedor) => {
-  //   setIdProducto('');
-  //   setNombreProducto()
-  //   setPrecioCompra('');
-  //   setEstadoProducto('');
-  //   setPrecioVenta('');
-  //   setSaldoExistencias('');
-  //   setCategoriaProducto_idCategoriaProducto('');
-  //   setStockMinimo('');
-  //   setStockMaximo('');
-  //   setOperation('');
-  //   if (op === 1) {
-  //     setTitle('Registrar compra')
-  //     obtenerIdConsecutivo();
-  //   }
-  //   else if (op === 2) {
-  //     setTitle('Editar compra')
-  //     setIdCompra(id);
-  //     setDescripcionCompra(descripcion);
-  //     setEstadoCompra(estado_);
-  //     setFechaCompra(fechaCompra);
-  //     setProveedores_idProveedor(proveedores_idProveedor);
-  //     setProveedores('')
-  //   }
-  //   setOperation(op)
-  //   window.setTimeout(function () {
-  //     document.getElementById('id').focus();
-  //   }, 500);
-  // }
+  //detalle productos
+  const [productosCompra, setProductosCompra] = useState([])
+  const [precio, setPrecio] = useState()
+  const [cantidad, setCantidad] = useState('')
+  const [idProducto, setIdProducto] = useState('')
 
+  const agregarProducto = () => {
+    // Verifica que los campos de producto estén llenos antes de agregarlo
+    if (idProducto && cantidad && precio) {
+      setProductosCompra([...productosCompra, { idProducto, cantidad, precio, subtotal: precio * cantidad }]);
+      console.log(setProductosCompra)
+      // Limpia los campos después de agregar un producto
+      setIdProducto('');
+      setCantidad('');
+      setPrecio('');
+    } else {
+      show_alerta('Todos los campos del producto son obligatorios', 'error');
+    }
+  };
+
+  const getProductosAsociados = async (idCompra) => {
+    try {
+      const response = await axios.get(`http://localhost:8081/api/compras/id/${idCompra}`);
+      setProductosAsociados(response.data);
+      setShowProductosModal(true); // Mostrar la modal de productos
+    } catch (error) {
+      console.error('Error al obtener los productos asociados:', error.message);
+    }
+  };
+
+  // const eliminarProducto = (index) => {
+  //   const nuevaListaProductos = [...productosCompra];
+  //   nuevaListaProductos.splice(index, 1);
+  //   setProductosCompra(nuevaListaProductos);
+  // };
 
   const validarCamposObligatorios = () => {
     let hayErrores = false;
@@ -204,18 +206,33 @@ const Compras = () => {
     }
 
     if (operation === 1) {
-      parametros = { idCompra: consecutivo, descripcionCompra: descripcion, estadoCompra: estado, fechaCompra: fechaCompra, proveedores_idProveedor: proveedores };
+      parametros = {
+        idCompra: consecutivo,
+        descripcionCompra: descripcion,
+        estadoCompra: estado,
+        fechaCompra: fechaCompra,
+        proveedores_idProveedor: proveedores,
+        detalleProductos: productosCompra
+
+      };
       console.log(parametros)
       metodo = 'POST';
     } else {
-      parametros = { idCompra: id, descripcionCompra: descripcion, estadoCompra: (estado === 0 ? 'false' : 'true'), fechaCompra: fechaCompra, proveedores_idProveedor: proveedores };
+      parametros = {
+        idCompra: id,
+        descripcionCompra: descripcion,
+        estadoCompra: (estado === 0 ? 'false' : 'true'),
+        fechaCompra: fechaCompra,
+        proveedores_idProveedor: proveedores
+      };
       metodo = 'PUT';
     }
     enviarSolicitud(metodo, parametros);
 
   }
 
-  const enviarSolicitud = async (metodo, parametros) => { await axios({ method: metodo, url: url, data: parametros }).then(function (respuesta) {
+  const enviarSolicitud = async (metodo, parametros) => {
+    await axios({ method: metodo, url: url, data: parametros }).then(function (respuesta) {
       if (metodo === 'POST') {
         Swal.fire({
           position: "center",
@@ -224,7 +241,7 @@ const Compras = () => {
           showConfirmButton: false,
           timer: 1500
         });
-        document.getElementById('btnCerrar').click();
+        //document.getElementById('btnCerrar').click();
 
       } else if (metodo === 'PUT') {
         Swal.fire({
@@ -234,7 +251,7 @@ const Compras = () => {
           showConfirmButton: false,
           timer: 1500
         });
-        document.getElementById('btnCerrar').click();
+        //document.getElementById('btnCerrar').click();
       }
       if (metodo === 'DELETE') {
         Swal.fire({
@@ -244,7 +261,7 @@ const Compras = () => {
           showConfirmButton: false,
           timer: 1500
         });
-        document.getElementById('btnCerrar').click();
+        //document.getElementById('btnCerrar').click();
 
       }
 
@@ -258,7 +275,7 @@ const Compras = () => {
   }
 
 
-    
+
   const deleteCompra = (id) => {
     const MySwal = withReactContent(Swal);
     MySwal.fire({
@@ -279,19 +296,23 @@ const Compras = () => {
 
     <div className='App'>
       <div className='container-fluid'>
-        <div className='row mt-3'>
-          <div className='col-md-4 offset-md-4'>
-            <div className='d-grid mx-auto'>
-              <button onClick={() => openModal(1)} className='btn btn-dark' data-bs-toggle='modal' data-bs-target='#modalCompras'>
+        <div >
+          <div style={{ display: 'flex', alignItems: 'center' }} id="Container">
+            <div className='col-md-4 offset-md-5' >
+              <h3>Compras</h3>
+            </div>
+
+            <div style={{ marginRight: 'auto' }}>
+              <button className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalCompras' onClick={() => [openModal(1), setFechaCompra(formatDate(new Date()))]} >
                 <FontAwesomeIcon icon={faPlusCircle} /> Añadir
               </button>
             </div>
           </div>
         </div>
         <div className='row mt-3'>
-          <div className='col-12 col-lg-8 offset-0 offset-lg-2'>
-            <div className='table-responsive'>
-              <table className='table table-bordered'>
+          <div>
+            <div className="table-responsive" style={{ maxWidth: '100%', margin: '0 auto' }}>
+              <table className='table table-striped' style={{ width: '100%' }}>
                 <thead>
                   <tr>
                     <th>#</th>
@@ -311,6 +332,10 @@ const Compras = () => {
                       <td>{c.fechaCompra}</td>
                       <td>{c.proveedores_idProveedor}</td>
                       <td>
+                        <button className='btn btn-info' onClick={() => getProductosAsociados(c.idCompra)}>
+                          <FontAwesomeIcon icon={faEye} />
+                        </button>
+                        &nbsp;
                         <button onClick={() => openModal(2, c.idCompra, c.descripcionCompra, c.estadoCompra, c.fechaCompra, c.proveedores_idProveedor)} className='btn btn-warning'
                           data-bs-toggle='modal' data-bs-target='#modalCompras'>
                           <FontAwesomeIcon icon={faEdit} />
@@ -319,74 +344,170 @@ const Compras = () => {
                         <button onClick={() => deleteCompra(c.idCompra)} className='btn btn-danger'>
                           <FontAwesomeIcon icon={faTrash} />
                         </button>
+
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          </div>
-        </div>
-      </div>
-      <div id='modalCompras' className='modal fade' aria-hidden='true'>
-        <div className='modal-dialog'>
-          <div className='modal-content'>
-            <div className='modal-header'>
-              <label className='h5'>{title}</label>
-              <button id='btnCerrar' onClick={() => { setDescripcionError(''); setIdError('')}} type='button' data-bs-dismiss='modal'><FontAwesomeIcon icon={faXmark} /></button>
-            </div>
-            <div className='modal-body'>
-              <input type='hidden' id='id' ></input>
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faIdCardClip} /></span>
-                <input type='number' id='id' className='form-control' placeholder='id' value={operation === 1 ? consecutivo : id}/>
-              </div>
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
-                <input
-                  type='text'
-                  id='descripcion'
-                  className={`form-control ${descripcionError ? 'is-invalid' : ''}`}
-                  placeholder='Descripcion'
-                  value={descripcion}
-                  onChange={(e) => {
-                    setDescripcionCompra(e.target.value);
-                    setDescripcionError('');
-                  }}
-                />
-                {descripcionError && (
-                  <div className='invalid-feedback'>
-                    {descripcionError}
-                  </div>
-                )}
-              </div>
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
-                <input type='text' id='estadoCompra' className='form-control' placeholder='Estado' value={estado} onChange={(e) => setEstadoCompra(e.target.value)}></input>
-              </div>
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
-                <input type='text' id='fechaCompra' className='form-control' placeholder='Fecha compra' value={fechaCompra} onChange={(e) => setFechaCompra(e.target.value)}></input>
-              </div>
-              <div className='input-group mb-3'>
-                <span key='proveedores_idProveedor' className='input-group-text'><FontAwesomeIcon icon={faTruckField} /></span>
-                <select id='proveedores_idProveedor' className='form-select' value={proveedores} onChange={(e) => setProveedores(e.target.value)}>
-                  <option value='' disabled>Seleccione un proveedor</option>
-                  {proveedor.map((p) => (
-                    <option key={p.idProveedor} value={p.idProveedor}>{p.nombreProveedor}</option>
-                  ))}
-                </select>
-              </div>
-              <div className='d-grid col-6 mx-auto'>
-                <button onClick={() => validar()} className='btn btn-success'>
-                  <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
-                </button>
-              </div>
-            </div>
 
           </div>
         </div>
       </div>
+
+      <ModalProyecto
+        title={title}
+        idModal='modalCompras'
+        inputs={[
+
+          <ContentDoble key={""} componentes={[
+            <ContentIndividual key={"id"} componentes={[
+              //<FontAwesomeIcon icon={faIdCardClip} />
+              <span key={"title"} ></span>,
+              <input key={"componente"} type='number' id='id' className='form-control' placeholder='id' value={operation === 1 ? consecutivo : id} />
+            ]} />,
+            <ContentIndividual key={"fechaCompra"} componentes={[
+              //<FontAwesomeIcon key={"icono"} icon={faCalendar} />,
+              <span key={"title"} ></span>,
+              <input key={"componente"} className="form-control" type='datetime-local' readOnly={true} id='fechaCompra' value={fechaCompra} onChange={(e) => setFechaCompra(e.target.value)}></input>
+            ]} />
+          ]}
+          />,
+
+          <ContentDoble key={""} componentes={[
+            <ContentIndividual key={"descripcion"} componentes={[
+              //<FontAwesomeIcon icon={faComment} />
+              <span key={"title"}></span>,
+              <input key={"componente"}
+                type='text'
+                id='descripcion'
+                className={`form-control ${descripcionError ? 'is-invalid' : ''}`}
+                placeholder='Descripcion'
+                value={descripcion}
+                onChange={(e) => {
+                  setDescripcionCompra(e.target.value);
+                  setDescripcionError('');
+                }}
+              />,
+              descripcionError && (
+                <div className='invalid-feedback'>,
+                  {descripcionError}
+                </div>
+              ),
+            ]} />,
+            <ContentIndividual key={"estadoCompra"} componentes={[
+              //<FontAwesomeIcon icon={faToggleOff} />
+              <span key={"title"}></span>,
+              <input key={"componente"} type='text' id='estadoCompra' className='form-control' placeholder='Estado' value={estado} onChange={(e) => setEstadoCompra(e.target.value)}></input>
+            ]} />
+          ]} />,
+
+          <ContentDoble key={""} componentes={[
+            <ContentIndividual key={""} componentes={[
+              //<FontAwesomeIcon icon={faTruckField} />
+              <span key='title' ></span>,
+              <select key={"proveedores_idProveedor"} id='proveedores_idProveedor' className='form-select' value={proveedores} onChange={(e) => setProveedores(e.target.value)}>
+                <option value='' disabled>Seleccione un proveedor</option>
+                {proveedor.map((p) => (
+                  <option key={p.idProveedor} value={p.idProveedor}>{p.nombreProveedor}</option>
+                ))}
+              </select>
+            ]} />,
+            <ContentIndividual key={"opciones"} componentes={[
+              <ContentIndividual key="opcionesButton" componentes={[
+                <ButtonNormal key="buttonAddProducto" idComponent="buttonAddProducto" title="Agregar producto" idModal='#modalProductos' />,
+                <ButtonNormal key="buttonCoProcucto" idComponent="buttonCoProducto" idModal='#modalProductos' title="Ver productos" />
+              ]} flexDirectionContents='row' justifyContents='space-evenly' />,
+            ]} />
+          ]} />,
+
+          <div key={"buttonGuardar"} className='col-md-4 offset-md-5' >
+            <button onClick={() => validar()} className='botones-azules' style={{ width: '60%' }}>
+              <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
+            </button>
+          </div>,
+        ]} widthContents='630px' />
+
+
+      <div id='modalProductos' className='modal fade' aria-hidden='true'>
+        <div className='modal-dialog'>
+          <div className='modal-content'>
+            <div className='modal-header'>
+              <h5 className='modal-title'>{title}</h5>
+              <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+            </div>
+            <div className='modal-body'>
+
+              <select key={"proveedores_idProveedor"} id='proveedores_idProveedor' className='form-select' value={proveedores} onChange={(e) => setProveedores(e.target.value)}>
+                <option value='' disabled>Seleccione un proveedor</option>
+                {proveedor.map((p) => (
+                  <option key={p.idProveedor} value={p.idProveedor}>{p.nombreProveedor}</option>
+                ))}
+              </select>
+
+              <div className='input-group mb-3'>
+                <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
+                <input type='text' id='idProducto' className='form-control' placeholder='Id' value={idProducto} onChange={(e) => setIdProducto(e.target.value)}></input>
+              </div>
+
+              <div className='input-group mb-3'>
+                <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
+                <input type='text' id='cantidad' className='form-control' placeholder='Cantidad' value={cantidad} onChange={(e) => setCantidad(e.target.value)}></input>
+              </div>
+
+              <div className='input-group mb-3'>
+                <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
+                <input type='text' id='precio' className='form-control' placeholder='Precio' value={precio} onChange={(e) => setPrecio(e.target.value)}></input>
+              </div>
+
+              <div key="buttonGuardar" className='d-grid col-6 mx-auto'>
+                <button onClick={() => agregarProducto()} className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalCompras'>
+                  <FontAwesomeIcon icon={faPlusCircle} /> Agregar Producto
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {showProductosModal && (
+        <div id='modalProductosAsociados' className='modal fade' aria-hidden='true'>
+          <div className='modal-dialog'>
+            <div className='modal-content'>
+              <div className='modal-header'>
+                <h5 className='modal-title'>Productos Asociados</h5>
+                <button type='button' className='btn-close' onClick={() => setShowProductosModal(false)} aria-label='Close'></button>
+              </div>
+              <div className='modal-body'>
+                <div className='table-responsive'>
+                  <table className='table table-striped'>
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        {/* Agregar más columnas si es necesario */}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {productosAsociados.map((producto) => (
+                        <tr key={producto.id}>
+                          <td>{producto.id}</td>
+                          <td>{producto.nombre}</td>
+                          <td>{producto.precio}</td>
+                          {/* Agregar más celdas si es necesario */}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
