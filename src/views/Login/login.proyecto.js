@@ -3,7 +3,7 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { show_alerta } from 'src/fuctions.proyecto';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faFloppyDisk, faComment, faEnvelope, faPaperPlane, faLock } from '@fortawesome/free-solid-svg-icons'
+import { faCheck, faEnvelope, faPaperPlane, faLock } from '@fortawesome/free-solid-svg-icons'
 
 
 const Login = () => {
@@ -199,7 +199,7 @@ const Login = () => {
 
 
 
-      {/* MODAL CORREO CONTRASEÑA */}
+      {/* MODAL CORREO */}
       <div id='modalCorreo' className='modal fade' aria-hidden='true'>
         <div className='modal-dialog'>
           <div className='modal-content'>
@@ -235,13 +235,23 @@ const Login = () => {
             <div className='modal-body'>
               <p>{mensaje}</p>
               <input type='hidden' id='id' ></input>
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
-                <input type='text' id='codigo' className='form-control' placeholder='Codigo' value={codigo} onChange={(e) => setCodigo(e.target.value)}></input>
+              <div className='input-group mb-3 justify-content-center align-items-center'>
+                {/* <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
+                <input type='text' id='codigo' className='form-control' placeholder='Codigo' value={codigo} onChange={(e) => setCodigo(e.target.value)}></input> */}
+                <div className='otp_inputs'>
+
+                <input type="text" placeholder='' maxLength='1' className='otp_input'></input>
+                <input type="text" placeholder='' maxLength='1' className='otp_input'></input>
+                <input type="text" placeholder='' maxLength='1' className='otp_input'></input>
+                <input type="text" placeholder='' maxLength='1' className='otp_input'></input>
+                <input type="text" placeholder='' maxLength='1' className='otp_input'></input>
+                <input type="text" placeholder='' maxLength='1' className='otp_input'></input>
+                </div>
+
               </div>
               <div className='d-grid col-6 mx-auto'>
                 <button onClick={() => { validar(); openModal(3); }} data-bs-toggle='modal' data-bs-target='#modalContrasena' className='btn btn-primary'>
-                  <FontAwesomeIcon icon={faPaperPlane} /> Enviar
+                  <FontAwesomeIcon icon={faCheck} /> Verificar
                 </button>
               </div>
             </div>

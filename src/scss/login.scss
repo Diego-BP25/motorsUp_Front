@@ -121,3 +121,27 @@ html{
   cursor: pointer;
   background-color: var(--azulOscuro);
 }
+.otp_inputs{
+  width: 320px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.otp_input {
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  outline: none;
+  border-radius: 5px;
+  border: 2px solid grey;
+  background-color: white;
+  color: black;
+  font-size: 1.5em;
+  margin-bottom: 10px;
+  caret-color: blue;
+}
+
+.otp_input:focus{
+  border: 2px solid blue;
+  color: blue;
+}
