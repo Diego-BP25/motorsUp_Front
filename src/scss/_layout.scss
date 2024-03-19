@@ -9,3 +9,23 @@
 .sidebar {
   --cui-sidebar-bg: linear-gradient(#0073B9,#015c95,#001725);
 }
+
+.containerinput {
+  margin-top: 10px; /* Ajusta el margen superior según tu diseño */
+}
+
+.inputBuscador:focus{
+background-color: transparentize($color: #ffffffb3, $amount: 0);
+}
+
+.input-group {
+  width: 300px; /* Ajusta el ancho del buscador según tu preferencia */
+}
+
+.icon-container {
+  position: absolute;
+  right: 10px; /* Posición del icono a la derecha */
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
