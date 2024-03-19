@@ -1,0 +1,147 @@
+:root{
+  --azul:#04081d;
+  --azulOscuro:#282a30;
+  --azulGris:#4685af;
+  --newColor: #1459b4;
+  --blanco:#faf8f8;
+  --fuente:'Quicksand', sans-serif;
+}
+html{
+  box-sizing: border-box;
+}
+
+*,*::after, *::before{
+  box-sizing: inherit;
+}
+
+.bodyLogin{
+  font-family: var(--fuente);
+  background-color: var(--azulOscuro);
+  display: flex;
+  align-items: center;
+  height: 100vh;
+}
+.olvideC {
+  display: inline;
+  color: blue; 
+  text-decoration: underline; 
+  cursor: pointer; 
+}
+
+
+.olvideC:hover {
+  text-decoration: none;
+  color: darkblue; 
+}
+.contenedor {
+  margin: 50px auto; /* Márgenes superior e inferior de 50px, y automáticamente centrará el contenedor horizontalmente */
+  max-width: 800px; /* Ancho máximo del contenedor reducido */
+  width: 90%; /* Ancho del contenedor reducido */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+  border-radius: 15px; /* Esquinas redondeadas */
+}
+
+.imagen-formulario{
+  background-image: url('../assets/images/login/bg.jpg');
+  background-position: center center;
+  background-size: cover;
+  height: 200px;
+  flex: 0 0 calc(51%);
+  position: relative;
+  
+}
+
+
+@media(min-width:768px){
+  .imagen-formulario{
+      height: auto;
+      background-position: right;
+  }
+
+}
+@media(min-width:1200px){
+  .imagen-formulario{
+      background-position: center;
+  }
+}
+
+@media(min-width:768px){
+  .contenedor-formulario{
+      display: flex;
+  }
+}
+
+.formulario{
+  padding: 50px;
+  background-color: var(--azul);
+}
+.texto-formulario h2, .input label, .password-olvidada a, .texto-formulario p{
+  color: var(--blanco);
+}
+.texto-formulario h2{
+  font-size: 40px;
+  text-align: center;
+}
+.texto-formulario p{
+  font-size: 22px;
+  text-align: center;
+}
+.input label{
+  display: block;
+  font-size: 22px;
+  font-weight: bold;
+  margin: 20px 0;
+}
+.password-olvidada a{
+  display: inline-block;
+  margin-top: 20px;
+  font-size: 22px;
+}
+.input input{
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 10px;
+  outline: none;
+  height: 45px;
+  font-size: 20px;
+  font-family: var(--fuente);
+  
+}
+.input input[type="submit"]{
+  background-color: var(--azulGris);
+  color: var(--blanco);
+  font-size: 22px;
+  font-weight: bold;
+  border: none;
+  margin-top: 20px;
+  transition: background-color .3s ease-in-out;
+}
+.input input[type="submit"]:hover{
+
+  cursor: pointer;
+  background-color: var(--azulOscuro);
+}
+.otp_inputs{
+  width: 320px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.otp_input {
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  outline: none;
+  border-radius: 5px;
+  border: 2px solid grey;
+  background-color: white;
+  color: black;
+  font-size: 1.5em;
+  margin-bottom: 10px;
+  caret-color: blue;
+}
+
+.otp_input:focus{
+  border: 2px solid blue;
+  color: blue;
+}
