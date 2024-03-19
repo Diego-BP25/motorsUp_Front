@@ -5,7 +5,6 @@
   @include transition(padding .15s);
 }
 
-// Color del menu
 .sidebar {
   --cui-sidebar-bg: linear-gradient(#0073B9,#015c95,#001725);
 }
@@ -28,4 +27,11 @@ background-color: transparentize($color: #ffffffb3, $amount: 0);
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
+}
+
+
+.pagination{
+  --cui-pagination-color: black;
+  --cui-pagination-active-bg: #0073B9;
+  --cui-pagination-active-border-color: #0073B9;
 }
