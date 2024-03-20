@@ -3,7 +3,7 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk,  faComment } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faComment } from '@fortawesome/free-solid-svg-icons'
 import { CSmartPagination } from '@coreui/react-pro'
 import { show_alerta } from 'src/fuctions.proyecto'
 
@@ -141,19 +141,22 @@ const Roles = () => {
   return (
     <div className='App'>
       <div className='container-fluid'>
-        <div className='row mt-3'>
-          <div className='col-md-4 offset-md-4'>
-            <h1>Roles</h1>
-          </div>
-          <div className='d-grid gap-8 col-md-4 offset-md-4'>
-            <button onClick={() => openModal(1)} className='btn btn-primary btn-custom ms-auto' data-bs-toggle='modal' data-bs-target='#modalRoles'>
-              <FontAwesomeIcon icon={faPlusCircle} /> Añadir
-            </button>
+        <div >
+          <div style={{ display: 'flex', alignItems: 'center' }} id="Container">
+            <div className='col-md-4 offset-md-5' >
+              <h3>Roles</h3>
+            </div>
+
+            <div style={{ marginRight: 'auto' }}>
+              <button className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalRoles' onClick={() => openModal(1)} >
+                <FontAwesomeIcon icon={faPlusCircle} /> Añadir
+              </button>
+            </div>
           </div>
         </div>
         <div className='row mt-3'>
-          <div className='col-12 col-lg-8 offset-0 offset-lg-2'>
-            <div className='table-responsive'>
+          <div >
+            <div className='table-responsive' style={{ maxWidth: '100%', margin: '0 auto' }}>
               <table className='table table-bordered'>
                 <thead>
                   <tr>
@@ -188,7 +191,7 @@ const Roles = () => {
           <div className='col-12 col-lg-8 offset-0 offset-lg-2'>
             <CSmartPagination
               activePage={currentPage}
-              pages={Math.ceil(rol.length / 5)} 
+              pages={Math.ceil(rol.length / 5)}
               onActivePageChange={setCurrentPage}
             />
           </div>
@@ -212,7 +215,7 @@ const Roles = () => {
                 <input type='text' id='nombre' className='form-control' placeholder='Nombre Rol' value={nombre} onChange={(e) => setNombre(e.target.value)}></input>
               </div>
               <div className='d-grid col-6 mx-auto'>
-                <button onClick={() => validar()} className='btn btn-success'>
+                <button onClick={() => validar()} className='botones-azules'>
                   <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
                 </button>
               </div>

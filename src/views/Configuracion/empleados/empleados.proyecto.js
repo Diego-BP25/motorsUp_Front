@@ -27,12 +27,12 @@ const Empleados = () => {
   const [actualizacion, setActualizacion] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
 
-  // const [roles, setRoles] = useState([])
+  const [roles, setRoles] = useState([])
   // const [selectedRoleId, setSelectedRoleId] = useState('')
 
   useEffect(() => {
     getEmpleados()
-    // getRoles()
+    getRoles()
     setActualizacion(false)
   }, [actualizacion ? empleado : null])
 
@@ -49,14 +49,18 @@ const Empleados = () => {
     }
   }
 
-  // const getRoles = async () => {
-  //   try {
-  //     const response = await axios.get('http://localhost:8081/api/roles')
-  //     setRoles(response.data)
-  //   } catch (error) {
-  //     console.error('Error al obtener los roles:', error.message)
-  //   }
-  // }
+  const getRoles = async () => {
+    try {
+      const response = await axios.get('http://localhost:8081/api/roles')
+      setRoles(response.data)
+    } catch (error) {
+      console.error('Error al obtener los roles:', error.message)
+    }
+  }
+  const nombreIdRol = (roleId) => {
+    const role = roles.find(role => role.idRol === roleId);
+    return role ? role.nombre : '';
+  };
 
   const openModal = (op, idEmpleado, nombreEmpleado, direccionEmpleado, telefonoEmpleado, estado, correoEmpleado, usuario, contrasena, roles_idRol) => {
     setIdEmpleado('');
@@ -95,11 +99,11 @@ const Empleados = () => {
 
 
     if (operation === 1) {
-      parametros = { idEmpleado: idEmpleado, nombreEmpleado: nombreEmpleado, direccionEmpleado: direccionEmpleado, telefonoEmpleado: telefonoEmpleado, estado: estado, correoEmpleado: correoEmpleado, usuario: usuario, contrasena: contrasena, roles_idRol: roles_idRol};
+      parametros = { idEmpleado: idEmpleado, nombreEmpleado: nombreEmpleado, direccionEmpleado: direccionEmpleado, telefonoEmpleado: telefonoEmpleado, estado: estado, correoEmpleado: correoEmpleado, usuario: usuario, contrasena: contrasena, roles_idRol: roles_idRol };
 
       console.log(parametros)
       metodo = 'POST';
-    } else if(operation ===2 ) {
+    } else if (operation === 2) {
       parametros = { idEmpleado: idEmpleado, nombreEmpleado: nombreEmpleado, direccionEmpleado: direccionEmpleado, telefonoEmpleado: telefonoEmpleado, estado: estado, correoEmpleado: correoEmpleado, usuario: usuario, contrasena: contrasena, roles_idRol: roles_idRol };
       metodo = 'PUT';
 
@@ -184,21 +188,23 @@ const Empleados = () => {
 
     <div className='App'>
       <div className='container-fluid'>
-        <div className='row mt-3'>
-          <div className='col-md-4 offset-md-4'>
-            <h1>Empleados</h1>
-          </div>
-          <div className='d-grid gap-8 col-md-4 offset-md-4'>
-            <button onClick={() => openModal(1)} className='btn btn-primary btn-custom ms-auto' data-bs-toggle='modal' data-bs-target='#modalEmpleados'>
-              <FontAwesomeIcon icon={faPlusCircle} /> Añadir
-            </button>
-          </div>
+        <div >
+          <div style={{ display: 'flex', alignItems: 'center' }} id="Container">
+            <div className='col-md-4 offset-md-5' >
+              <h3>Empleados</h3>
+            </div>
 
+            <div style={{ marginRight: 'auto' }}>
+              <button className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalEmpleados' onClick={() => [openModal(1)]} >
+                <FontAwesomeIcon icon={faPlusCircle} /> Añadir
+              </button>
+            </div>
+          </div>
         </div>
         <div className='row mt-3'>
-          <div className='col-12 col-lg-8 offset-0 offset-lg-2'>
-            <div className='table-responsive'>
-              <table className='table table-bordered'>
+          <div >
+            <div className="table-responsive" style={{ maxWidth: '100%', margin: '0 auto' }}>
+              <table className='table table-striped' style={{ width: '100%' }}>
                 <thead>
                   <tr>
                     <th>CC</th>
@@ -221,7 +227,7 @@ const Empleados = () => {
                       <td>{e.telefonoEmpleado}</td>
                       <td>{e.estado}</td>
                       <td>{e.correoEmpleado}</td>
-                      <td>{e.roles_idRol}</td>
+                      <td>{nombreIdRol(e.roles_idRol)}</td>
                       <td>
                         <button onClick={() => openModal(2, e.idEmpleado, e.nombreEmpleado, e.direccionEmpleado, e.telefonoEmpleado, e.estado, e.correoEmpleado, e.usuario, e.contrasena, e.roles_idRol)} className='btn btn-warning'
                           data-bs-toggle='modal' data-bs-target='#modalEmpleados'>
@@ -293,16 +299,13 @@ const Empleados = () => {
 
 
               <div className='input-group mb-3'>
-                {/* <span className='input-group-text'><FontAwesomeIcon icon={faTruckField} /></span>
-                <select id='roles_idRol' className='form-select' value={selectedRoleId} onChange={(e) => setSelectedRoleId(e.target.value)}>
+                <span className='input-group-text'><FontAwesomeIcon icon={faTruckField} /></span>
+                <select id='roles_idRol' className='form-select' value={roles_idRol} onChange={(e) => setRoles_idRol(e.target.value)}>
                   <option value='' disabled>Seleccione un rol</option>
                   {roles.map((rol) => (
-                    <option key={rol.id} value={rol.id}>{rol.nombre}</option>
+                    <option key={rol.idRol} value={rol.idRol}>{rol.nombre}</option>
                   ))}
-                </select> */}
-                <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
-                <input type='text' id='roles_idRol' className='form-control' placeholder='Roles' value={roles_idRol} onChange={(e) => setRoles_idRol(e.target.value)}></input>
-
+                </select>
               </div>
 
 
