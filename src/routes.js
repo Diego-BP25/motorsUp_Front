@@ -2,12 +2,17 @@ import React from 'react'
 
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard.proyecto'))
 const Compras = React.lazy(() => import('./views/Compras/compra/compra.proyecto'))
+const AgregarCompra = React.lazy(() => import('./views/Compras/compra/agregarCompra.proyecto'))
 const Productos = React.lazy(() => import('./views/Compras/productos/productos.proyecto'))
 const Empleado = React.lazy(() => import('./views/Configuracion/empleados/empleados.proyecto'))
 const Rol = React.lazy(() => import('./views/Configuracion/roles/roles.proyecto'))
 const cotizaciones = React.lazy(() => import('./views/cotizaciones/cotizaciones.proyecto'))
 const Propietarios = React.lazy(() => import('./views/Servicios/Propietarios/propietario.proyecto'))
 const Ventas = React.lazy(() => import('./views/ventas/venta/venta.proyecto'))
+<<<<<<< HEAD
+=======
+
+>>>>>>> e7ad68f3443d4a79e3046cd5307445fa6f02685b
 const Agendamiento = React.lazy(() =>
   import('./views/Servicios/agendamiento/agendamiento.proyecto'),
 )
@@ -20,6 +25,7 @@ const routes = [
   { path: '/compras', name: 'Compras', element: Compras, exact: true },
   { path: '/cotizacion', name: 'Cotizacion', element: cotizaciones, exact: true },
   { path: '/compras/compra', name: 'Gestion compras', element: Compras },
+  { path: '/compras/agregar', name: 'Agregar compra', element: AgregarCompra },
   { path: '/cotizacio/cotizaciones', name: 'Cotizaciones', element: cotizaciones, exact: true },
   { path: '/compras/productos', name: 'Productos', element: Productos, exact: true },
   { path: '/compras/proveedores', name: 'Proveedores', element: Compras },
