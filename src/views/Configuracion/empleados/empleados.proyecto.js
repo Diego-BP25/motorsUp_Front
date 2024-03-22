@@ -213,7 +213,8 @@ const Empleados = () => {
                       <td>{e.nombreEmpleado}</td>
                       <td>{e.direccionEmpleado}</td>
                       <td>{e.telefonoEmpleado}</td>
-                      <td>{e.estado}</td>
+                      <td>
+                        <span className={!e.estado  ? 'estado-inactivo' : 'estado-activo'}>{!e.estado ? 'Inactivo' : 'Activo'}</span></td>
                       <td>{e.correoEmpleado}</td>
                       <td>{e.roles_idRol}</td>
                       <td>
