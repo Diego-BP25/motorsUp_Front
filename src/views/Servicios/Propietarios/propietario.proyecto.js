@@ -150,8 +150,12 @@ const Propietarios = () => {
   const filtrar = (terminoBusqueda) => {
     var resultadosBusqueda = propietario.filter((elemento) => {
 
-      if (elemento.nombrePropietario.toString().toLowerCase().includes(terminoBusqueda.toLowerCase())
-      ) {
+      if (elemento.nombrePropietario.toString().toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
+      elemento.telefonoPropietario.toString().toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
+      elemento.correoPropietario.toString().toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
+      elemento.estadoPropietario.toString().toLowerCase().includes(terminoBusqueda.toLowerCase())
+      ) 
+       {
         return elemento;
       }
     });
@@ -162,20 +166,22 @@ const Propietarios = () => {
 
     <div className='App'>
       <div className='container-fluid'>
+
         <div className='row mt-3'>
-          <div className='col-md-4 offset-md-4'>
-            <div className='d-grid mx-auto'>
-              <button onClick={() => openModal(1)} className='btn btn-success ms-2' data-bs-toggle='modal' data-bs-target='#modalPropietarios'>
+          <div >
+
+            <div className='table-responsive'>
+            <div style={{ display: 'flex', alignItems: 'center' }} id="Container">
+            <div className='col-md-4 offset-md-5' >
+              <h3>Propietarios</h3>
+            </div>
+
+            <div style={{ marginRight: 'auto' }}>
+              <button className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalPropietarios' onClick={() => [openModal(1)]} >
                 <FontAwesomeIcon icon={faPlusCircle} /> Añadir
               </button>
             </div>
           </div>
-        </div>
-
-        <div className='row mt-3'>
-          <div className='col-12 col-lg-8 offset-0 offset-lg-2'>
-
-            <div className='table-responsive'>
               <div className='containerinput d-flex justify-content-start align-items-center'>
                 <div className='input-group'>
                   <input className='form-control inputBuscador'
@@ -189,7 +195,9 @@ const Propietarios = () => {
                   </div>
                 </div>
               </div>
-              <table className='table table-bordered'>
+              <div className="table-responsive" style={{ maxWidth: '100%', margin: '0 auto' }}>
+
+              <table className='table table-striped' style={{ width: '100%' }}>
 
                 <thead>
                   <tr>
@@ -224,6 +232,7 @@ const Propietarios = () => {
                   ))}
                 </tbody>
               </table>
+              </div>
             </div>
           </div>
         </div>

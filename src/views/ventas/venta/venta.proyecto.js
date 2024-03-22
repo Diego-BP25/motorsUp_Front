@@ -22,6 +22,7 @@ const Ventas = () => {
     const [operation, setOperation] = useState(1)
     const [title, setTitle] = useState('')
     const [actualizacion, setActualizacion] = useState(false)
+    const [estadoModal, setEstadoModal] = useState(true)
 
   
     useEffect(() => {
@@ -51,10 +52,9 @@ const Ventas = () => {
         else if (op === 2) {
             setTitle('Editar venta  ')
             setIdVenta(idVenta);
-            setFecha(fecha);
-            setMetodoPago(metodoPago);
+
             setEstado(estado);
-            setTotal(total);
+
         }
 
         setOperation(op)
@@ -71,6 +71,9 @@ const Ventas = () => {
             console.log(idVenta)
             parametros ={idVenta: idVenta, fecha: fecha,metodoPago: metodoPago, estado: total};
             metodo = 'POST';
+            }else {
+              parametros = { idVenta: idVenta, estado: estado }
+              metodo = 'PUT';
             }
             enviarSolicitud(metodo, parametros);
     }
@@ -87,6 +90,15 @@ const Ventas = () => {
                     timer: 1500
         });
         document.getElementById('btnCerrar').click();
+      } else if (metodo === 'PUT') {
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Venta editada con exito",
+          showConfirmButton: false,
+          timer: 1500
+        });
+        document.getElementById('btnCerrar').click();
     }if (metodo === 'DELETE') {
         Swal.fire({
             position: "center",
@@ -96,12 +108,7 @@ const Ventas = () => {
             timer: 1500
           });
           document.getElementById('btnCerrar').click();
-    }
-      setActualizacion(true)
-    })
-    .catch(function (error) {
-      show_alerta('Error en la solicitud', 'error');
-      console.log(error);
+    };
     })
 }
 
@@ -131,14 +138,14 @@ const deleteVenta = (idVenta) =>{
         <div className='row mt-3'>
           <div className='col-md-4 offset-md-4'>
             <div className='d-grid mx-auto'>
-            <button onClick={()=> {openModal(1); setFecha(formatDate(new Date()))}} className='btn btn-success ms-2' data-bs-toggle='modal' data-bs-target='#modalVentas' > 
+            <button onClick={()=> {openModal(1); setFecha(formatDate(new Date())); setEstadoModal(true)}} className='btn btn-success ms-2' data-bs-toggle='modal' data-bs-target='#modalVentas' > 
                 <FontAwesomeIcon icon={faPlusCircle} /> Añadir
               </button>
             </div>
            </div>
           </div>
           <div className='row mt-3'>
-            <div className='col-12 col-lg-8 offset-0 offset-lg-2'>
+            <div>
               <div className='table-responsive'>
                 <table className='table table-bordered'>
                   <thead>
@@ -158,14 +165,19 @@ const deleteVenta = (idVenta) =>{
                     {venta.map((r) => (
                       <tr key={r.idVenta} >
                         
-                        <td onClick={()=>{alert(r.idVenta)}}>{r.idVenta}</td> 
-                        <td onClick={()=>{alert(r.idVenta)}}>{r.fecha}</td>
-                        <td onClick={()=>{alert(r.idVenta)}}>{r.metodoPago}</td>
-                        <td onClick={()=>{alert(r.idVenta)}}>{r.estado?'true':'false'}</td>
-                        <td onClick={()=>{alert(r.idVenta)}}>{r.total}</td>
+                        <td>{r.idVenta}</td> 
+                        <td>{r.fecha}</td>
+                        <td>{r.metodoPago}</td>
+                        <td>{r.estado?'true':'false'}</td>
+                        <td>{r.total}</td>
                         
                         <td>
-                            &nbsp;
+                        <button onClick={() => {openModal(2, r.idVenta, r.estado); setEstadoModal(false)}} className='btn btn-warning'
+                          data-bs-toggle='modal' data-bs-target='#modalVentas'>
+                          <FontAwesomeIcon icon={faEdit} />
+                          
+                        </button>
+                        &nbsp;
                             <button onClick ={()=> deleteVenta(r.idVenta)}className='btn btn-danger'> 
                             <FontAwesomeIcon icon={faTrash} />
                             </button>
@@ -203,22 +215,23 @@ const deleteVenta = (idVenta) =>{
                 <span className='input-group-text'><FontAwesomeIcon icon={faHashtag} /></span>
                 <input type='text' id='id' className='form-control' placeholder='ID' value={idVenta} onChange={(e)=> setIdVenta(e.target.value)}></input>
               </div>
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faCalendarDays} /></span>
-                <input type='datetime-local' id='Fecha' className='form-control' placeholder='Fecha' value={fecha} onChange={(e)=> setFecha(e.target.value)}></input>
-              </div>
-              <div className='input-group mb-3'>
+              {estadoModal? 
+               <div className='input-group mb-3'>
+               <span className='input-group-text'><FontAwesomeIcon icon={faCalendarDays} /></span>
+               <input type='datetime-local' id='Fecha' className='form-control' placeholder='Fecha' value={fecha} onChange={(e)=> setFecha(e.target.value)}></input>
+             </div>: false}
+             {estadoModal? <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faCreditCard} /></span>
                 <input type='text' id='Metodo pago' className='form-control' placeholder='Metodo pago' value={metodoPago} onChange={(e)=> setMetodoPago(e.target.value)}></input>
-              </div>
+              </div>:false}
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
                 <input type='text' id='Estado' className='form-control' placeholder='Estado' value={estado} onChange={(e)=> setEstado(e.target.value)}></input>
               </div>
-              <div className='input-group mb-3'>
+              {estadoModal? <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faDollar} /></span>
                 <input type='text' id='Total' className='form-control' placeholder='Total' value={total} onChange={(e)=> setTotal(e.target.value)}></input>
-              </div>
+              </div>:false}
               <div className='d-grid col-6 mx-auto'>
                 <button onClick={() => validar()}  className='btn btn-success'>
                   <FontAwesomeIcon icon={faFloppyDisk} /> Guardar

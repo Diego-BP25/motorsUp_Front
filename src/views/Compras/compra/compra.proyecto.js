@@ -296,6 +296,7 @@ const Compras = () => {
 
     <div className='App'>
       <div className='container-fluid'>
+        
         <div >
           <div style={{ display: 'flex', alignItems: 'center' }} id="Container">
             <div className='col-md-4 offset-md-5' >
@@ -309,6 +310,7 @@ const Compras = () => {
             </div>
           </div>
         </div>
+
         <div className='row mt-3'>
           <div>
             <div className="table-responsive" style={{ maxWidth: '100%', margin: '0 auto' }}>

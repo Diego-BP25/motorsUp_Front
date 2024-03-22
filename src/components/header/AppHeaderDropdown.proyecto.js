@@ -13,7 +13,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faRightToBracket} from '@fortawesome/free-solid-svg-icons'
 
 
-import avatar8 from './../../assets/images/avatars/6.jpg'
+import avatar8 from './../../assets/images/avatars/logo1.jpg'
 
 const AppHeaderDropdown = () => {
   return (
