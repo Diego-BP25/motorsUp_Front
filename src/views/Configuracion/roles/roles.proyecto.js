@@ -3,7 +3,7 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faComment } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faComment, faSearch } from '@fortawesome/free-solid-svg-icons'
 import { CSmartPagination } from '@coreui/react-pro'
 import { show_alerta } from 'src/fuctions.proyecto'
 
@@ -17,11 +17,42 @@ const Roles = () => {
   const [title, setTitle] = useState('')
   const [actualizacion, setActualizacion] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
+  const [busqueda, setBusqueda] = useState("");
+
+  const [nombreError, setNombreError] = useState('');
+
+  const [consecutivo, setConsecutivo] = useState(0);
 
   useEffect(() => {
     getRoles()
     setActualizacion(false)
   }, [actualizacion ? rol : null])
+
+  useEffect(() => {
+    if (operation === 1) {
+      obtenerIdConsecutivo();
+    }
+  }, [operation]);
+
+
+  const obtenerIdConsecutivo = async () => {
+    try {
+      const respuesta = await axios.get(url);
+      const rol = respuesta.data;
+      if (rol.length > 0) {
+        const maxId = Math.max(...rol.map(c => c.idRol));
+        setConsecutivo(maxId + 1);
+      } else {
+        setConsecutivo(1);
+      }
+    } catch (error) {
+      console.error('Error al obtener el número consecutivo más alto:', error.message);
+    }
+  };
+
+
+
+
 
   const getRoles = async () => {
     try {
@@ -38,6 +69,7 @@ const Roles = () => {
 
     if (op === 1) {
       setTitle('Registrar Rol')
+      obtenerIdConsecutivo();
     }
     else if (op === 2) {
       setTitle('Editar Rol')
@@ -50,10 +82,27 @@ const Roles = () => {
     }, 500);
   }
 
+  const validarCamposObligatorios = () => {
+    let hayErrores = false;
+    if (!nombre.trim()) {
+      setNombreError('El campo nombre obligatorio');
+      hayErrores = true;
+    } else {
+      setNombreError('');
+    }
+    return hayErrores;
+  };
+
   const validar = () => {
     var parametros;
     var metodo;
 
+
+    const camposObligatoriosInvalidos = validarCamposObligatorios();
+
+    if (camposObligatoriosInvalidos) {
+      return;
+    }
 
     if (operation === 1) {
       console.log(idRol)
@@ -87,7 +136,7 @@ const Roles = () => {
           showConfirmButton: false,
           timer: 1500
         });
-        document.getElementById('btnCerrar').click();
+       document.getElementById('btnCerrar').click();
       }
       if (metodo === 'DELETE') {
         Swal.fire({
@@ -131,6 +180,30 @@ const Roles = () => {
 
   }
 
+  const handleChange = (e) => {
+    const valor = e.target.value;
+    setBusqueda(valor); // Actualizar el estado de búsqueda
+
+    if (valor.trim() === '') {
+      getRoles(); // Si el valor está vacío, obtener todos los propietarios nuevamente
+    } else {
+      filtrar(valor); // Si hay un valor, aplicar el filtro de búsqueda
+    }
+  };
+
+  const filtrar = (terminoBusqueda) => {
+    var resultadosBusqueda = rol.filter((elemento) => {
+
+      if (elemento.nombre.toString().toLowerCase().includes(terminoBusqueda.toLowerCase())
+      ) {
+        return elemento;
+      }
+    });
+    setRol(resultadosBusqueda);
+  }
+
+
+
   // Función para obtener los roles de la página actual
   const getCurrentPageRoles = () => {
     const startIndex = (currentPage - 1) * 5;
@@ -142,12 +215,25 @@ const Roles = () => {
     <div className='App'>
       <div className='container-fluid'>
         <div >
-          <div style={{ display: 'flex', alignItems: 'center' }} id="Container">
-            <div className='col-md-4 offset-md-5' >
+          <div style={{ display: 'flex', }} id="Container">
+
+          <div style={{ marginRight: 'auto' }}>
               <h3>Roles</h3>
             </div>
+            <div className='input-group' style={{ marginRight: '1%' }}>
+              <input className='form-control inputBuscador'
+                id='buscador'
+                value={busqueda}
+                placeholder='Buscar'
+                onChange={handleChange}
+              />
+              <div className="icon-container">
+                <FontAwesomeIcon icon={faSearch} />
+              </div>
+            </div>
 
-            <div style={{ marginRight: 'auto' }}>
+
+            <div style={{ marginRight: '-0.1%' }}>
               <button className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalRoles' onClick={() => openModal(1)} >
                 <FontAwesomeIcon icon={faPlusCircle} /> Añadir
               </button>
@@ -157,7 +243,7 @@ const Roles = () => {
         <div className='row mt-3'>
           <div >
             <div className='table-responsive' style={{ maxWidth: '100%', margin: '0 auto' }}>
-              <table className='table table-bordered'>
+              <table className='table table-striped'>
                 <thead>
                   <tr>
                     <th>ID</th>
@@ -188,8 +274,9 @@ const Roles = () => {
         </div>
         {/* Paginación */}
         <div className='row mt-3'>
-          <div className='col-12 col-lg-8 offset-0 offset-lg-2'>
+          <div className='col-12 col-lg-8 offset-0 offset-lg-2' >
             <CSmartPagination
+              style={{ marginLeft: '-208px' }}
               activePage={currentPage}
               pages={Math.ceil(rol.length / 5)}
               onActivePageChange={setCurrentPage}
@@ -202,26 +289,25 @@ const Roles = () => {
           <div className='modal-content'>
             <div className='modal-header'>
               <label className='h5'>{title}</label>
-              <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
+              <button type='button' id='btnCerrar' className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
             </div>
             <div className='modal-body'>
               <input type='hidden' id='id' ></input>
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
-                <input type='text' id='idRol' className='form-control' placeholder='ID' value={idRol} onChange={(e) => setIdRol(e.target.value)}></input>
+                <input type='text' id='idRol' className='form-control' placeholder='ID' value={operation === 1 ? consecutivo : idRol} onChange={(e) => setIdRol(e.target.value)}  disabled></input>
               </div>
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
-                <input type='text' id='nombre' className='form-control' placeholder='Nombre Rol' value={nombre} onChange={(e) => setNombre(e.target.value)}></input>
+                <input type='text' id='nombre' className={`form-control ${nombreError ? 'is-invalid' : ''}`} placeholder='Nombre Rol' value={nombre} onChange={(e) => {
+                  setNombreError('')
+                  setNombre(e.target.value)}}></input>
               </div>
               <div className='d-grid col-6 mx-auto'>
                 <button onClick={() => validar()} className='botones-azules'>
                   <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
                 </button>
               </div>
-            </div>
-            <div className='modal-footer'>
-              <button id='btnCerrar' type='button' className='btn btn-secondary' data-bs-dismiss='modal'>Cerrar</button>
             </div>
           </div>
         </div>
