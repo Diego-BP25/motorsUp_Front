@@ -6,9 +6,7 @@ import {
   CDropdownMenu,
   CDropdownToggle,
 } from '@coreui/react'
-import {
-  cilBell
-} from '@coreui/icons'
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faRightToBracket} from '@fortawesome/free-solid-svg-icons'
 
