@@ -18,7 +18,7 @@ const Empleados = () => {
   const [telefonoEmpleado, setTelefonoEmpleado] = useState('')
   const [estado, setEstado] = useState('')
   const [correoEmpleado, setCorreoEmpleado] = useState('')
-  const [usuario, setUsuario] = useState('')
+
   const [contrasena, setContrasena] = useState('')
   const [roles_idRol, setRoles_idRol] = useState('')
   const [operation, setOperation] = useState(1)
@@ -56,14 +56,14 @@ const Empleados = () => {
     }
   }
 
-  const openModal = (op, idEmpleado, nombreEmpleado, direccionEmpleado, telefonoEmpleado, estado, correoEmpleado, usuario, contrasena, roles_idRol) => {
+  const openModal = (op, idEmpleado, nombreEmpleado, direccionEmpleado, telefonoEmpleado, estado, correoEmpleado, contrasena, roles_idRol) => {
     setIdEmpleado('');
     setNombreEmpleado()
     setDireccionEmpleado('');
     setTelefonoEmpleado('');
     setEstado('');
     setCorreoEmpleado('');
-    setUsuario('');
+
     setContrasena('');
     setRoles_idRol('');
     if (op === 1) {
@@ -77,7 +77,7 @@ const Empleados = () => {
       setTelefonoEmpleado(telefonoEmpleado);
       setEstado(estado);
       setCorreoEmpleado(correoEmpleado);
-      setUsuario(usuario);
+      
       setContrasena(contrasena);
       setRoles_idRol(roles_idRol);
     }
@@ -93,10 +93,10 @@ const Empleados = () => {
 
 
     if (operation === 1) {
-      parametros = { idEmpleado: idEmpleado, nombreEmpleado: nombreEmpleado, direccionEmpleado: direccionEmpleado, telefonoEmpleado: telefonoEmpleado, estado: estado, correoEmpleado: correoEmpleado, usuario: usuario, contrasena: contrasena, roles_idRol: roles_idRol };
+      parametros = { idEmpleado: idEmpleado, nombreEmpleado: nombreEmpleado, direccionEmpleado: direccionEmpleado, telefonoEmpleado: telefonoEmpleado, estado: true, correoEmpleado: correoEmpleado, contrasena: contrasena, roles_idRol: roles_idRol };
       metodo = 'POST';
     } else {
-      parametros = { idEmpleado: idEmpleado, nombreEmpleado: nombreEmpleado, direccionEmpleado: direccionEmpleado, telefonoEmpleado: telefonoEmpleado, estado: estado, correoEmpleado: correoEmpleado, usuario: usuario, contrasena: contrasena, roles_idRol: roles_idRol };
+      parametros = { idEmpleado: idEmpleado, nombreEmpleado: nombreEmpleado, direccionEmpleado: direccionEmpleado, telefonoEmpleado: telefonoEmpleado, estado: estado, correoEmpleado: correoEmpleado, contrasena: contrasena, roles_idRol: roles_idRol };
       metodo = 'PUT';
     }
     enviarSolicitud(metodo, parametros);
@@ -217,7 +217,7 @@ const Empleados = () => {
                       <td>{e.correoEmpleado}</td>
                       <td>{e.roles_idRol}</td>
                       <td>
-                        <button onClick={() => openModal(2, e.idEmpleado, e.nombreEmpleado, e.direccionEmpleado, e.telefonoEmpleado, e.estado, e.correoEmpleado, e.usuario, e.contrasena, e.roles_idRol)} className='btn btn-warning'
+                        <button onClick={() => openModal(2, e.idEmpleado, e.nombreEmpleado, e.direccionEmpleado, e.telefonoEmpleado, e.estado, e.correoEmpleado, e.contrasena, e.roles_idRol)} className='btn btn-warning'
                           data-bs-toggle='modal' data-bs-target='#modalEmpleados'>
                           <FontAwesomeIcon icon={faEdit} />
                         </button>
@@ -279,8 +279,6 @@ const Empleados = () => {
 
 
               <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
-                <input type='text' id='usuario' className='form-control' placeholder='Usuario' value={usuario} onChange={(e) => setUsuario(e.target.value)}></input>
                 <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
                 <input type='text' id='contrasena' className='form-control' placeholder='Contraseña' value={contrasena} onChange={(e) => setContrasena(e.target.value)}></input>
               </div>
