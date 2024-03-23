@@ -45,3 +45,13 @@ background-color: transparentize($color: #ffffffb3, $amount: 0);
   --cui-pagination-active-bg: #0073B9;
   --cui-pagination-active-border-color: #0073B9;
 }
+
+.estado-activo {
+  color: green; 
+  font-weight: bold;
+}
+
+.estado-inactivo {
+  color: red;
+  font-weight: bold;
+}
