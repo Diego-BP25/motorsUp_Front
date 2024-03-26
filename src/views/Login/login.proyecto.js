@@ -105,9 +105,10 @@ const Login = () => {
     }
   };
 
-  const openModal = (op, correoRecuperacion, contrasenaNueva) => {
+  const openModal = (op, correoRecuperacion, contrasenaNueva, codigo) => {
     setCorreoRecuperacion('');
     setContrasenaNueva('');
+    setCodigo('');
 
     if (op === 1) {
       setTitle('Recuperar Contraseña')
@@ -121,7 +122,12 @@ const Login = () => {
       setTitle('Nueva Contraseña')
       setMensaje('Introduzca su nueva contraseña..');
     }
-    setOperation(op)
+    setOperation(op);
+
+     if (op !== 1 && (correoRecuperacion === '' )) {
+      console.log('correo vacio')
+      return;
+    }
     window.setTimeout(function () {
       document.getElementById('correo').focus();
     }, 500);
@@ -214,7 +220,7 @@ const Login = () => {
                 <input type='text' id='correoRecuperacion' className='form-control' placeholder='Correo' value={correoRecuperacion} onChange={(e) => setCorreoRecuperacion(e.target.value)}></input>
               </div>
               <div className='d-grid col-6 mx-auto'>
-                <button onClick={() => { validar(); openModal(2); }} data-bs-toggle='modal' data-bs-target='#modalCodigo' className='btn btn-primary'>
+                <button onClick={() => { validar(); openModal(2, correoRecuperacion); }} data-bs-toggle='modal' data-bs-target='#modalCodigo' className='botones-azules'>
                   <FontAwesomeIcon icon={faPaperPlane} /> Enviar
                 </button>
               </div>
@@ -234,27 +240,34 @@ const Login = () => {
             </div>
             <div className='modal-body'>
               <p>{mensaje}</p>
-              <input type='hidden' id='id' ></input>
+              <input type='hidden' id='id' />
               <div className='input-group mb-3 justify-content-center align-items-center'>
-                {/* <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
-                <input type='text' id='codigo' className='form-control' placeholder='Codigo' value={codigo} onChange={(e) => setCodigo(e.target.value)}></input> */}
                 <div className='otp_inputs'>
-
-                <input type="text" placeholder='' maxLength='1' className='otp_input'></input>
-                <input type="text" placeholder='' maxLength='1' className='otp_input'></input>
-                <input type="text" placeholder='' maxLength='1' className='otp_input'></input>
-                <input type="text" placeholder='' maxLength='1' className='otp_input'></input>
-                <input type="text" placeholder='' maxLength='1' className='otp_input'></input>
-                <input type="text" placeholder='' maxLength='1' className='otp_input'></input>
+                  <input type="text" placeholder='' maxLength='1' className='otp_input' />
+                  <input type="text" placeholder='' maxLength='1' className='otp_input' />
+                  <input type="text" placeholder='' maxLength='1' className='otp_input' />
+                  <input type="text" placeholder='' maxLength='1' className='otp_input' />
+                  <input type="text" placeholder='' maxLength='1' className='otp_input' />
+                  <input type="text" placeholder='' maxLength='1' className='otp_input' />
                 </div>
-
               </div>
               <div className='d-grid col-6 mx-auto'>
-                <button onClick={() => { validar(); openModal(3); }} data-bs-toggle='modal' data-bs-target='#modalContrasena' className='btn btn-primary'>
+                <button onClick={() => {
+                  const otpInputs = document.querySelectorAll('.otp_input');
+                  let codigo = '';
+                  otpInputs.forEach(input => {
+                    codigo += input.value;
+                  });
+                  setCodigo(codigo); // Actualizar el estado 'codigo'
+                  validar();
+                  openModal(3);
+                }} data-bs-toggle='modal' data-bs-target='#modalContrasena' className='botones-azules'>
                   <FontAwesomeIcon icon={faCheck} /> Verificar
                 </button>
               </div>
             </div>
+
+
           </div>
         </div>
       </div>
@@ -275,7 +288,7 @@ const Login = () => {
                 <input type='password' id='contrasenaNueva' className='form-control' placeholder='Contraseña' value={contrasenaNueva} onChange={(e) => setContrasenaNueva(e.target.value)}></input>
               </div>
               <div className='d-grid col-6 mx-auto'>
-                <button onClick={() => validar()} className='btn btn-primary'>
+                <button onClick={() => validar()} className='botones-azules'>
                   <FontAwesomeIcon icon={faPaperPlane} /> Enviar
                 </button>
               </div>

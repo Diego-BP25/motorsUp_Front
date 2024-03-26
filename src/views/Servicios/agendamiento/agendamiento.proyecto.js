@@ -11,7 +11,6 @@ const Agendamientos = () => {
   const url = 'http://localhost:8081/api/agendamientos'
   const [agendamiento, setAgendamiento] = useState([])
 
-
   useEffect(() => {
     getAgendamientos()
   }, [])
@@ -25,9 +24,12 @@ const Agendamientos = () => {
     }
   }
 
+  const handleSelectSlot = ({ start, end }) => {
+    // Aquí puedes manejar lo que deseas hacer cuando el usuario seleccione un espacio de tiempo vacío en el calendario
+    console.log("Espacio de tiempo seleccionado:", start, end);
+  };
 
   const localizer = dayjsLocalizer(dayjs)
-
   
   const events = agendamiento.map(item => ({
     start: dayjs(item.fecha).toDate(), 
@@ -46,6 +48,7 @@ const Agendamientos = () => {
         startAccessor="start"
         endAccessor="end"
         titleAccessor="title"
+        onSelectSlot={handleSelectSlot} // Aquí se maneja la selección del espacio de tiempo
         messages={{
           allDay: 'Todo el día',
           previous: 'Anterior',
