@@ -8,8 +8,11 @@ import "dayjs/locale/es";
 dayjs.locale("es");
 
 const Agendamientos = () => {
+
   const url = 'http://localhost:8081/api/agendamientos'
   const [agendamiento, setAgendamiento] = useState([])
+  const [SelectedDate, setSelectedDate] = useState(null);
+
 
   useEffect(() => {
     getAgendamientos()
@@ -23,11 +26,6 @@ const Agendamientos = () => {
       console.error('Error al obtener los Agendamientos:', error.message)
     }
   }
-
-  const handleSelectSlot = ({ start, end }) => {
-    // Aquí puedes manejar lo que deseas hacer cuando el usuario seleccione un espacio de tiempo vacío en el calendario
-    console.log("Espacio de tiempo seleccionado:", start, end);
-  };
 
   const localizer = dayjsLocalizer(dayjs)
   
@@ -48,7 +46,6 @@ const Agendamientos = () => {
         startAccessor="start"
         endAccessor="end"
         titleAccessor="title"
-        onSelectSlot={handleSelectSlot} // Aquí se maneja la selección del espacio de tiempo
         messages={{
           allDay: 'Todo el día',
           previous: 'Anterior',
@@ -63,6 +60,7 @@ const Agendamientos = () => {
           event: 'Evento',
           showMore: total => `+ Ver más (${total})`
         }}
+    
       />
     </div>
   )
