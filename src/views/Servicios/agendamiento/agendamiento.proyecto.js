@@ -58,12 +58,18 @@ const Agendamiento = () => {
     setShowModal(true);
     setSelectedDate(slotInfo.start);
     setSelectEvent(null);
+    setIdAgendamiento(''); 
+    setPlaca(''); 
+    setHora(dayjs('').format('HH:mm'));
   };
   const handleSelectedEvent = (event) => {
-    
     setShowModalEdit(true);
     setSelectEvent(event);
+    setIdAgendamiento(event.id); 
+    setPlaca(event.title); 
+    setHora(dayjs(event.start).format('HH:mm')); 
   };
+  
 
 
 
@@ -73,10 +79,11 @@ const Agendamiento = () => {
   const events = agendamiento.map(item => ({
     start: dayjs(item.fecha).toDate(),
     end: dayjs(item.fecha).add(1, 'hour').toDate(),
-    title: item.vehiculos_placa
+    title: item.vehiculos_placa,
+    id: item.idAgendamiento
   }))
 
-  const validar = () => {
+  const validar = (operation) => {
     var parametros;
     var metodo;
 
@@ -104,7 +111,8 @@ const Agendamiento = () => {
       console.log(parametros)
       metodo = 'POST';
     } else if (operation === 2) {
-      parametros = {};
+
+      parametros = {idAgendamiento: id, fecha: `${dayjs(selectEvent.start).format('YYYY-MM-DD')} ${hora}`, vehiculos_placa: placa};
       metodo = 'PUT';
 
       console.log(parametros)
@@ -125,26 +133,26 @@ const Agendamiento = () => {
         });
         //document.getElementById('btn-close').click();
       }
-      //  else if (metodo === 'PUT') {
-      //   Swal.fire({
-      //     position: "center",
-      //     icon: "success",
-      //     title: "Empleado editado con exito",
-      //     showConfirmButton: false,
-      //     timer: 1500
-      //   });
-      //   document.getElementById('btnCerrar').click();
-      // }
-      // if (metodo === 'DELETE') {
-      //   Swal.fire({
-      //     position: "center",
-      //     icon: "success",
-      //     title: "Empleado eliminado con exito",
-      //     showConfirmButton: false,
-      //     timer: 1500
-      //   });
-      //   document.getElementById('btnCerrar').click();
-      // }
+       else if (metodo === 'PUT') {
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Agendamiento editado con exito",
+          showConfirmButton: false,
+          timer: 1500
+        });
+        //document.getElementById('btnCerrar').click();
+      }
+      if (metodo === 'DELETE') {
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Agendamiento eliminado con exito",
+          showConfirmButton: false,
+          timer: 1500
+        });
+        //document.getElementById('btnCerrar').click();
+      }
 
       setActualizacion(true)
 
@@ -157,6 +165,24 @@ const Agendamiento = () => {
         show_alerta('Error en la solicitud', 'error');
         console.log(error);
       });
+  }
+
+  const deleteAgendamiento = (idAgendamiento) => {
+
+    const MySwal = withReactContent(Swal);
+    MySwal.fire({
+      title: '¿Seguro de eliminar este Agendamiento?',
+      icon: 'question', text: 'No podra activar nuevamente el Rol',
+      showCancelButton: true, confirmButtonText: 'Aceptar', cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setIdAgendamiento(idAgendamiento);
+        enviarSolicitud('DELETE', { idAgendamiento: id });
+      } else {
+        show_alerta('El agendamiento no fue eliminado', 'info')
+      }
+    });
+
   }
 
 
@@ -262,7 +288,7 @@ const Agendamiento = () => {
                 <button
                   type="button"
                   className="botones-azules"
-                  onClick={() => validar()}
+                  onClick={() => validar(1)}
                 >
                   Guardar
                 </button>
@@ -313,7 +339,7 @@ const Agendamiento = () => {
                     placeholder='ID'
                     value={id}
                     onChange={(e) => setIdAgendamiento(e.target.value)}
-
+                    disabled
                   />
                 </div>
 
@@ -325,9 +351,6 @@ const Agendamiento = () => {
                       <option key={v.placa} value={v.placa}>{v.placa}</option>
                     ))}
                   </select>
-                  <button className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalEmpleados'  >
-                    <FontAwesomeIcon icon={faPlusCircle} /> Añadir
-                  </button>
                 </div>
 
                 <div className='input-group mb-3'>
@@ -347,14 +370,14 @@ const Agendamiento = () => {
                 <button
                   type="button"
                   className="botones-azules"
-                  onClick={() => validar()}
+                  onClick={() => validar(2)}
                 >
                   Editar
                 </button>
                 <button
                   type="button"
                   className="btn btn-danger"
-                  onClick={() => validar()}
+                  onClick={() => deleteAgendamiento(id)}
                 >
                   Eliminar
                 </button>
