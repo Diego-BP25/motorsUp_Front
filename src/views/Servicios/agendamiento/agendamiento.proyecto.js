@@ -18,6 +18,7 @@ const Agendamiento = () => {
   const url = 'http://localhost:8081/api/agendamientos'
   const [agendamiento, setAgendamiento] = useState([])
   const [showModal, setShowModal] = useState(false);
+  const [showModalEdit, setShowModalEdit] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [eventTitle, setEventTitle] = useState("");
   const [selectEvent, setSelectEvent] = useState(null);
@@ -59,7 +60,9 @@ const Agendamiento = () => {
     setSelectEvent(null);
   };
   const handleSelectedEvent = (event) => {
-
+    
+    setShowModalEdit(true);
+    setSelectEvent(event);
   };
 
 
@@ -269,77 +272,97 @@ const Agendamiento = () => {
         </div>
       )}
 
-      <div id='modalVehiculoEditar' className='modal fade' aria-hidden='true' >
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title">
-                {selectEvent ? "Editar Agendamiento" : "Agregar Agendamiento"}
-              </h5>
-              <button
-                type="button"
-                className="btn-close"
-                onClick={() => {
-                  setShowModal(false);
-                  setEventTitle("");
-                  setSelectEvent(null);
-                }}
-              ></button>
-            </div>
-            <div className="modal-body">
 
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faUserGear} /></span>
-                <input
-                  type='text'
-                  id='id'
-                  className='form-control'
-                  placeholder='ID'
-                  value={id}
-                  onChange={(e) => setIdAgendamiento(e.target.value)}
-
-                />
+{showModalEdit && (
+        <div
+          className="modal"
+          style={{
+            display: "block",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            position: "fixed",
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+          }}
+        >
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">
+                  Editar Agendamiento
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => {
+                    setShowModalEdit(false);
+                    setEventTitle("");
+                    setSelectEvent(null);
+                  }}
+                ></button>
               </div>
+              <div className="modal-body">
 
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faUserGear} /></span>
-                <select id='placa' className='form-select' value={placa} onChange={(e) => setPlaca(e.target.value)} style={{ marginRight: '12px' }}>
-                  <option value='' disabled>Vehiculo</option>
-                  {vehiculos.map((v) => (
-                    <option key={v.placa} value={v.placa}>{v.placa}</option>
-                  ))}
-                </select>
-                <button className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalEmpleados'  >
-                  <FontAwesomeIcon icon={faPlusCircle} /> Añadir
+                <div className='input-group mb-3'>
+                  <span className='input-group-text'><FontAwesomeIcon icon={faUserGear} /></span>
+                  <input
+                    type='text'
+                    id='id'
+                    className='form-control'
+                    placeholder='ID'
+                    value={id}
+                    onChange={(e) => setIdAgendamiento(e.target.value)}
+
+                  />
+                </div>
+
+                <div className='input-group mb-3'>
+                  <span className='input-group-text'><FontAwesomeIcon icon={faUserGear} /></span>
+                  <select id='placa' className='form-select' value={placa} onChange={(e) => setPlaca(e.target.value)} style={{ marginRight: '12px' }}>
+                    <option value='' disabled>Vehiculo</option>
+                    {vehiculos.map((v) => (
+                      <option key={v.placa} value={v.placa}>{v.placa}</option>
+                    ))}
+                  </select>
+                  <button className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalEmpleados'  >
+                    <FontAwesomeIcon icon={faPlusCircle} /> Añadir
+                  </button>
+                </div>
+
+                <div className='input-group mb-3'>
+                  <span className='input-group-text'><FontAwesomeIcon icon={faUserGear} /></span>
+                  <input
+                    type='time'
+                    id='horaInicio'
+                    className='form-control'
+                    placeholder='Hora'
+                    value={hora}
+                    onChange={(e) => setHora(e.target.value)}
+                  />
+                </div>
+
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="botones-azules"
+                  onClick={() => validar()}
+                >
+                  Editar
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={() => validar()}
+                >
+                  Eliminar
                 </button>
               </div>
-
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faUserGear} /></span>
-                <input
-                  type='time'
-                  id='horaInicio'
-                  className='form-control'
-                  placeholder='Hora'
-                  value={hora}
-                  onChange={(e) => setHora(e.target.value)}
-                />
-              </div>
-
-            </div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="botones-azules"
-                onClick={() => validar()}
-              >
-                Guardar
-              </button>
             </div>
           </div>
         </div>
-      </div>
-
+      )}
     </div>
   );
 };
