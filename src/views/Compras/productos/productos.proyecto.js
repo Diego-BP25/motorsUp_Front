@@ -6,7 +6,7 @@ import withReactContent from 'sweetalert2-react-content'
 import { show_alerta } from 'src/fuctions.proyecto'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faTruckField, faCalendar, faToggleOff, faIdCardClip, faComment, faXmark } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faCalendar, faToggleOff, faIdCardClip, faXmark } from '@fortawesome/free-solid-svg-icons'
 
 
 const Productos = () => {
@@ -212,7 +212,7 @@ const Productos = () => {
                 </thead>
                 <tbody className='table-group-divider'>
                   {productos.map((p) => (
-                    console.log(p.precioVenta),
+                    
                     <tr key={p.idProducto}>
                       <td>{p.idProducto}</td>
                       <td>{p.estadoProducto === 0 ? 'Suspendido' : 'Activo'}</td>

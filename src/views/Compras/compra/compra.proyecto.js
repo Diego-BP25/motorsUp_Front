@@ -7,10 +7,11 @@ import withReactContent from 'sweetalert2-react-content'
 import { show_alerta } from 'src/fuctions.proyecto'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faCalendar, faToggleOff, faEye } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faCalendar, faToggleOff, faEye, faSearch } from '@fortawesome/free-solid-svg-icons'
 import { ContentDoble, ContentIndividual, ModalProyecto } from 'src/components/proyect/modal.proyecto'
 import { ButtonNormal } from 'src/components/proyect/buttons.proyecto'
 import { formatDate } from 'src/views/funcionesExtras.proyecto'
+import { Link } from 'react-router-dom';
 
 const Compras = () => {
   //api de compras
@@ -32,6 +33,9 @@ const Compras = () => {
   //estado para el boton info
   const [showProductosModal, setShowProductosModal] = useState(false); // Estado para mostrar/ocultar la modal de productos
   const [productosAsociados, setProductosAsociados] = useState([]); // Estado para almacenar los productos asociados a la compra seleccionada
+
+  //buscador
+  const [busqueda, setBusqueda] = useState("");
 
 
 
@@ -78,6 +82,9 @@ const Compras = () => {
     getProveedores()
   }, [])
 
+  useEffect(() => {
+    getProductos()
+  }, [])
 
 
   const getProveedores = async () => {
@@ -138,15 +145,15 @@ const Compras = () => {
   const [productosCompra, setProductosCompra] = useState([])
   const [precio, setPrecio] = useState()
   const [cantidad, setCantidad] = useState('')
-  const [idProducto, setIdProducto] = useState('')
+  //const [idProducto, setIdProducto] = useState('')
 
   const agregarProducto = () => {
     // Verifica que los campos de producto estén llenos antes de agregarlo
-    if (idProducto && cantidad && precio) {
-      setProductosCompra([...productosCompra, { idProducto, cantidad, precio, subtotal: precio * cantidad }]);
+    if (productos && cantidad && precio) {
+      setProductosCompra([...productosCompra, { producto, cantidad, precio, subtotal: precio * cantidad }]);
       console.log(setProductosCompra)
       // Limpia los campos después de agregar un producto
-      setIdProducto('');
+      setProductos('');
       setCantidad('');
       setPrecio('');
     } else {
@@ -291,6 +298,27 @@ const Compras = () => {
       }
     });
   }
+  const handleChange = (e) => {
+    const valor = e.target.value;
+    setBusqueda(valor); // Actualizar el estado de búsqueda
+
+    if (valor.trim() === '') {
+      getCompras(); // Si el valor está vacío, obtener todos los propietarios nuevamente
+    } else {
+      filtrar(valor); // Si hay un valor, aplicar el filtro de búsqueda
+    }
+  };
+
+  const filtrar = (terminoBusqueda) => {
+    var resultadosBusqueda = compra.filter((elemento) => {
+
+      if (elemento.descripcionCompra.toString().toLowerCase().includes(terminoBusqueda.toLowerCase())
+      ) {
+        return elemento;
+      }
+    });
+    setCompra(resultadosBusqueda);
+  }
 
   return (
 
@@ -298,12 +326,30 @@ const Compras = () => {
       <div className='container-fluid'>
         
         <div >
-          <div style={{ display: 'flex', alignItems: 'center' }} id="Container">
-            <div className='col-md-4 offset-md-5' >
-              <h3>Compras</h3>
-            </div>
+          <div style={{ display: 'flex',  }} id="Container">
 
             <div style={{ marginRight: 'auto' }}>
+              <h3>Compras</h3>
+            </div>
+            <div className='input-group' style={{ marginRight: '1%' }}>
+              <input className='form-control inputBuscador'
+                id='buscador'
+                value={busqueda}
+                placeholder='Buscar'
+                onChange={handleChange}
+              />
+              <div className="icon-container">
+                <FontAwesomeIcon icon={faSearch} />
+              </div>
+            </div>
+
+            <Link to="/compras/agregar">
+              <button className='botones-azules'>
+                <FontAwesomeIcon icon={faPlusCircle} /> Añadir
+              </button>
+            </Link>
+
+            <div style={{ marginRight: '-0.1%' }}>
               <button className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalCompras' onClick={() => [openModal(1), setFechaCompra(formatDate(new Date()))]} >
                 <FontAwesomeIcon icon={faPlusCircle} /> Añadir
               </button>
@@ -313,6 +359,7 @@ const Compras = () => {
 
         <div className='row mt-3'>
           <div>
+           
             <div className="table-responsive" style={{ maxWidth: '100%', margin: '0 auto' }}>
               <table className='table table-striped' style={{ width: '100%' }}>
                 <thead>
@@ -441,17 +488,15 @@ const Compras = () => {
             </div>
             <div className='modal-body'>
 
-              <select key={"proveedores_idProveedor"} id='proveedores_idProveedor' className='form-select' value={proveedores} onChange={(e) => setProveedores(e.target.value)}>
-                <option value='' disabled>Seleccione un proveedor</option>
-                {proveedor.map((p) => (
-                  <option key={p.idProveedor} value={p.idProveedor}>{p.nombreProveedor}</option>
+              <select key={"idProducto"} id='idProducto' className='form-select' value={productos} onChange={(e) => setProductos(e.target.value)}>
+                <option value='' disabled>Seleccione un producto</option>
+                {producto.map((p) => (
+                  <option key={p.idProducto} value={p.idProducto}>{p.idProducto}</option>
                 ))}
               </select>
 
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
-                <input type='text' id='idProducto' className='form-control' placeholder='Id' value={idProducto} onChange={(e) => setIdProducto(e.target.value)}></input>
-              </div>
+
+
 
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
