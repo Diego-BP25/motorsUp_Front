@@ -325,7 +325,7 @@ const Compras = () => {
     <div className='App'>
       <div className='container-fluid'>
         
-        <div >
+        <div > 
           <div style={{ display: 'flex',  }} id="Container">
 
             <div style={{ marginRight: 'auto' }}>
