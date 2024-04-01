@@ -54,7 +54,7 @@ const Agendamiento = () => {
     }
   }
 
-  const handleSelectSlot = (slotInfo) => {
+  const SeleccionarDia = (slotInfo) => {
     setShowModal(true);
     setSelectedDate(slotInfo.start);
     setSelectEvent(null);
@@ -62,7 +62,7 @@ const Agendamiento = () => {
     setPlaca(''); 
     setHora(dayjs('').format('HH:mm'));
   };
-  const handleSelectedEvent = (event) => {
+  const SeleccionarEvento = (event) => {
     setShowModalEdit(true);
     setSelectEvent(event);
     setIdAgendamiento(event.id); 
@@ -131,7 +131,7 @@ const Agendamiento = () => {
           showConfirmButton: false,
           timer: 1500
         });
-        //document.getElementById('btn-close').click();
+        // document.getElementById('btnCerrar').click();
       }
        else if (metodo === 'PUT') {
         Swal.fire({
@@ -141,7 +141,7 @@ const Agendamiento = () => {
           showConfirmButton: false,
           timer: 1500
         });
-        //document.getElementById('btnCerrar').click();
+        // document.getElementById('btnCerrar').click();
       }
       if (metodo === 'DELETE') {
         Swal.fire({
@@ -151,14 +151,13 @@ const Agendamiento = () => {
           showConfirmButton: false,
           timer: 1500
         });
-        //document.getElementById('btnCerrar').click();
+        // document.getElementById('btnCerrar').click();
       }
 
       setActualizacion(true)
 
       if (tipo === 'success') {
-        //document.getElementById('btnCerrar').click();
-        // getRoles();
+        // document.getElementById('btnCerrar').click();
       }
     })
       .catch(function (error) {
@@ -172,7 +171,7 @@ const Agendamiento = () => {
     const MySwal = withReactContent(Swal);
     MySwal.fire({
       title: '¿Seguro de eliminar este Agendamiento?',
-      icon: 'question', text: 'No podra activar nuevamente el Rol',
+      icon: 'question', text: 'No podra activar nuevamente el Agendamiento',
       showCancelButton: true, confirmButtonText: 'Aceptar', cancelButtonText: 'Cancelar'
     }).then((result) => {
       if (result.isConfirmed) {
@@ -196,8 +195,8 @@ const Agendamiento = () => {
         endAccessor="end"
         style={{ margin: "50px" }}
         selectable={true}
-        onSelectSlot={handleSelectSlot}
-        onSelectEvent={handleSelectedEvent}
+        onSelectSlot={SeleccionarDia}
+        onSelectEvent={SeleccionarEvento}
         messages={{
           allDay: 'Todo el día',
           previous: 'Anterior',
@@ -227,7 +226,7 @@ const Agendamiento = () => {
             right: 0,
           }}
         >
-          <div className="modal-dialog">
+          <div className='modal-dialog modal-dialog-centered'>
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">
@@ -312,13 +311,14 @@ const Agendamiento = () => {
             right: 0,
           }}
         >
-          <div className="modal-dialog">
+          <div className='modal-dialog modal-dialog-centered'>
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">
                   Editar Agendamiento
                 </h5>
                 <button
+                  id="btnCerrar"
                   type="button"
                   className="btn-close"
                   onClick={() => {
@@ -376,7 +376,7 @@ const Agendamiento = () => {
                 </button>
                 <button
                   type="button"
-                  className="btn btn-danger"
+                  className="botones-rojos"
                   onClick={() => deleteAgendamiento(id)}
                 >
                   Eliminar

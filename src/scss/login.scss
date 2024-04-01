@@ -1,126 +1,60 @@
-:root{
-  --azul:#04081d;
-  --azulOscuro:#282a30;
-  --azulGris:#4685af;
-  --newColor: #1459b4;
-  --blanco:#faf8f8;
-  --fuente:'Quicksand', sans-serif;
-}
-html{
+* {
+  padding: 0;
+  margin: 0;
   box-sizing: border-box;
 }
 
-*,*::after, *::before{
-  box-sizing: inherit;
-}
-
-.bodyLogin{
-  font-family: var(--fuente);
-  background-color: var(--azulOscuro);
+.divPrincipal {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 5px auto;
   display: flex;
+  justify-content: center;
   align-items: center;
-  height: 100vh;
+  background: #004c9e;
+  box-shadow: inset 31px 31px 62px #0f61b9,
+              inset -31px -31px 62px #0095ff;
 }
-.olvideC {
-  display: inline;
-  color: blue; 
-  text-decoration: underline; 
-  cursor: pointer; 
+
+.divPrincipalLogin {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 5px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #004c9e;
+  box-shadow: inset 31px 31px 62px #0f61b9,
+              inset -31px -31px 62px #0095ff;
 }
 
 
-.olvideC:hover {
-  text-decoration: none;
-  color: darkblue; 
-}
-.contenedor {
-  margin: 50px auto; /* Márgenes superior e inferior de 50px, y automáticamente centrará el contenedor horizontalmente */
-  max-width: 800px; /* Ancho máximo del contenedor reducido */
-  width: 90%; /* Ancho del contenedor reducido */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra ligera */
-  border-radius: 15px; /* Esquinas redondeadas */
+.divSecundarioLogin{
+  margin: 45px 38px ;
+  padding: 35px;
+  box-shadow: 6px 6px 20px black;
+  background: #ffffff;
+  border-radius: 6px;
 }
 
-.imagen-formulario{
-  background-image: url('../assets/images/login/bg.jpg');
-  background-position: center center;
-  background-size: cover;
-  height: 200px;
-  flex: 0 0 calc(51%);
-  position: relative;
-  
+.divSecundarioRegister{
+  margin: 35px 38px ;
+  padding: 35px;
+  box-shadow: 0px 0px 25px black;
+  background: #ffffff;
+  border-radius: 6px;
 }
 
-
-@media(min-width:768px){
-  .imagen-formulario{
-      height: auto;
-      background-position: right;
-  }
-
-}
-@media(min-width:1200px){
-  .imagen-formulario{
-      background-position: center;
-  }
+.imageBackground{
+  height: 354px;
+  width: 350px;
 }
 
-@media(min-width:768px){
-  .contenedor-formulario{
-      display: flex;
-  }
-}
-
-.formulario{
-  padding: 50px;
-  background-color: var(--azul);
-}
-.texto-formulario h2, .input label, .password-olvidada a, .texto-formulario p{
-  color: var(--blanco);
-}
-.texto-formulario h2{
-  font-size: 40px;
-  text-align: center;
-}
-.texto-formulario p{
-  font-size: 22px;
-  text-align: center;
-}
-.input label{
-  display: block;
-  font-size: 22px;
-  font-weight: bold;
-  margin: 20px 0;
-}
-.password-olvidada a{
-  display: inline-block;
-  margin-top: 20px;
-  font-size: 22px;
-}
-.input input{
-  width: 100%;
-  padding: 10px 16px;
-  border-radius: 10px;
-  outline: none;
-  height: 45px;
-  font-size: 20px;
-  font-family: var(--fuente);
-  
-}
-.input input[type="submit"]{
-  background-color: var(--azulGris);
-  color: var(--blanco);
-  font-size: 22px;
-  font-weight: bold;
-  border: none;
-  margin-top: 20px;
-  transition: background-color .3s ease-in-out;
-}
-.input input[type="submit"]:hover{
-
-  cursor: pointer;
-  background-color: var(--azulOscuro);
-}
 .otp_inputs{
   width: 320px;
   display: flex;
@@ -144,4 +78,195 @@ html{
 .otp_input:focus{
   border: 2px solid blue;
   color: blue;
+}
+
+
+
+
+.containerRegister {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  align-items: left;
+  max-width: 100%;
+  margin: 2% auto;
+  padding: 7px;
+  transition-duration: 0.7s;
+}
+
+.textRegistro {
+  padding-top: 14px;
+  font-size: 24px;
+  font-weight: 500;
+  color: #000000;
+  text-shadow: none;
+}
+
+.textLogin {
+  padding: 11px;
+  font-size: 24px;
+  font-weight: 500;
+  color: #007bff;
+  text-shadow: none;
+}
+
+
+
+
+
+
+.card-inner {
+  margin: 0px 10px;
+  padding: 5px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.521);
+  border-radius: 6px;
+  transition-duration: 0.4s;
+
+}
+
+.card-inner:hover {
+  transform: scale(1.01);
+  box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.849);
+  transition-duration: 0.4s;
+
+}
+
+@keyframes circleAnimate {
+  to {
+      transform: translateY(-15px);
+  }
+}
+@keyframes circleAnimate2 {
+  to {
+      transform: translateY(15px);
+  }
+}
+.inputs {
+  padding: 10px;
+  
+  
+}
+
+.input {
+  max-width: 275px;
+  height: 55px;
+  width: 225px;
+  outline: none;
+  font-size: 16px;
+  border-radius: 5px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-bottom-width: 2px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.input:valid {
+  border-color: #000;
+  color: #000;
+}
+
+.input:invalid {
+  border-color: #ff0000;
+  color: #ff0000;
+  box-shadow: 2px 2px 8px 1px #ff0000;
+  /* translate: -8px 8px 0px 0px; */
+}
+
+.text {
+  margin-top: 10px;
+  color: black;
+}
+
+
+#btn {
+  max-width: 275px;
+  height: 55px;
+  width: 225px;
+  outline: none;
+  font-size: 16px;
+  border-radius: 5px;
+  padding: 15px;
+  text-transform: uppercase;
+  border-radius: 6px;
+  font-size: 17px;
+  font-weight: 500;
+  color: #ffffff;
+  text-shadow: none;
+  background: #007bff;
+  transition: 0.5s ease;
+  user-select: none;
+}
+
+#btn:hover {
+  background: #0665cc;
+  color: #ffffff;
+}
+
+#btn1 {
+  margin: 10px;
+  max-width: 275px;
+  height: 55px;
+  width: 275px;
+  outline: none;
+  font-size: 16px;
+  border-radius: 5px;
+  padding: 15px;
+  text-transform: uppercase;
+  border-radius: 6px;
+  font-size: 17px;
+  font-weight: 500;
+  color: #ffffff;
+  text-shadow: none;
+  background: #007bff;
+  transition: 0.5s ease;
+  user-select: none;
+}
+
+#btn1:hover {
+  background: #0665cc;
+  color: #ffffff;
+}
+
+
+.textLoginAndRegister {
+  color: #007bff;
+  transition-duration: 0.4s;
+}
+
+.textLoginAndRegister:hover {
+  color: #0062ca;
+  transition-duration: 0.4s;
+}
+
+
+/* RESPONSIVE */
+
+
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+
+
+  .inputs {
+      padding: 10px;
+  }
+
+  .input {
+      width: 170px;
+  }
+
+  
+
+  .cardLogin {
+      margin: 6% auto;
+      width: 80%;
+  }
+
+  .button3 {
+      padding: 7px 16px;
+  }
+
+
 }
