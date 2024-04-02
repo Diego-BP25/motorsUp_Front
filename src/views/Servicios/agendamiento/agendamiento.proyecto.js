@@ -30,11 +30,45 @@ const Agendamiento = () => {
   //Vehiculos
   const [vehiculos, setVehiculos] = useState([])
   const [placa, setPlaca] = useState('')
+  const [consecutivo, setConsecutivo] = useState(0);
 
   useEffect(() => {
     getAgendamientos()
     getVehiculos()
-  }, [actualizacion ? agendamiento : null])
+
+  }, [])
+
+  useEffect(() => {
+    if (actualizacion) {
+      getAgendamientos();
+      setShowModal(false);
+      setShowModalEdit(false);
+      window.location.reload();
+    }
+  }, [actualizacion]);
+
+
+  useEffect(() => {
+    if (operation === 1) {
+      obtenerIdConsecutivo();
+    }
+  }, [operation]);
+
+
+  const obtenerIdConsecutivo = async () => {
+    try {
+      const respuesta = await axios.get(url);
+      const agendamiento = respuesta.data;
+      if (agendamiento.length > 0) {
+        const maxId = Math.max(...agendamiento.map(c => c.idAgendamiento));
+        setConsecutivo(maxId + 1);
+      } else {
+        setConsecutivo(1);
+      }
+    } catch (error) {
+      console.error('Error al obtener el número consecutivo más alto:', error.message);
+    }
+  };
 
   const getAgendamientos = async () => {
     try {
@@ -67,7 +101,8 @@ const Agendamiento = () => {
     setSelectEvent(event);
     setIdAgendamiento(event.id); 
     setPlaca(event.title); 
-    setHora(dayjs(event.start).format('HH:mm')); 
+    const nuevaHora = dayjs(event.start).add(5, 'hour').format('HH:mm');
+    setHora(nuevaHora); 
   };
   
 
@@ -106,15 +141,18 @@ const Agendamiento = () => {
       }
 
 
-      parametros = { idAgendamiento: id, fecha: fechaHora, vehiculos_placa: placa };
+      parametros = { idAgendamiento: consecutivo, fecha: fechaHora, vehiculos_placa: placa };
 
       console.log(parametros)
       metodo = 'POST';
+      setActualizacion(false);
+      setTimeout(() => setActualizacion(true), 1000);
     } else if (operation === 2) {
 
       parametros = {idAgendamiento: id, fecha: `${dayjs(selectEvent.start).format('YYYY-MM-DD')} ${hora}`, vehiculos_placa: placa};
       metodo = 'PUT';
-
+      setActualizacion(false);
+      setTimeout(() => setActualizacion(true), 1000);
       console.log(parametros)
     }
     enviarSolicitud(metodo, parametros);
@@ -154,7 +192,7 @@ const Agendamiento = () => {
         // document.getElementById('btnCerrar').click();
       }
 
-      setActualizacion(true)
+   
 
       if (tipo === 'success') {
         // document.getElementById('btnCerrar').click();
@@ -245,15 +283,15 @@ const Agendamiento = () => {
               <div className="modal-body">
 
                 <div className='input-group mb-3'>
-                  <span className='input-group-text'><FontAwesomeIcon icon={faUserGear} /></span>
+                  {/* <span className='input-group-text'><FontAwesomeIcon icon={faUserGear} /></span> */}
                   <input
                     type='text'
                     id='id'
                     className='form-control'
                     placeholder='ID'
-                    value={id}
+                    value={consecutivo}
                     onChange={(e) => setIdAgendamiento(e.target.value)}
-
+                    hidden
                   />
                 </div>
 
@@ -331,7 +369,7 @@ const Agendamiento = () => {
               <div className="modal-body">
 
                 <div className='input-group mb-3'>
-                  <span className='input-group-text'><FontAwesomeIcon icon={faUserGear} /></span>
+                  
                   <input
                     type='text'
                     id='id'
@@ -339,7 +377,7 @@ const Agendamiento = () => {
                     placeholder='ID'
                     value={id}
                     onChange={(e) => setIdAgendamiento(e.target.value)}
-                    disabled
+                    hidden
                   />
                 </div>
 

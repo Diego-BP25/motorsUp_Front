@@ -176,21 +176,14 @@ const Login = () => {
   return (
     <>
       <div className="divPrincipalLogin">
-
-
         <div className='divSecundarioLogin flex'>
-
-
           <div className="imageBackground">
             <img
               src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExa25yZnMwYXljNDM1d3c3eGFhZnV3ZWdpYnV2ajV5MmlrM3k2MWgydiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/RRJCGAfbPW1kZzFNSu/giphy.gif"
               alt=""
             />
-           
           </div>
-
           <div className="card-inner">
-
             <div className="containerRegister">
               <form onSubmit={validarDatos}>
                 <h1 className="text-center" style={{ color: "#007bff" }}>Motors Up</h1>
@@ -206,7 +199,6 @@ const Login = () => {
                   />
                 </div>
 
-
                 <div className="inputs">
                   <label>Contraseña</label>
                   <br />
@@ -218,48 +210,44 @@ const Login = () => {
                   />
                 </div>
 
-
-
                 <button id="btn1" className="button" type="submit">
                   Ingresar
                 </button>
 
                 <p>
-
-                  <p className="textLoginAndRegister" onClick={() => openModal(1)} data-bs-toggle='modal' data-bs-target='#modalCorreo'>Olvide mi contraseña</p>
+                  <p className="textLoginAndRegister" onClick={() => openModal(1)} data-bs-toggle='modal' data-bs-target='#modalCorreo'>Olvidé mi contraseña</p>
                 </p>
-
               </form>
             </div>
           </div>
         </div>
-      </div>
 
-      <div className='bodyLogin'>
-        {/* MODAL CORREO */}
-        <div id='modalCorreo' className='modal fade' aria-hidden='true'>
-          <div className='modal-dialog modal-dialog-centered'>
-            <div className='modal-content'>
-              <div className='modal-header'>
-                <label className='h4'>{title}</label>
-                <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
-              </div>
-              <div className='modal-body'>
-                <input type='hidden' id='id' ></input>
-                <div className='input-group mb-3'>
-                  <span className='input-group-text'><FontAwesomeIcon icon={faEnvelope} /></span>
-                  <input type='text' id='correoRecuperacion' className='form-control' placeholder='Correo' value={correoRecuperacion} onChange={(e) => setCorreoRecuperacion(e.target.value)}></input>
+
+        <div className='bodyLogin'>
+          {/* MODAL CORREO */}
+          <div id='modalCorreo' className='modal fade' aria-hidden='true'>
+            <div className='modal-dialog modal-dialog-centered'>
+              <div className='modal-content'>
+                <div className='modal-header'>
+                  <label className='h4'>{title}</label>
+                  <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
                 </div>
-                <div className='d-grid col-6 mx-auto'>
-                  <button onClick={() => { validar(); openModal(2, correoRecuperacion); }} data-bs-toggle='modal' data-bs-target='#modalCodigo' className='botones-azules'>
-                    <FontAwesomeIcon icon={faPaperPlane} /> Enviar
-                  </button>
+                <div className='modal-body'>
+                  <input type='hidden' id='id' ></input>
+                  <div className='input-group mb-3'>
+                    <span className='input-group-text'><FontAwesomeIcon icon={faEnvelope} /></span>
+                    <input type='text' id='correoRecuperacion' className='form-control' placeholder='Correo' value={correoRecuperacion} onChange={(e) => setCorreoRecuperacion(e.target.value)}></input>
+                  </div>
+                  <div className='d-grid col-6 mx-auto'>
+                    <button onClick={() => { validar(); openModal(2, correoRecuperacion); }} data-bs-toggle='modal' data-bs-target='#modalCodigo' className='botones-azules'>
+                      <FontAwesomeIcon icon={faPaperPlane} /> Enviar
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-
 
         <div id='modalCodigo' className='modal fade' aria-hidden='true'>
           <div className='modal-dialog modal-dialog-centered'>
