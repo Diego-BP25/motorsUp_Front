@@ -2,49 +2,42 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faCalendar, faToggleOff, faIdCardClip, faTag, faFileText, faTruckField, faHashtag, faBagShopping, faDollar } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faTrash,  faFloppyDisk, faCalendar, faToggleOff, faTag, faFileText, faHashtag, faBagShopping, faDollar, faUser } from '@fortawesome/free-solid-svg-icons'
 
 const AgregarCompra = () => {
     // API URL
-    const url = 'http://localhost:8081/api/compras';
+    const url = 'http://localhost:8081/api/ventas';
 
     // Estados del formulario
-    const [idCompra, setIdCompra] = useState('');
-    const [descripcion, setDescripcion] = useState('');
+    const [idVenta, setIdVenta] = useState('');
+    const [fechaVenta, setFechaVenta] = useState('');
+    const [metodoPago, setMetodoPago] = useState('');
     const [estado, setEstado] = useState('');
-    const [fechaCompra, setFechaCompra] = useState('');
-    const [proveedores, setProveedores] = useState([]);
-    const [proveedorSeleccionado, setProveedorSeleccionado] = useState('');
+    const [total, setTotal] = useState('');
+    const [empleados, setEmpleado] = useState([]);
+    const [empleados_idEmpleado, setIdEmpleado] = useState('');
     const [productos, setProductos] = useState([]);
-    const [idProducto, setIdProducto] = useState('');
-    const [productoSeleccionado, setProductoSeleccionado] = useState('');
+    const [productos_idProducto, setIdProducto] = useState('');
     const [cantidad, setCantidad] = useState('');
-    const [precio, setPrecio] = useState('');
-    const [productosCompra, setProductosCompra] = useState([]);
+    const [precioVenta, setPrecio] = useState('');
+    const [productosVenta, setProductosVenta] = useState([]);
     const [consecutivo, setConsecutivo] = useState(0);
 
     // Obtener datos iniciales
     useEffect(() => {
-        getProveedores();
         getProductos();
+        getEmpleados();
+
     }, []);
 
-    // Obtener lista de proveedores
-    const getProveedores = async () => {
-        try {
-            const response = await axios.get('http://localhost:8081/api/proveedores');
-            setProveedores(response.data);
-        } catch (error) {
-            console.error('Error al obtener los proveedores:', error.message);
-        }
-    };
+    
 
     const obtenerIdConsecutivo = async () => {
         try {
             const respuesta = await axios.get(url);
-            const compras = respuesta.data;
-            if (compras.length > 0) {
-                const maxId = Math.max(...compras.map(c => c.idCompra));
+            const ventas = respuesta.data;
+            if (ventas.length > 0) {
+                const maxId = Math.max(...ventas.map(c => c.idVenta));
                 setConsecutivo(maxId + 1);
             } else {
                 setConsecutivo(1);
@@ -65,62 +58,73 @@ const AgregarCompra = () => {
         }
     };
 
-    // Función para eliminar un producto de la lista de productos agregados
-    const eliminarProducto = (index) => {
-        const nuevosProductos = [...productosCompra];
-        nuevosProductos.splice(index, 1);
-        setProductosCompra(nuevosProductos);
+    // Obtener lista de empleados
+    const getEmpleados = async () => {
+        try {
+            const response = await axios.get('http://localhost:8081/api/empleados');
+            setEmpleado(response.data);
+        } catch (error) {
+            console.error('Error al obtener los empleados:', error.message);
+        }
     };
 
-    // Función para agregar un producto a la compra
+    // Función para eliminar un producto de la lista de productos agregados
+    const eliminarProducto = (index) => {
+        const nuevosProductos = [...productosVenta];
+        nuevosProductos.splice(index, 1);
+        setProductosVenta(nuevosProductos);
+    };
+
+    // Función para agregar un producto a la venta
     const agregarProducto = () => {
-        if (idProducto && cantidad && precio) {
-            const subtotal = parseFloat(cantidad) * parseFloat(precio);
-            setProductosCompra([...productosCompra, { idProducto, cantidad, precio, subtotal }]);
+        if (empleados_idEmpleado && productos_idProducto && cantidad && precioVenta) {
+            const total = parseFloat(cantidad) * parseFloat(precioVenta);
+            setProductosVenta([...productosVenta, { empleados_idEmpleado, productos_idProducto, cantidad, precioVenta, total }]);
             setCantidad('');
             setPrecio('');
             setIdProducto('');
+            setIdEmpleado('');
         } else {
             Swal.fire({
                 icon: 'error',
                 text: 'Todos los campos del producto son obligatorios',
             });
         }
+
     };
 
-
-
-    // Función para guardar la compra
-    const guardarCompra = async () => {
+    // Función para guardar la venta
+    const guardarVenta = async () => {
         try {
 
-            const nuevaCompra = {
-                idCompra: consecutivo,
-                descripcionCompra: descripcion,
-                estadoCompra: estado,
-                fechaCompra: fechaCompra,
-                proveedores_idProveedor: proveedorSeleccionado,
-                detalleProductos: productosCompra,
+            const nuevaVenta = {
+                idVenta: consecutivo,
+                fecha: fechaVenta,
+                metodoPago: metodoPago,
+                estado: estado,
+                total:total,
+                detalleProductos: productosVenta,
             };
-            console.log(nuevaCompra)
-            await axios.post(url, nuevaCompra);
+            console.log(nuevaVenta)
+            await axios.post(url, nuevaVenta);
 
             Swal.fire({
                 icon: 'success',
-                text: 'Compra agregada con éxito',
+                text: 'Venta agregada con éxito',
             });
 
             // Limpiar formulario después de guardar
-            setDescripcion('');
+            setFechaVenta('');
+            setMetodoPago('');
             setEstado('');
-            setFechaCompra('');
-            setProveedorSeleccionado('');
-            setProductosCompra([]);
+            setTotal('');
+            setProductosVenta([]);
         } catch (error) {
-            console.error('Error al guardar la compra:', error.message);
+            console.error('Error al guardar la venta:', error.message);
+            console.log(error)
             Swal.fire({
                 icon: 'error',
-                text: 'Error al guardar la compra',
+                text: 'Error al guardar la venta',
             });
         }
     };
@@ -129,48 +133,55 @@ const AgregarCompra = () => {
         <div className='App' >
             <div className='container mt-5' >
                 <div style={{ marginRight: 'auto', marginTop: '-5%', }}>
-                    <h3>Agregar compra</h3>
+                    <h3>Agregar venta</h3>
                 </div>
-                <form onSubmit={guardarCompra} >
+                <form onSubmit={guardarVenta} >
                     <div className="container">
                         <div className="row">
                             <div className="col" >
                                 <div className='input-group mb-3' style={{ border: '1px solid', maxWidth: '55%', paddingBottom: '1%', paddingLeft: '2%', paddingTop: '2%', paddingRight: '2%', marginLeft: '-2%' }}>
 
                                     <div className='input-group mb-3' onChange={obtenerIdConsecutivo()}>
-                                        <label htmlFor='idCompra' className='input-group-text'><FontAwesomeIcon icon={faIdCardClip} /></label>
-                                        <input type='number' id='idCompra' className="form-control" value={consecutivo} />
+                                        <label htmlFor='idVenta' className='input-group-text'><FontAwesomeIcon icon={faHashtag} /></label>
+                                        <input type='number' id='idVenta' placeholder='Id' className="form-control" value={consecutivo} />
                                     </div>
 
                                     <div className='input-group mb-3' >
-                                        <label htmlFor='descripcion' className='input-group-text'><FontAwesomeIcon icon={faFileText} /></label>
-                                        <input type='text' id='descripcion' placeholder='Descripcion' className="form-control" value={descripcion} onChange={(e) => setDescripcion(e.target.value)} />
+                                        <label htmlFor='fechaVenta' className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></label>
+                                        <input type='datetime-local' id='fechaVenta' placeholder='Fecha' className="form-control" value={fechaVenta} onChange={(e) => setFechaVenta(e.target.value)} />
+                                    </div>
+
+                                    <div className='input-group mb-3' >
+                                        <label htmlFor='metodoPago' className='input-group-text'><FontAwesomeIcon icon={faDollar} /></label>
+                                        <input type='text' id='metodoPago' placeholder='metodo Pago' className="form-control" value={metodoPago} onChange={(e) => setMetodoPago(e.target.value)} />
                                     </div>
 
                                     <div className='input-group mb-3' >
                                         <label htmlFor='estado' className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></label>
-                                        <input type='text' id='estado' className="form-control" value={estado} onChange={(e) => setEstado(e.target.value)} />
+                                        <input type='text' id='estado' placeholder='estado' className="form-control" value={estado} onChange={(e) => setEstado(e.target.value)} />
                                     </div>
 
                                     <div className='input-group mb-3' >
-                                        <label htmlFor='fechaCompra' className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></label>
-                                        <input id='fechaCompra' className="form-control" value={fechaCompra} onChange={(e) => setFechaCompra(e.target.value)} />
+                                        <label htmlFor='total' className='input-group-text'><FontAwesomeIcon icon={faFileText} /></label>
+                                        <input type='number' id='total' placeholder='total' className="form-control" value={total} onChange={(e) => setTotal(e.target.value)} />
                                     </div>
 
-                                    <div className='input-group mb-3' >
-                                        <label htmlFor='proveedor' className='input-group-text'><FontAwesomeIcon icon={faTruckField} /></label>
-                                        <select id='proveedor' className="form-control" value={proveedorSeleccionado} onChange={(e) => setProveedorSeleccionado(e.target.value)}>
-                                            <option value=''>Seleccione un proveedor</option>
-                                            {proveedores.map((prov) => (
-                                                <option key={prov.idProveedor} value={prov.idProveedor}>{prov.nombreProveedor}</option>
-                                            ))}
-                                        </select>
-                                    </div>
+                     
                                     <h4 style={{ marginRight: 'auto', }}>Productos</h4>
 
                                     <div className='input-group mb-3' >
-                                        <label htmlFor='idProducto' className='input-group-text'><FontAwesomeIcon icon={faBagShopping} /></label>
-                                        <select id='idProducto' className="form-control" value={idProducto} onChange={(e) => setIdProducto(e.target.value)}>
+                                        <label htmlFor='empleados_idEmpleado' className='input-group-text'><FontAwesomeIcon icon={faUser} /></label>
+                                        <select id='empleados_idEmpleado' className="form-control" value={empleados_idEmpleado} onChange={(e) => setIdEmpleado(e.target.value)}>
+                                            <option value=''>Empleado relazionado</option>
+                                            {empleados.map((pro) => (
+                                                <option key={pro.idEmpleado} value={pro.idEmpleado}>{pro.nombreEmpleado}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div className='input-group mb-3' >
+                                        <label htmlFor='productos_idProducto' className='input-group-text'><FontAwesomeIcon icon={faBagShopping} /></label>
+                                        <select id='productos_idProducto' className="form-control" value={productos_idProducto} onChange={(e) => setIdProducto(e.target.value)}>
                                             <option value=''>Seleccione un producto</option>
                                             {productos.map((pro) => (
                                                 <option key={pro.idProducto} value={pro.idProducto}>{pro.nombreProducto}</option>
@@ -178,14 +189,15 @@ const AgregarCompra = () => {
                                         </select>
                                     </div>
 
+
                                     <div className='input-group mb-3' >
                                         <label htmlFor='cantidad' className='input-group-text'><FontAwesomeIcon icon={faHashtag} /></label>
                                         <input type='number' className="form-control" id='cantidad' placeholder='Cantidad' value={cantidad} onChange={(e) => setCantidad(e.target.value)} />
                                     </div>
 
                                     <div className='input-group mb-3' >
-                                        <label htmlFor='precio' className='input-group-text'><FontAwesomeIcon icon={faTag} /></label>
-                                        <input type='number' className="form-control" id='precio' placeholder='Precio' value={precio} onChange={(e) => setPrecio(e.target.value)} />
+                                        <label htmlFor='precioVenta' className='input-group-text'><FontAwesomeIcon icon={faTag} /></label>
+                                        <input type='number' className="form-control" id='precioVenta' placeholder='precioVenta' value={precioVenta} onChange={(e) => setPrecio(e.target.value)} />
                                     </div>
 
 
@@ -214,12 +226,12 @@ const AgregarCompra = () => {
                                             </tr>
                                         </thead>
                                         <tbody >
-                                            {productosCompra.map((producto, index) => (
+                                            {productosVenta.map((producto, index) => (
                                                 <tr key={index} >
-                                                    <td>{producto.idProducto}</td>
+                                                    <td>{producto.productos_idProducto}</td>
                                                     <td>{producto.cantidad}</td>
-                                                    <td>{producto.precio}</td>
-                                                    <td>{producto.subtotal}</td>
+                                                    <td>{producto.precioVenta}</td>
+                                                    <td>{producto.total}</td>
                                                     <td>
                                                         <button type='button' onClick={() => eliminarProducto(index)} className='btn btn-danger'>
                                                             <FontAwesomeIcon icon={faTrash} />
@@ -234,14 +246,14 @@ const AgregarCompra = () => {
                         </div>
                     </div>
 
-                    <div className='input-group mb-3' style={{ marginTop: '-9.5%', marginLeft: '32%' }}>
+                    {/* <div className='input-group mb-3' style={{ marginTop: '-9.5%', marginLeft: '32%' }}>
                         <label htmlFor='precio' className='input-group-text'><FontAwesomeIcon icon={faDollar} /></label>
-                        <input type='number' className="form-control" id='precio' value={precio} onChange={(e) => setPrecio(e.target.value)} />
-                    </div>
+                        <input type='number' className="form-control" id='precio' value={precio} onChange={(e) => (e.target.value)} />
+                    </div> */}
 
                     <div key={"buttonGuardar"} className='col-md-4 offset-md-5' style={{ marginTop: '-5.5%', marginLeft: '76.7%' }}>
                         <button type='submit' className='botones-azules' style={{ width: '60%', marginTop: '3%' }}>
-                            <FontAwesomeIcon icon={faFloppyDisk} /> Guardar compra
+                            <FontAwesomeIcon icon={faFloppyDisk} /> Guardar venta
                         </button>
                     </div>
 

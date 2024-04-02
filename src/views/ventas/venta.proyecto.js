@@ -180,7 +180,7 @@ const Ventas = () => {
             </div>
           </div>
 
-          <Link to="/Ventas/agregarServ" style={{ marginRight: '1%'}}>
+          <Link to="/Ventas/agregarProduc" style={{ marginRight: '1%'}}>
             <button className='botones-azules'>
               <FontAwesomeIcon icon={faPlusCircle} /> Añadir
             </button>
@@ -205,9 +205,9 @@ const Ventas = () => {
                     <th>Metodo pago</th>
                     <th>Estado</th>
                     <th>Total</th>
-                    <th>Acciones</th>
                     <th>Detalle_servicio</th>
                     <th>Detalle_producto</th>
+                    <th>Acciones</th>
 
                   </tr>
                 </thead>
@@ -220,18 +220,6 @@ const Ventas = () => {
                       <td>{r.metodoPago}</td>
                       <td>{r.estado ? 'true' : 'false'}</td>
                       <td>{r.total}</td>
-
-                      <td>
-                        <button onClick={() => { openModal(2, r.idVenta, r.estado); setEstadoModal(false) }} className='btn btn-warning'
-                          data-bs-toggle='modal' data-bs-target='#modalVentas'>
-                          <FontAwesomeIcon icon={faEdit} />
-
-                        </button>
-                        &nbsp;
-                        <button onClick={() => deleteVenta(r.idVenta)} className='btn btn-danger'>
-                          <FontAwesomeIcon icon={faTrash} />
-                        </button>
-                      </td>
                       <td>
                         &nbsp;
                         <button className='btn btn-primary' >
@@ -244,6 +232,18 @@ const Ventas = () => {
                           <FontAwesomeIcon icon={faEye} />
                         </button>
                       </td>
+                      <td>
+                        <button onClick={() => { openModal(2, r.idVenta, r.estado); setEstadoModal(false) }} className='btn btn-warning'
+                          data-bs-toggle='modal' data-bs-target='#modalVentas'>
+                          <FontAwesomeIcon icon={faEdit} />
+
+                        </button>
+                        &nbsp;
+                        <button onClick={() => deleteVenta(r.idVenta)} className='btn btn-danger'>
+                          <FontAwesomeIcon icon={faTrash} />
+                        </button>
+                      </td>
+                      
                     </tr>
                   ))}
                 </tbody>
