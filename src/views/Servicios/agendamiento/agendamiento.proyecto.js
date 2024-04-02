@@ -92,19 +92,19 @@ const Agendamiento = () => {
     setShowModal(true);
     setSelectedDate(slotInfo.start);
     setSelectEvent(null);
-    setIdAgendamiento(''); 
-    setPlaca(''); 
+    setIdAgendamiento('');
+    setPlaca('');
     setHora(dayjs('').format('HH:mm'));
   };
   const SeleccionarEvento = (event) => {
     setShowModalEdit(true);
     setSelectEvent(event);
-    setIdAgendamiento(event.id); 
-    setPlaca(event.title); 
+    setIdAgendamiento(event.id);
+    setPlaca(event.title);
     const nuevaHora = dayjs(event.start).add(5, 'hour').format('HH:mm');
-    setHora(nuevaHora); 
+    setHora(nuevaHora);
   };
-  
+
 
 
 
@@ -149,7 +149,7 @@ const Agendamiento = () => {
       setTimeout(() => setActualizacion(true), 1000);
     } else if (operation === 2) {
 
-      parametros = {idAgendamiento: id, fecha: `${dayjs(selectEvent.start).format('YYYY-MM-DD')} ${hora}`, vehiculos_placa: placa};
+      parametros = { idAgendamiento: id, fecha: `${dayjs(selectEvent.start).format('YYYY-MM-DD')} ${hora}`, vehiculos_placa: placa };
       metodo = 'PUT';
       setActualizacion(false);
       setTimeout(() => setActualizacion(true), 1000);
@@ -171,7 +171,7 @@ const Agendamiento = () => {
         });
         // document.getElementById('btnCerrar').click();
       }
-       else if (metodo === 'PUT') {
+      else if (metodo === 'PUT') {
         Swal.fire({
           position: "center",
           icon: "success",
@@ -192,7 +192,7 @@ const Agendamiento = () => {
         // document.getElementById('btnCerrar').click();
       }
 
-   
+
 
       if (tipo === 'success') {
         // document.getElementById('btnCerrar').click();
@@ -249,6 +249,7 @@ const Agendamiento = () => {
           event: 'Evento',
           showMore: total => `+ Ver más (${total})`
         }}
+
       />
 
       {showModal && (
@@ -261,10 +262,10 @@ const Agendamiento = () => {
             top: 0,
             bottom: 0,
             left: 0,
-            right: 0,
+            right: 0
           }}
         >
-          <div className='modal-dialog modal-dialog-centered'>
+          <div className='modal-dialog modal-dialog-centered' style={{ maxWidth: '55%', maxHeight: '200%' }}>
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">
@@ -308,8 +309,16 @@ const Agendamiento = () => {
                   </button>
                 </div>
 
-                <div className='input-group mb-3'>
+                <div className='input-group mb-3' >
                   <span className='input-group-text'><FontAwesomeIcon icon={faUserGear} /></span>
+                  <input
+                    type='date'
+                    id='horaInicio'
+                    className='form-control'
+                    placeholder='Hora'
+                    value={hora}
+                    onChange={(e) => setHora(e.target.value)}
+                  />
                   <input
                     type='time'
                     id='horaInicio'
@@ -319,6 +328,29 @@ const Agendamiento = () => {
                     onChange={(e) => setHora(e.target.value)}
                   />
                 </div>
+
+
+
+                <div className='input-group mb-3'>
+                  <span className='input-group-text'><FontAwesomeIcon icon={faUserGear} /></span>
+                  <select id='placa' className='form-select' value={placa} onChange={(e) => setPlaca(e.target.value)} style={{ marginRight: '12px' }}>
+                    <option value='' disabled>Servicio</option>
+                    {vehiculos.map((v) => (
+                      <option key={v.placa} value={v.placa}>{v.placa}</option>
+                    ))}
+                  </select>
+                  <button className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalEmpleados'  >
+                    <FontAwesomeIcon icon={faPlusCircle} /> Añadir
+                  </button>
+                </div>
+
+
+                <div className='input-group mb-3'>
+                <input type="text"></input>
+                </div>
+
+
+
 
               </div>
               <div className="modal-footer">
@@ -336,7 +368,7 @@ const Agendamiento = () => {
       )}
 
 
-{showModalEdit && (
+      {showModalEdit && (
         <div
           className="modal"
           style={{
@@ -369,7 +401,7 @@ const Agendamiento = () => {
               <div className="modal-body">
 
                 <div className='input-group mb-3'>
-                  
+
                   <input
                     type='text'
                     id='id'
