@@ -4,7 +4,7 @@ import { Calendar, dayjsLocalizer } from "react-big-calendar";
 import dayjs from 'dayjs'
 import "dayjs/locale/es";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { faUserGear, faPlusCircle } from '@fortawesome/free-solid-svg-icons'
+import { faUserGear, faPlusCircle, faCalendar, faMotorcycle, faScrewdriverWrench, faC } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { show_alerta } from 'src/fuctions.proyecto'
 import Swal from 'sweetalert2'
@@ -26,16 +26,21 @@ const Agendamiento = () => {
   const [id, setIdAgendamiento] = useState("");
   const [operation, setOperation] = useState(1)
   const [actualizacion, setActualizacion] = useState(false)
+  const [consecutivo, setConsecutivo] = useState(0);
 
   //Vehiculos
   const [vehiculos, setVehiculos] = useState([])
   const [placa, setPlaca] = useState('')
-  const [consecutivo, setConsecutivo] = useState(0);
+
+  //Servicios
+  const [servicios, setServicios] = useState([])
+  const [idServicio, setIdServicio] = useState('')
+  const [descripcionServicio, setDescripcionServicio] = useState("");
 
   useEffect(() => {
     getAgendamientos()
     getVehiculos()
-
+    getServicios()
   }, [])
 
   useEffect(() => {
@@ -43,7 +48,7 @@ const Agendamiento = () => {
       getAgendamientos();
       setShowModal(false);
       setShowModalEdit(false);
-      window.location.reload();
+      //window.location.reload();
     }
   }, [actualizacion]);
 
@@ -54,6 +59,19 @@ const Agendamiento = () => {
     }
   }, [operation]);
 
+  const seleccionarServicio = (e) => {
+    const selectedIdServicio = e.target.value;
+    setIdServicio(selectedIdServicio);
+
+
+    const selectedServicio = servicios.find(s => s.idServicio === selectedIdServicio);
+    if (selectedServicio) {
+      setDescripcionServicio(selectedServicio.descripcion);
+      console.log(selectedServicio)
+    } else {
+      setDescripcionServicio("");
+    }
+  };
 
   const obtenerIdConsecutivo = async () => {
     try {
@@ -88,6 +106,15 @@ const Agendamiento = () => {
     }
   }
 
+  const getServicios = async () => {
+    try {
+      const response = await axios.get('http://localhost:8081/api/servicio')
+      setServicios(response.data)
+    } catch (error) {
+      console.error('Error al obtener los servicios:', error.message)
+    }
+  }
+
   const SeleccionarDia = (slotInfo) => {
     setShowModal(true);
     setSelectedDate(slotInfo.start);
@@ -104,10 +131,6 @@ const Agendamiento = () => {
     const nuevaHora = dayjs(event.start).add(5, 'hour').format('HH:mm');
     setHora(nuevaHora);
   };
-
-
-
-
 
   const localizer = dayjsLocalizer(dayjs)
 
@@ -282,76 +305,112 @@ const Agendamiento = () => {
                 ></button>
               </div>
               <div className="modal-body">
+                <div className="row">
+                  <section className="col-md-6">
 
-                <div className='input-group mb-3'>
-                  {/* <span className='input-group-text'><FontAwesomeIcon icon={faUserGear} /></span> */}
-                  <input
-                    type='text'
-                    id='id'
-                    className='form-control'
-                    placeholder='ID'
-                    value={consecutivo}
-                    onChange={(e) => setIdAgendamiento(e.target.value)}
-                    hidden
-                  />
+                    <div className='input-group '>
+                      {/* <span className='input-group-text'><FontAwesomeIcon icon={faUserGear} /></span> */}
+                      <input
+                        type='text'
+                        id='id'
+                        className='form-control'
+                        placeholder='ID'
+                        value={consecutivo}
+                        onChange={(e) => setIdAgendamiento(e.target.value)}
+                        hidden
+                      />
+                    </div>
+
+                    <div className='input-group mb-3'>
+                      <span className='input-group-text'><FontAwesomeIcon icon={faMotorcycle} /></span>
+                      <select id='placa' className='form-select' value={placa} onChange={(e) => setPlaca(e.target.value)} style={{ marginRight: '12px' }}>
+                        <option value='' disabled>Vehiculo</option>
+                        {vehiculos.map((v) => (
+                          <option key={v.placa} value={v.placa}>{v.placa}</option>
+                        ))}
+                      </select>
+                      <button className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalEmpleados'  >
+                        <FontAwesomeIcon icon={faPlusCircle} /> Añadir
+                      </button>
+                    </div>
+
+                    <div className='input-group mb-3' >
+                      <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
+                      <input
+                        disabled
+                        type='text'
+                        className='form-control'
+                        placeholder="Dia"
+                        style={{ marginRight: '12px' }}
+                        value={dayjs(selectedDate).format('DD/MM/YYYY')}
+                      />
+                      <input
+                        type='time'
+                        id='horaInicio'
+                        className='form-control'
+                        placeholder='Hora'
+                        value={hora}
+                        onChange={(e) => setHora(e.target.value)}
+                      />
+                    </div>
+
+                    <div className='input-group mb-3'>
+                      <span className='input-group-text'><FontAwesomeIcon icon={faScrewdriverWrench} /></span>
+                      <select id='idServicio' className='form-select' value={idServicio} onChange={seleccionarServicio} style={{ marginRight: '12px' }}>
+                        <option value='' disabled>Servicios</option>
+                        {servicios.map((s) => (
+                          <option key={s.idServicio} value={s.idServicio}>{s.nombreServicio}</option>
+                        ))}
+                      </select>
+                      <button className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalEmpleados'  >
+                        <FontAwesomeIcon icon={faPlusCircle} />
+                      </button>
+                    </div>
+
+                    <div className='input-group mb-3'>
+                      <textarea
+                        className="form-control"
+                        rows="3"
+                        value={descripcionServicio}
+
+                      ></textarea>
+                    </div>
+                  </section>
+
+                  <section className="col-md-6" >
+                    <div className='input-group mb-3'>
+
+                      <div style={{ border: '1px solid', maxWidth: '135%', maxHeight: '50%', padding: '3%', overflow: 'scroll' }}>
+                        <h4>Servicios Agregados</h4>
+                        <table className='table'>
+                          <thead style={{ position: 'center', top: 0, backgroundColor: 'white' }} >
+                            <tr >
+
+                              <th>Servicio</th>
+                              <th>Descripcion</th>
+                              <th>Acciones</th>
+                            </tr>
+                          </thead>
+                          <tbody >
+                            {/* {productosCompra.map((producto, index) => (
+                                                  <tr key={index} >
+                                                      <td>{producto.idProducto}</td>
+                                                      <td>{producto.cantidad}</td>
+                                                      <td>{producto.precio}</td>
+                                                      <td>{producto.subtotal}</td>
+                                                      <td>
+                                                          <button type='button' onClick={() => eliminarProducto(index)} className='btn btn-danger'>
+                                                              <FontAwesomeIcon icon={faTrash} />
+                                                          </button>
+                                                      </td>
+                                                  </tr>
+                                              ))} */}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </section>
                 </div>
-
-                <div className='input-group mb-3'>
-                  <span className='input-group-text'><FontAwesomeIcon icon={faUserGear} /></span>
-                  <select id='placa' className='form-select' value={placa} onChange={(e) => setPlaca(e.target.value)} style={{ marginRight: '12px' }}>
-                    <option value='' disabled>Vehiculo</option>
-                    {vehiculos.map((v) => (
-                      <option key={v.placa} value={v.placa}>{v.placa}</option>
-                    ))}
-                  </select>
-                  <button className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalEmpleados'  >
-                    <FontAwesomeIcon icon={faPlusCircle} /> Añadir
-                  </button>
-                </div>
-
-                <div className='input-group mb-3' >
-                  <span className='input-group-text'><FontAwesomeIcon icon={faUserGear} /></span>
-                  <input
-                    type='date'
-                    id='horaInicio'
-                    className='form-control'
-                    placeholder='Hora'
-                    value={hora}
-                    onChange={(e) => setHora(e.target.value)}
-                  />
-                  <input
-                    type='time'
-                    id='horaInicio'
-                    className='form-control'
-                    placeholder='Hora'
-                    value={hora}
-                    onChange={(e) => setHora(e.target.value)}
-                  />
-                </div>
-
-
-
-                <div className='input-group mb-3'>
-                  <span className='input-group-text'><FontAwesomeIcon icon={faUserGear} /></span>
-                  <select id='placa' className='form-select' value={placa} onChange={(e) => setPlaca(e.target.value)} style={{ marginRight: '12px' }}>
-                    <option value='' disabled>Servicio</option>
-                    {vehiculos.map((v) => (
-                      <option key={v.placa} value={v.placa}>{v.placa}</option>
-                    ))}
-                  </select>
-                  <button className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalEmpleados'  >
-                    <FontAwesomeIcon icon={faPlusCircle} /> Añadir
-                  </button>
-                </div>
-
-
-                <div className='input-group mb-3'>
-                <input type="text"></input>
-                </div>
-
-
-
-
               </div>
               <div className="modal-footer">
                 <button
