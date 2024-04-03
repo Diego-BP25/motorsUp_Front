@@ -59,15 +59,12 @@ const Agendamiento = () => {
     }
   }, [operation]);
 
-  const seleccionarServicio = (e) => {
-    const selectedIdServicio = e.target.value;
-    setIdServicio(selectedIdServicio);
-
-
-    const selectedServicio = servicios.find(s => s.idServicio === selectedIdServicio);
+  const seleccionarServicio = (idServicio) => {
+    setIdServicio(idServicio);
+    
+    const selectedServicio = servicios.find(s => s.idServicio == idServicio);
     if (selectedServicio) {
       setDescripcionServicio(selectedServicio.descripcion);
-      console.log(selectedServicio)
     } else {
       setDescripcionServicio("");
     }
@@ -356,10 +353,10 @@ const Agendamiento = () => {
 
                     <div className='input-group mb-3'>
                       <span className='input-group-text'><FontAwesomeIcon icon={faScrewdriverWrench} /></span>
-                      <select id='idServicio' className='form-select' value={idServicio} onChange={seleccionarServicio} style={{ marginRight: '12px' }}>
+                      <select id='idServicio' className='form-select' value={idServicio}  style={{ marginRight: '12px' }}>
                         <option value='' disabled>Servicios</option>
                         {servicios.map((s) => (
-                          <option key={s.idServicio} value={s.idServicio}>{s.nombreServicio}</option>
+                          <option key={s.idServicio} value={s.idServicio} onClick={(e) => seleccionarServicio(e.target.value)}>{s.nombreServicio}</option>
                         ))}
                       </select>
                       <button className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalEmpleados'  >
@@ -372,7 +369,9 @@ const Agendamiento = () => {
                         className="form-control"
                         rows="3"
                         value={descripcionServicio}
-
+                        onChange={(e) => setDescripcionServicio(e.target.value)}
+                        disabled
+                        style={{ resize: 'none' }}
                       ></textarea>
                     </div>
                   </section>
@@ -387,7 +386,6 @@ const Agendamiento = () => {
                             <tr >
 
                               <th>Servicio</th>
-                              <th>Descripcion</th>
                               <th>Acciones</th>
                             </tr>
                           </thead>
