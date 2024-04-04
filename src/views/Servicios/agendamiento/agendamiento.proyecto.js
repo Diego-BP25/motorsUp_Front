@@ -4,7 +4,7 @@ import { Calendar, dayjsLocalizer } from "react-big-calendar";
 import dayjs from 'dayjs'
 import "dayjs/locale/es";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { faUserGear, faPlusCircle, faCalendar, faMotorcycle, faScrewdriverWrench, faC } from '@fortawesome/free-solid-svg-icons'
+import { faUserGear, faPlusCircle, faCalendar, faMotorcycle, faScrewdriverWrench, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { show_alerta } from 'src/fuctions.proyecto'
 import Swal from 'sweetalert2'
@@ -37,6 +37,30 @@ const Agendamiento = () => {
   const [idServicio, setIdServicio] = useState('')
   const [descripcionServicio, setDescripcionServicio] = useState("");
 
+
+  //Detalles
+  const [agendamientoServicios, setAgendamientoServicios] = useState([]);
+
+
+  const agregarServicio = () => {
+    if (idServicio && descripcionServicio) {
+      setAgendamientoServicios([...agendamientoServicios, { idServicio, descripcionServicio }]);
+      setDescripcionServicio('');
+      setIdServicio('');
+    } else {
+      Swal.fire({
+        icon: 'error',
+        text: 'Todos los campos del producto son obligatorios',
+      });
+    }
+  }
+
+  const eliminarServicio = (index) => {
+    const nuevosServicios = [...agendamientoServicios];
+    nuevosServicios.splice(index, 1);
+    setAgendamientoServicios(nuevosServicios);
+};
+
   useEffect(() => {
     getAgendamientos()
     getVehiculos()
@@ -61,7 +85,7 @@ const Agendamiento = () => {
 
   const seleccionarServicio = (idServicio) => {
     setIdServicio(idServicio);
-    
+
     const selectedServicio = servicios.find(s => s.idServicio == idServicio);
     if (selectedServicio) {
       setDescripcionServicio(selectedServicio.descripcion);
@@ -353,13 +377,13 @@ const Agendamiento = () => {
 
                     <div className='input-group mb-3'>
                       <span className='input-group-text'><FontAwesomeIcon icon={faScrewdriverWrench} /></span>
-                      <select id='idServicio' className='form-select' value={idServicio}  style={{ marginRight: '12px' }}>
+                      <select id='idServicio' className='form-select' value={idServicio} style={{ marginRight: '12px' }}>
                         <option value='' disabled>Servicios</option>
                         {servicios.map((s) => (
                           <option key={s.idServicio} value={s.idServicio} onClick={(e) => seleccionarServicio(e.target.value)}>{s.nombreServicio}</option>
                         ))}
                       </select>
-                      <button className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalEmpleados'  >
+                      <button className='botones-azules' data-bs-toggle='modal' onClick={() => agregarServicio()}  >
                         <FontAwesomeIcon icon={faPlusCircle} />
                       </button>
                     </div>
@@ -390,19 +414,16 @@ const Agendamiento = () => {
                             </tr>
                           </thead>
                           <tbody >
-                            {/* {productosCompra.map((producto, index) => (
-                                                  <tr key={index} >
-                                                      <td>{producto.idProducto}</td>
-                                                      <td>{producto.cantidad}</td>
-                                                      <td>{producto.precio}</td>
-                                                      <td>{producto.subtotal}</td>
-                                                      <td>
-                                                          <button type='button' onClick={() => eliminarProducto(index)} className='btn btn-danger'>
-                                                              <FontAwesomeIcon icon={faTrash} />
-                                                          </button>
-                                                      </td>
-                                                  </tr>
-                                              ))} */}
+                            {agendamientoServicios.map((agendamiento, index) => (
+                              <tr key={index} >
+                                <td>{agendamiento.nombreServicio}</td>
+                                <td>
+                                  <button type='button' onClick={() => eliminarServicio(index)} className='btn btn-danger'>
+                                    <FontAwesomeIcon icon={faTrash} />
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
                           </tbody>
                         </table>
                       </div>
