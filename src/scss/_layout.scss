@@ -52,3 +52,13 @@ background-color: transparentize($color: #ffffffb3, $amount: 0);
   background-color: #ffffff;
   padding: 20px; 
 }
+
+.estado-activo {
+  color: green; 
+  font-weight: bold;
+}
+
+.estado-inactivo {
+  color: red;
+  font-weight: bold;
+}
