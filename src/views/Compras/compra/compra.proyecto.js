@@ -7,11 +7,14 @@ import withReactContent from 'sweetalert2-react-content'
 import { show_alerta } from 'src/fuctions.proyecto'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faCalendar, faToggleOff, faEye, faSearch } from '@fortawesome/free-solid-svg-icons'
+import { faTrash, faPlusCircle, faFloppyDisk, faCalendar, faToggleOff, faEye, faSearch, faCloudDownload } from '@fortawesome/free-solid-svg-icons'
 import { ContentDoble, ContentIndividual, ModalProyecto } from 'src/components/proyect/modal.proyecto'
 import { ButtonNormal } from 'src/components/proyect/buttons.proyecto'
-import { formatDate } from 'src/views/funcionesExtras.proyecto'
+import { fecha2 } from 'src/views/funcionesExtras.proyecto'
 import { Link } from 'react-router-dom';
+import { CSmartPagination } from '@coreui/react-pro';
+import Modal from 'react-bootstrap/Modal';
+import Button from 'react-bootstrap/Button';
 
 const Compras = () => {
   //api de compras
@@ -31,18 +34,19 @@ const Compras = () => {
   const [consecutivo, setConsecutivo] = useState(0);
 
   //estado para el boton info
-  const [showProductosModal, setShowProductosModal] = useState(false); // Estado para mostrar/ocultar la modal de productos
-  const [productosAsociados, setProductosAsociados] = useState([]); // Estado para almacenar los productos asociados a la compra seleccionada
-
+  const [productosAsociados, setProductosAsociados] = useState([]);
+  const [showModal, setShowModal] = useState(false);
   //buscador
   const [busqueda, setBusqueda] = useState("");
 
+  //paginado
+  const [currentPage, setCurrentPage] = useState(1)
 
 
 
   //proveedor
   const [proveedor, setProveedor] = useState([])
-  const [proveedores, setProveedores] = useState('')
+  const [proveedores, setProveedores] = useState({});
 
   //productos
   const [producto, setProducto] = useState([])
@@ -60,6 +64,10 @@ const Compras = () => {
       obtenerIdConsecutivo();
     }
   }, [operation]);
+
+  useEffect(() => {
+    getProveedores();
+  }, []);
 
 
   const obtenerIdConsecutivo = async () => {
@@ -89,12 +97,16 @@ const Compras = () => {
 
   const getProveedores = async () => {
     try {
-      const respuesta = await axios.get('http://localhost:8081/api/proveedores', {})
-      setProveedor(await respuesta.data)
+      const respuesta = await axios.get('http://localhost:8081/api/proveedores');
+      const datosProveedores = respuesta.data.reduce((acc, proveedor) => {
+        acc[proveedor.idProveedor] = proveedor.nombreProveedor; // Almacenar el nombre
+        return acc;
+      }, {});
+      setProveedores(datosProveedores);
     } catch (error) {
-      console.error('Error al obtener los proveedores:', error.message)
+      console.error('Error al obtener los proveedores:', error.message);
     }
-  }
+  };
 
   const getProductos = async () => {
     try {
@@ -163,19 +175,20 @@ const Compras = () => {
 
   const getProductosAsociados = async (idCompra) => {
     try {
-      const response = await axios.get(`http://localhost:8081/api/compras/id/${idCompra}`);
-      setProductosAsociados(response.data);
-      setShowProductosModal(true); // Mostrar la modal de productos
+      const response = await axios.get(`http://localhost:8081/api/compras/${idCompra}`);
+      setProductosAsociados(response.data.detallesCompra);
+      setShowModal(true); // Mostrar la modal de productos asociados
     } catch (error) {
       console.error('Error al obtener los productos asociados:', error.message);
     }
   };
 
-  // const eliminarProducto = (index) => {
-  //   const nuevaListaProductos = [...productosCompra];
-  //   nuevaListaProductos.splice(index, 1);
-  //   setProductosCompra(nuevaListaProductos);
-  // };
+  // Función para obtener los roles de la página actual
+  const getCurrentPageCompras = () => {
+    const startIndex = (currentPage - 1) * 5;
+    const endIndex = startIndex + 5;
+    return compra.slice(startIndex, endIndex);
+  }
 
   const validarCamposObligatorios = () => {
     let hayErrores = false;
@@ -323,82 +336,82 @@ const Compras = () => {
   return (
 
     <div className='App'>
+
       <div className='container-fluid'>
-        <div >
-          <div style={{ display: 'flex',  }} id="Container">
+        <div style={{ display: 'flex', }} id="Container">
 
-            <div style={{ marginRight: 'auto' }}>
-              <h3>Compras</h3>
-            </div>
-            <div className='input-group' style={{ marginRight: '1%' }}>
-              <input className='form-control inputBuscador'
-                id='buscador'
-                value={busqueda}
-                placeholder='Buscar'
-                onChange={handleChange}
-              />
-              <div className="icon-container">
-                <FontAwesomeIcon icon={faSearch} />
-              </div>
-            </div>
-
-            <Link to="/compras/agregar">
-              <button className='botones-azules'>
-                <FontAwesomeIcon icon={faPlusCircle} /> Añadir
-              </button>
-            </Link>
-
-            <div style={{ marginRight: '-0.1%' }}>
-              <button className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalCompras' onClick={() => [openModal(1), setFechaCompra(formatDate(new Date()))]} >
-                <FontAwesomeIcon icon={faPlusCircle} /> Añadir
-              </button>
+          <div style={{ marginRight: 'auto' }}>
+            <h3>Compras</h3>
+          </div>
+          <div className='input-group' style={{ marginRight: '1%' }}>
+            <input className='form-control inputBuscador'
+              id='buscador'
+              value={busqueda}
+              placeholder='Buscar'
+              onChange={handleChange}
+            />
+            <div className="icon-container">
+              <FontAwesomeIcon icon={faSearch} />
             </div>
           </div>
+
+          <Link to="/compras/agregar">
+            <button className='botones-azules'>
+              <FontAwesomeIcon icon={faPlusCircle} /> Añadir
+            </button>
+          </Link>
         </div>
+
         <div className='row mt-3'>
-          <div>
-           
-            <div className="table-responsive" style={{ maxWidth: '100%', margin: '0 auto' }}>
-              <table className='table table-striped' style={{ width: '100%' }}>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Descripcion</th>
-                    <th>Estado</th>
-                    <th>Fecha</th>
-                    <th>Id proveedor</th>
-                    <th>Acciones</th>
+          <div className="table-responsive" style={{ maxWidth: '100%', margin: '0 auto' }}>
+            <table className='table table-striped' style={{ width: '100%' }}>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Descripcion</th>
+                  <th>Estado</th>
+                  <th>Fecha</th>
+                  <th>Id proveedor</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody className='table-group-divider'>
+                {getCurrentPageCompras().map((c) => (
+                  <tr key={c.idCompra}>
+                    <td>{c.idCompra}</td>
+                    <td>{c.descripcionCompra}</td>
+                    <td>{c.estadoCompra === 0 ? 'Suspendido' : 'Activo'}</td>
+                    <td>{fecha2(c.fechaCompra)}</td>
+                    <td>{proveedores[c.proveedores_idProveedor]}</td>
+                    <td>
+                      <button className='btn btn-info' onClick={() => getProductosAsociados(c.idCompra)}>
+                        <FontAwesomeIcon icon={faEye} />
+                      </button>
+                      &nbsp;
+                      <button className='btn btn-success'
+                        data-bs-toggle='modal' data-bs-target='#modalCompras'>
+                        <FontAwesomeIcon icon={faCloudDownload} />
+                      </button>
+                      &nbsp;
+                      <button onClick={() => deleteCompra(c.idCompra)} className='btn btn-danger'>
+                        <FontAwesomeIcon icon={faTrash} />
+                      </button>
+
+                    </td>
                   </tr>
-                </thead>
-                <tbody className='table-group-divider'>
-                  {compra.map((c) => (
-                    <tr key={c.idCompra}>
-                      <td>{c.idCompra}</td>
-                      <td>{c.descripcionCompra}</td>
-                      <td>{c.estadoCompra === 0 ? 'Suspendido' : 'Activo'}</td>
-                      <td>{c.fechaCompra}</td>
-                      <td>{c.proveedores_idProveedor}</td>
-                      <td>
-                        <button className='btn btn-info' onClick={() => getProductosAsociados(c.idCompra)}>
-                          <FontAwesomeIcon icon={faEye} />
-                        </button>
-                        &nbsp;
-                        <button onClick={() => openModal(2, c.idCompra, c.descripcionCompra, c.estadoCompra, c.fechaCompra, c.proveedores_idProveedor)} className='btn btn-warning'
-                          data-bs-toggle='modal' data-bs-target='#modalCompras'>
-                          <FontAwesomeIcon icon={faEdit} />
-                        </button>
-                        &nbsp;
-                        <button onClick={() => deleteCompra(c.idCompra)} className='btn btn-danger'>
-                          <FontAwesomeIcon icon={faTrash} />
-                        </button>
-
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        {/* Paginación */}
+        <div className='row mt-3' style={{ marginLeft: '-21.5%' }}>
+          <div className='col-12 col-lg-8 offset-0 offset-lg-2'>
+            <CSmartPagination
+              activePage={currentPage}
+              pages={Math.ceil(compra.length / 5)}
+              onActivePageChange={setCurrentPage}
+            />
           </div>
         </div>
       </div>
@@ -516,43 +529,40 @@ const Compras = () => {
           </div>
         </div>
       </div>
-
-      {showProductosModal && (
-        <div id='modalProductosAsociados' className='modal fade' aria-hidden='true'>
-          <div className='modal-dialog'>
-            <div className='modal-content'>
-              <div className='modal-header'>
-                <h5 className='modal-title'>Productos Asociados</h5>
-                <button type='button' className='btn-close' onClick={() => setShowProductosModal(false)} aria-label='Close'></button>
-              </div>
-              <div className='modal-body'>
-                <div className='table-responsive'>
-                  <table className='table table-striped'>
-                    <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Precio</th>
-                        {/* Agregar más columnas si es necesario */}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {productosAsociados.map((producto) => (
-                        <tr key={producto.id}>
-                          <td>{producto.id}</td>
-                          <td>{producto.nombre}</td>
-                          <td>{producto.precio}</td>
-                          {/* Agregar más celdas si es necesario */}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Productos Asociados</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <table className='table table-striped'>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+                <th>subtotal</th>
+                <th>Id compra</th>
+                <th>Id producto</th>
+              </tr>
+            </thead>
+            <tbody>
+              {productosAsociados.map((producto) => (
+                <tr key={producto.idDetalleCompra}>
+                  <td>{producto.idDetalleCompra}</td>
+                  <td>{producto.precio}</td>
+                  <td>{producto.cantidad}</td>
+                  <td>{producto.subtotal}</td>
+                  <td>{producto.compras_idCompra}</td>
+                  <td>{producto.productos_idProducto}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant='secondary' onClick={() => setShowModal(false)}>Cerrar</Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   )
 }

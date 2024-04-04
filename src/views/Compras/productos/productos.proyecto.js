@@ -6,8 +6,8 @@ import withReactContent from 'sweetalert2-react-content'
 import { show_alerta } from 'src/fuctions.proyecto'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faCalendar, faToggleOff, faIdCardClip, faXmark } from '@fortawesome/free-solid-svg-icons'
-
+import { faEdit, faTrash, faSearch, faPlusCircle, faFloppyDisk, faCalendar, faToggleOff, faIdCardClip, faXmark } from '@fortawesome/free-solid-svg-icons'
+import { CSmartPagination } from '@coreui/react-pro';
 
 const Productos = () => {
   //api de productos
@@ -26,6 +26,13 @@ const Productos = () => {
   const [operation, setOperation] = useState(1)
   const [actualizacion, setActualizacion] = useState(false)
   const [consecutivo, setConsecutivo] = useState(0);
+
+
+  //buscador
+  const [busqueda, setBusqueda] = useState("");
+
+  //paginado
+  const [currentPage, setCurrentPage] = useState(1)
 
 
   useEffect(() => {
@@ -76,21 +83,21 @@ const Productos = () => {
     setStockMaximo('');
     setOperation('');
     if (op === 1) {
-        setTitle('Registrar producto')
-        obtenerIdConsecutivo();
+      setTitle('Registrar producto')
+      obtenerIdConsecutivo();
     }
     else if (op === 2) {
-        setTitle('Editar producto')
-        setIdProducto(idProducto);
-        setNombreProducto(nombreProducto);
-        setPrecioCompra(precioCompra);
-        setEstadoProducto(estadoProducto);
-        setPrecioVenta(precioVenta);
-        setSaldoExistencias(saldoExistencias);
-        setCategoriaProducto_idCategoriaProducto(categoriaProducto_idCategoriaProducto);
-        setStockMinimo(stockMinimo);
-        setStockMaximo(stockMaximo);
-        setOperation('');
+      setTitle('Editar producto')
+      setIdProducto(idProducto);
+      setNombreProducto(nombreProducto);
+      setPrecioCompra(precioCompra);
+      setEstadoProducto(estadoProducto);
+      setPrecioVenta(precioVenta);
+      setSaldoExistencias(saldoExistencias);
+      setCategoriaProducto_idCategoriaProducto(categoriaProducto_idCategoriaProducto);
+      setStockMinimo(stockMinimo);
+      setStockMaximo(stockMaximo);
+      setOperation('');
     }
     setOperation(op)
     window.setTimeout(function () {
@@ -109,17 +116,18 @@ const Productos = () => {
     // }
 
     if (operation === 1) {
-      parametros = { idProducto: consecutivo, estadoProducto: estadoProducto, nombreProducto: nombreProducto, precioCompra: precioCompra, precioVenta: precioVenta, saldoExistencias: saldoExistencias , stockMaximo: stockMaximo, stockMinimo: stockMinimo, categoriaProducto_idCategoriaProducto: categoriaProducto_idCategoriaProducto};
+      parametros = { idProducto: consecutivo, estadoProducto: estadoProducto, nombreProducto: nombreProducto, precioCompra: precioCompra, precioVenta: precioVenta, saldoExistencias: saldoExistencias, stockMaximo: stockMaximo, stockMinimo: stockMinimo, categoriaProducto_idCategoriaProducto: categoriaProducto_idCategoriaProducto };
       metodo = 'POST';
     } else {
-      parametros = { idProducto: idProducto, estadoProducto: (estadoProducto === 0 ? 'false' : 'true') , nombreProducto: nombreProducto, precioCompra: precioCompra, precioVenta: precioVenta, saldoExistencias: saldoExistencias , stockMaximo: stockMaximo, stockMinimo: stockMinimo, categoriaProducto_idCategoriaProducto: categoriaProducto_idCategoriaProducto};
+      parametros = { idProducto: idProducto, estadoProducto: (estadoProducto === 0 ? 'false' : 'true'), nombreProducto: nombreProducto, precioCompra: precioCompra, precioVenta: precioVenta, saldoExistencias: saldoExistencias, stockMaximo: stockMaximo, stockMinimo: stockMinimo, categoriaProducto_idCategoriaProducto: categoriaProducto_idCategoriaProducto };
       metodo = 'PUT';
     }
     enviarSolicitud(metodo, parametros);
 
   }
 
-  const enviarSolicitud = async (metodo, parametros) => { await axios({ method: metodo, url: url, data: parametros }).then(function (respuesta) {
+  const enviarSolicitud = async (metodo, parametros) => {
+    await axios({ method: metodo, url: url, data: parametros }).then(function (respuesta) {
       if (metodo === 'POST') {
         Swal.fire({
           position: "center",
@@ -162,7 +170,7 @@ const Productos = () => {
   }
 
 
-    
+
   const deleteProducto = (idProducto) => {
     const MySwal = withReactContent(Swal);
     MySwal.fire({
@@ -179,68 +187,119 @@ const Productos = () => {
     });
   }
 
+  const handleChange = (e) => {
+    const valor = e.target.value;
+    setBusqueda(valor); // Actualizar el estado de búsqueda
+
+    if (valor.trim() === '') {
+      getProductos(); // Si el valor está vacío, obtener todos los propietarios nuevamente
+    } else {
+      filtrar(valor); // Si hay un valor, aplicar el filtro de búsqueda
+    }
+  };
+
+  const filtrar = (terminoBusqueda) => {
+    var resultadosBusqueda = productos.filter((elemento) => {
+
+      if (elemento.nombreProducto.toString().toLowerCase().includes(terminoBusqueda.toLowerCase())
+      ) {
+        return elemento;
+      }
+    });
+    setProductos(resultadosBusqueda);
+  }
+
+  // Función para obtener los productos de la página actual
+  const getCurrentPageProductos = () => {
+    const startIndex = (currentPage - 1) * 5;
+    const endIndex = startIndex + 5;
+    return productos.slice(startIndex, endIndex);
+  }
+
   return (
 
     <div className='App'>
       <div className='container-fluid'>
-        <div className='row mt-3'>
-          <div className='col-md-4 offset-md-4'>
-            <div className='d-grid mx-auto'>
-              <button onClick={() => openModal(1)} className='btn btn-dark' data-bs-toggle='modal' data-bs-target='#modalProductos'>
-                <FontAwesomeIcon icon={faPlusCircle} /> Añadir
-              </button>
+        <div style={{ display: 'flex', }} id="Container">
+          <div style={{ marginRight: 'auto' }}>
+            <h3>Productos</h3>
+          </div>
+
+          <div className='input-group' style={{ marginRight: '1%' }}>
+            <input className='form-control inputBuscador'
+              id='buscador'
+              value={busqueda}
+              placeholder='Buscar'
+              onChange={handleChange}
+            />
+            <div className="icon-container">
+              <FontAwesomeIcon icon={faSearch} />
             </div>
           </div>
+
+          <button className='botones-azules' onClick={() => openModal(1)} data-bs-toggle='modal' data-bs-target='#modalProductos'>
+            <FontAwesomeIcon icon={faPlusCircle} /> Añadir
+          </button>
+
         </div>
         <div className='row mt-3'>
-          <div className='col-12 col-lg-8 offset-0 offset-lg-2'>
-            <div className='table-responsive'>
-              <table className='table table-bordered'>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Estado</th>
-                    <th>Nombre</th>
-                    <th>Precio compra</th>
-                    <th>Precio venta</th>
-                    <th>Saldo existencia</th>
-                    <th>Stock maximo</th>
-                    <th>Stock minimo</th>
-                    <th>Categoria</th>
-                    <th>Acciones</th>
+          <div className="table-responsive" style={{ maxWidth: '100%', margin: '0 auto' }}>
+            <table className='table table-striped' style={{ width: '100%' }}>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Estado</th>
+                  <th>Nombre</th>
+                  <th>Precio compra</th>
+                  <th>Precio venta</th>
+                  <th>Saldo existencia</th>
+                  <th>Stock maximo</th>
+                  <th>Stock minimo</th>
+                  <th>Categoria</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody className='table-group-divider'>
+                {getCurrentPageProductos().map((p) => (
+
+                  <tr key={p.idProducto}>
+                    <td>{p.idProducto}</td>
+                    <td>{p.estadoProducto === 0 ? 'Suspendido' : 'Activo'}</td>
+                    <td>{p.nombreProducto}</td>
+                    <td>{p.precioCompra}</td>
+                    <td>{p.precioVenta}</td>
+                    <td>{p.saldoExistencias}</td>
+                    <td>{p.stockMaximo}</td>
+                    <td>{p.stockMinimo}</td>
+                    <td>{p.categoriaProducto_idCategoriaProducto}</td>
+                    <td>
+                      <button onClick={() => openModal(2, p.idProducto, p.estadoProducto, p.nombreProducto, p.precioCompra, p.precioVenta, p.saldoExistencias, p.stockMaximo, p.stockMinimo, p.categoriaProducto_idCategoriaProducto)} className='btn btn-warning'
+                        data-bs-toggle='modal' data-bs-target='#modalProductos'>
+                        <FontAwesomeIcon icon={faEdit} />
+                      </button>
+                      &nbsp;
+                      <button onClick={() => deleteProducto(p.idProducto)} className='btn btn-danger'>
+                        <FontAwesomeIcon icon={faTrash} />
+                      </button>
+                    </td>
                   </tr>
-                </thead>
-                <tbody className='table-group-divider'>
-                  {productos.map((p) => (
-                    
-                    <tr key={p.idProducto}>
-                      <td>{p.idProducto}</td>
-                      <td>{p.estadoProducto === 0 ? 'Suspendido' : 'Activo'}</td>
-                      <td>{p.nombreProducto}</td>
-                      <td>{p.precioCompra }</td>
-                      <td>{p.precioVenta}</td>
-                      <td>{p.saldoExistencias}</td>
-                      <td>{p.stockMaximo}</td>
-                      <td>{p.stockMinimo}</td>
-                      <td>{p.categoriaProducto_idCategoriaProducto}</td>
-                      <td>
-                        <button onClick={() => openModal(2, p.idProducto, p.estadoProducto, p.nombreProducto, p.precioCompra, p.precioVenta, p.saldoExistencias, p.stockMaximo, p.stockMinimo, p.categoriaProducto_idCategoriaProducto)} className='btn btn-warning'
-                          data-bs-toggle='modal' data-bs-target='#modalProductos'>
-                          <FontAwesomeIcon icon={faEdit} />
-                        </button>
-                        &nbsp;
-                        <button onClick={() => deleteProducto(p.idProducto)} className='btn btn-danger'>
-                          <FontAwesomeIcon icon={faTrash} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        {/* Paginación */}
+        <div className='row mt-3' style={{ marginLeft: '-21.5%' }}>
+          <div className='col-12 col-lg-8 offset-0 offset-lg-2'>
+            <CSmartPagination
+              activePage={currentPage}
+              pages={Math.ceil(productos.length / 5)}
+              onActivePageChange={setCurrentPage}
+            />
           </div>
         </div>
       </div>
+
       <div id='modalProductos' className='modal fade' aria-hidden='true'>
         <div className='modal-dialog'>
           <div className='modal-content'>
@@ -252,9 +311,9 @@ const Productos = () => {
               <input type='hidden' id='id' ></input>
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faIdCardClip} /></span>
-                <input type='number' id='idProductos' className='form-control' placeholder='id' value={operation === 1 ? consecutivo : idProducto}/>
+                <input type='number' id='idProductos' className='form-control' placeholder='id' value={operation === 1 ? consecutivo : idProducto} />
               </div>
-              
+
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
                 <input type='text' id='estadoProducto' className='form-control' placeholder='Estado' value={estadoProducto} onChange={(e) => setEstadoProducto(e.target.value)}></input>
@@ -294,7 +353,7 @@ const Productos = () => {
                 <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
                 <input type='text' id='categoriaProducto_idCategoriaProducto' className='form-control' placeholder='Categoria' value={categoriaProducto_idCategoriaProducto} onChange={(e) => setCategoriaProducto_idCategoriaProducto(e.target.value)}></input>
               </div>
-              
+
               <div className='d-grid col-6 mx-auto'>
                 <button onClick={() => validar()} className='btn btn-success'>
                   <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
