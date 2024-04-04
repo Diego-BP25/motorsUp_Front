@@ -9,7 +9,6 @@ const Rol = React.lazy(() => import('./views/Configuracion/roles/roles.proyecto'
 const cotizaciones = React.lazy(() => import('./views/cotizaciones/cotizaciones.proyecto'))
 const Propietarios = React.lazy(() => import('./views/Servicios/Propietarios/propietario.proyecto'))
 const Ventas = React.lazy(() => import('./views/ventas/venta/venta.proyecto'))
-
 const Agendamiento = React.lazy(() =>
   import('./views/Servicios/agendamiento/agendamiento.proyecto'),
 )
