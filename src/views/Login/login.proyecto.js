@@ -105,9 +105,10 @@ const Login = () => {
     }
   };
 
-  const openModal = (op, correoRecuperacion, contrasenaNueva) => {
+  const openModal = (op, correoRecuperacion, contrasenaNueva, codigo) => {
     setCorreoRecuperacion('');
     setContrasenaNueva('');
+    setCodigo('');
 
     if (op === 1) {
       setTitle('Recuperar Contraseña')
@@ -121,7 +122,12 @@ const Login = () => {
       setTitle('Nueva Contraseña')
       setMensaje('Introduzca su nueva contraseña..');
     }
-    setOperation(op)
+    setOperation(op);
+
+    if (op !== 1 && (correoRecuperacion === '')) {
+      console.log('correo vacio')
+      return;
+    }
     window.setTimeout(function () {
       document.getElementById('correo').focus();
     }, 500);
@@ -168,127 +174,155 @@ const Login = () => {
 
 
   return (
-    <div className='bodyLogin'>
-      <div className="contenedor-formulario contenedor">
-        <div className="imagen-formulario">
-
-        </div>
-
-        <form className="formulario" onSubmit={validarDatos}>
-          <div className="texto-formulario">
-            <h2>Bienvenido de nuevo..</h2>
-            <p>Motors Up</p>
+    <>
+      <div className="divPrincipalLogin">
+        <div className='divSecundarioLogin flex'>
+          <div className="imageBackground">
+            <img
+              src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExa25yZnMwYXljNDM1d3c3eGFhZnV3ZWdpYnV2ajV5MmlrM3k2MWgydiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/RRJCGAfbPW1kZzFNSu/giphy.gif"
+              alt=""
+            />
           </div>
-          <div className="input">
-            <label htmlFor="correo">Correo</label>
-            <input type="text" id="correo" value={correo} onChange={(e) => setCorreo(e.target.value)}></input>
-          </div>
-          <div className="input">
-            <label htmlFor="contrasena">Contraseña</label>
-            <input type="password" id="contrasena" value={password} onChange={(e) => setContrasena(e.target.value)}></input>
-          </div>
-          <div className="password-olvidada">
-            <p className="olvideC" onClick={() => openModal(1)} data-bs-toggle='modal' data-bs-target='#modalCorreo'>¿Olvidaste tu contraseña?</p>
-          </div>
-          <div className="input">
-            <input type="submit" value="Iniciar Sesión"></input>
-          </div>
-        </form>
-      </div>
+          <div className="card-inner">
+            <div className="containerRegister">
+              <form onSubmit={validarDatos}>
+                <h1 className="text-center" style={{ color: "#007bff" }}>Motors Up</h1>
 
-
-
-
-      {/* MODAL CORREO */}
-      <div id='modalCorreo' className='modal fade' aria-hidden='true'>
-        <div className='modal-dialog'>
-          <div className='modal-content'>
-            <div className='modal-header'>
-              <label className='h4'>{title}</label>
-              <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
-            </div>
-            <div className='modal-body'>
-              <input type='hidden' id='id' ></input>
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faEnvelope} /></span>
-                <input type='text' id='correoRecuperacion' className='form-control' placeholder='Correo' value={correoRecuperacion} onChange={(e) => setCorreoRecuperacion(e.target.value)}></input>
-              </div>
-              <div className='d-grid col-6 mx-auto'>
-                <button onClick={() => { validar(); openModal(2); }} data-bs-toggle='modal' data-bs-target='#modalCodigo' className='btn btn-primary'>
-                  <FontAwesomeIcon icon={faPaperPlane} /> Enviar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-      <div id='modalCodigo' className='modal fade' aria-hidden='true'>
-        <div className='modal-dialog'>
-          <div className='modal-content'>
-            <div className='modal-header'>
-              <label className='h4'>{title}</label>
-
-              <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
-            </div>
-            <div className='modal-body'>
-              <p>{mensaje}</p>
-              <input type='hidden' id='id' ></input>
-              <div className='input-group mb-3 justify-content-center align-items-center'>
-                {/* <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
-                <input type='text' id='codigo' className='form-control' placeholder='Codigo' value={codigo} onChange={(e) => setCodigo(e.target.value)}></input> */}
-                <div className='otp_inputs'>
-
-                <input type="text" placeholder='' maxLength='1' className='otp_input'></input>
-                <input type="text" placeholder='' maxLength='1' className='otp_input'></input>
-                <input type="text" placeholder='' maxLength='1' className='otp_input'></input>
-                <input type="text" placeholder='' maxLength='1' className='otp_input'></input>
-                <input type="text" placeholder='' maxLength='1' className='otp_input'></input>
-                <input type="text" placeholder='' maxLength='1' className='otp_input'></input>
+                <div className="inputs">
+                  <label>Correo</label>
+                  <br />
+                  <input
+                    type="email"
+                    className="input"
+                    placeholder="Correo"
+                    id="correo" value={correo} onChange={(e) => setCorreo(e.target.value)}
+                  />
                 </div>
 
-              </div>
-              <div className='d-grid col-6 mx-auto'>
-                <button onClick={() => { validar(); openModal(3); }} data-bs-toggle='modal' data-bs-target='#modalContrasena' className='btn btn-primary'>
-                  <FontAwesomeIcon icon={faCheck} /> Verificar
+                <div className="inputs">
+                  <label>Contraseña</label>
+                  <br />
+                  <input
+                    type="password"
+                    className="input"
+                    placeholder="Contraseña"
+                    id="contrasena" value={password} onChange={(e) => setContrasena(e.target.value)}
+                  />
+                </div>
+
+                <button id="btn1" className="button" type="submit">
+                  Ingresar
                 </button>
+
+                <p>
+                  <p className="textLoginAndRegister" onClick={() => openModal(1)} data-bs-toggle='modal' data-bs-target='#modalCorreo'>Olvidé mi contraseña</p>
+                </p>
+              </form>
+            </div>
+          </div>
+        </div>
+
+
+        <div className='bodyLogin'>
+          {/* MODAL CORREO */}
+          <div id='modalCorreo' className='modal fade' aria-hidden='true'>
+            <div className='modal-dialog modal-dialog-centered'>
+              <div className='modal-content'>
+                <div className='modal-header'>
+                  <label className='h4'>{title}</label>
+                  <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
+                </div>
+                <div className='modal-body'>
+                  <input type='hidden' id='id' ></input>
+                  <div className='input-group mb-3'>
+                    <span className='input-group-text'><FontAwesomeIcon icon={faEnvelope} /></span>
+                    <input type='text' id='correoRecuperacion' className='form-control' placeholder='Correo' value={correoRecuperacion} onChange={(e) => setCorreoRecuperacion(e.target.value)}></input>
+                  </div>
+                  <div className='d-grid col-6 mx-auto'>
+                    <button onClick={() => { validar(); openModal(2, correoRecuperacion); }} data-bs-toggle='modal' data-bs-target='#modalCodigo' className='botones-azules'>
+                      <FontAwesomeIcon icon={faPaperPlane} /> Enviar
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div id='modalContrasena' className='modal fade' aria-hidden='true'>
-        <div className='modal-dialog'>
-          <div className='modal-content'>
-            <div className='modal-header'>
-              <label className='h5'>{title}</label>
+        <div id='modalCodigo' className='modal fade' aria-hidden='true'>
+          <div className='modal-dialog modal-dialog-centered'>
+            <div className='modal-content'>
+              <div className='modal-header'>
+                <label className='h4'>{title}</label>
 
-              <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
-            </div>
-            <div className='modal-body'>
-              <p>{mensaje}</p>
-              <input type='hidden' id='id' ></input>
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faLock} /></span>
-                <input type='password' id='contrasenaNueva' className='form-control' placeholder='Contraseña' value={contrasenaNueva} onChange={(e) => setContrasenaNueva(e.target.value)}></input>
+                <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
               </div>
-              <div className='d-grid col-6 mx-auto'>
-                <button onClick={() => validar()} className='btn btn-primary'>
-                  <FontAwesomeIcon icon={faPaperPlane} /> Enviar
-                </button>
+              <div className='modal-body'>
+                <p>{mensaje}</p>
+                <input type='hidden' id='id' />
+                <div className='input-group mb-3 justify-content-center align-items-center'>
+                  <div className='otp_inputs'>
+                    <input type="text" placeholder='' maxLength='1' className='otp_input' />
+                    <input type="text" placeholder='' maxLength='1' className='otp_input' />
+                    <input type="text" placeholder='' maxLength='1' className='otp_input' />
+                    <input type="text" placeholder='' maxLength='1' className='otp_input' />
+                    <input type="text" placeholder='' maxLength='1' className='otp_input' />
+                    <input type="text" placeholder='' maxLength='1' className='otp_input' />
+                  </div>
+                </div>
+                <div className='d-grid col-6 mx-auto'>
+                  <button onClick={() => {
+                    const otpInputs = document.querySelectorAll('.otp_input');
+                    let codigo = '';
+                    otpInputs.forEach(input => {
+                      codigo += input.value;
+                    });
+                    setCodigo(codigo); // Actualizar el estado 'codigo'
+                    validar();
+                    openModal(3);
+                  }} data-bs-toggle='modal' data-bs-target='#modalContrasena' className='botones-azules'>
+                    <FontAwesomeIcon icon={faCheck} /> Verificar
+                  </button>
+                </div>
+              </div>
+
+
+            </div>
+          </div>
+        </div>
+
+        <div id='modalContrasena' className='modal fade' aria-hidden='true'>
+          <div className='modal-dialog modal-dialog-centered'>
+            <div className='modal-content'>
+              <div className='modal-header'>
+                <label className='h5'>{title}</label>
+
+                <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
+              </div>
+              <div className='modal-body'>
+                <p>{mensaje}</p>
+                <input type='hidden' id='id' ></input>
+                <div className='input-group mb-3'>
+                  <span className='input-group-text'><FontAwesomeIcon icon={faLock} /></span>
+                  <input type='password' id='contrasenaNueva' className='form-control' placeholder='Contraseña' value={contrasenaNueva} onChange={(e) => setContrasenaNueva(e.target.value)}></input>
+                </div>
+                <div className='d-grid col-6 mx-auto'>
+                  <button onClick={() => validar()} className='botones-azules'>
+                    <FontAwesomeIcon icon={faPaperPlane} /> Enviar
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
+
+
+
+
+
       </div>
+    </>
 
-
-
-
-
-    </div>
   );
 };
 
