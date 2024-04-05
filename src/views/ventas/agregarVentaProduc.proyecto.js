@@ -80,6 +80,7 @@ const AgregarCompra = () => {
         if (empleados_idEmpleado && productos_idProducto && cantidad && precioVenta) {
             const total = parseFloat(cantidad) * parseFloat(precioVenta);
             const tipo= "producto"
+            
             setProductosVenta([...productosVenta, {tipo, empleados_idEmpleado, productos_idProducto, cantidad, precioVenta, total }]);
             setCantidad('');
             setPrecio('');
