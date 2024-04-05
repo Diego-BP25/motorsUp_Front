@@ -186,7 +186,7 @@ const Ventas = () => {
             </button>
           </Link>
 
-          <Link to="/compras/agregar">
+          <Link to="/Ventas/agregarServ">
             <button className='botones-azules'>
               <FontAwesomeIcon icon={faPlusCircle} /> Añadir
             </button>

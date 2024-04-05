@@ -182,9 +182,9 @@ const Propietarios = () => {
             </div>
           </div>
 
-            <button className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalPropietarios' onClick={() => openModal(1)} >
-              <FontAwesomeIcon icon={faPlusCircle} /> Añadir
-            </button>
+            <button className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalPropietarios' onClick={() => [openModal(1)]} >
+                <FontAwesomeIcon icon={faPlusCircle} /> Añadir
+              </button>
         </div>
         <div className='row mt-3'>
 
