@@ -285,7 +285,7 @@ const Roles = () => {
         </div>
       </div>
       <div id='modalRoles' className='modal fade' aria-hidden='true'>
-        <div className='modal-dialog'>
+        <div className='modal-dialog modal-dialog-centered'>
           <div className='modal-content'>
             <div className='modal-header'>
               <label className='h5'>{title}</label>

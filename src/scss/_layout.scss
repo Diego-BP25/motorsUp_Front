@@ -19,6 +19,15 @@
   background-color: #0073B9;
   border-radius: 5px;
 }
+.botones-rojos {
+  display: inline-block;
+  padding: 10px 20px;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #fff;
+  background-color: #b90000;
+  border-radius: 5px;
+}
 .containerinput {
   margin-top: 10px; /* Ajusta el margen superior según tu diseño */
 }
@@ -46,6 +55,14 @@ background-color: transparentize($color: #ffffffb3, $amount: 0);
   --cui-pagination-active-border-color: #0073B9;
 }
 
+
+#container1 {
+  border-radius: 10px;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  padding: 20px; 
+}
+
 .estado-activo {
   color: green; 
   font-weight: bold;
@@ -55,3 +72,4 @@ background-color: transparentize($color: #ffffffb3, $amount: 0);
   color: red;
   font-weight: bold;
 }
+
