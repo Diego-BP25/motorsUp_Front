@@ -35,36 +35,26 @@ const Agendamiento = () => {
   //Servicios
   const [servicios, setServicios] = useState([])
   const [idServicio, setIdServicio] = useState('')
-  const [descripcionServicio, setDescripcionServicio] = useState("");
+  const [descripcion, setDescripcionServicio] = useState('');
+
 
 
   //Detalles
   const [agendamientoServicios, setAgendamientoServicios] = useState([]);
 
 
-  const agregarServicio = () => {
-    if (idServicio && descripcionServicio) {
-      setAgendamientoServicios([...agendamientoServicios, { idServicio, descripcionServicio }]);
-      setDescripcionServicio('');
-      setIdServicio('');
-    } else {
-      Swal.fire({
-        icon: 'error',
-        text: 'Todos los campos del producto son obligatorios',
-      });
-    }
-  }
 
   const eliminarServicio = (index) => {
     const nuevosServicios = [...agendamientoServicios];
     nuevosServicios.splice(index, 1);
     setAgendamientoServicios(nuevosServicios);
-};
+  };
 
   useEffect(() => {
     getAgendamientos()
     getVehiculos()
     getServicios()
+    
   }, [])
 
   useEffect(() => {
@@ -142,6 +132,9 @@ const Agendamiento = () => {
     setSelectEvent(null);
     setIdAgendamiento('');
     setPlaca('');
+    setDescripcionServicio('');
+    setIdServicio('');
+    setAgendamientoServicios([]);
     setHora(dayjs('').format('HH:mm'));
   };
   const SeleccionarEvento = (event) => {
@@ -151,6 +144,10 @@ const Agendamiento = () => {
     setPlaca(event.title);
     const nuevaHora = dayjs(event.start).add(5, 'hour').format('HH:mm');
     setHora(nuevaHora);
+    setSelectedDate(event.start)
+    const serviciosAsociados = agendamientoServicios.filter(servicio => servicio.agendamiento_idAgendamiento  === event.id);
+    setAgendamientoServicios(serviciosAsociados);
+    console.log(serviciosAsociados)
   };
 
   const localizer = dayjsLocalizer(dayjs)
@@ -185,7 +182,7 @@ const Agendamiento = () => {
       }
 
 
-      parametros = { idAgendamiento: consecutivo, fecha: fechaHora, vehiculos_placa: placa };
+      parametros = { idAgendamiento: consecutivo, fecha: fechaHora, vehiculos_placa: placa, detalleAgendamientos: agendamientoServicios };
 
       console.log(parametros)
       metodo = 'POST';
@@ -264,6 +261,21 @@ const Agendamiento = () => {
       }
     });
 
+  }
+
+  const agregarServicio = () => {
+    const servicioSeleccionado = servicios.find(servicio => servicio.idServicio == idServicio);
+    if (idServicio && descripcion && servicioSeleccionado) {
+      const nombreServicio = servicioSeleccionado.nombreServicio;
+      setAgendamientoServicios([...agendamientoServicios, { idServicio, descripcion, nombreServicio }]);
+      setDescripcionServicio('');
+      setIdServicio('');
+    } else {
+      Swal.fire({
+        icon: 'error',
+        text: 'Todos los campos del producto son obligatorios',
+      });
+    }
   }
 
 
@@ -345,12 +357,12 @@ const Agendamiento = () => {
                     <div className='input-group mb-3'>
                       <span className='input-group-text'><FontAwesomeIcon icon={faMotorcycle} /></span>
                       <select id='placa' className='form-select' value={placa} onChange={(e) => setPlaca(e.target.value)} style={{ marginRight: '12px' }}>
-                        <option value='' disabled>Vehiculo</option>
+                        <option value=''>Vehiculo</option>
                         {vehiculos.map((v) => (
                           <option key={v.placa} value={v.placa}>{v.placa}</option>
                         ))}
                       </select>
-                      <button className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalEmpleados'  >
+                      <button className='botones-azules'>
                         <FontAwesomeIcon icon={faPlusCircle} /> Añadir
                       </button>
                     </div>
@@ -377,13 +389,13 @@ const Agendamiento = () => {
 
                     <div className='input-group mb-3'>
                       <span className='input-group-text'><FontAwesomeIcon icon={faScrewdriverWrench} /></span>
-                      <select id='idServicio' className='form-select' value={idServicio} style={{ marginRight: '12px' }}>
+                      <select id='idServicio' className='form-select' value={idServicio} onClick={(e) => seleccionarServicio(e.target.value)} onChange={(e) => setIdServicio(e.target.value)} style={{ marginRight: '12px' }}>
                         <option value='' disabled>Servicios</option>
                         {servicios.map((s) => (
-                          <option key={s.idServicio} value={s.idServicio} onClick={(e) => seleccionarServicio(e.target.value)}>{s.nombreServicio}</option>
+                          <option key={s.idServicio} value={s.idServicio}>{s.nombreServicio}</option>
                         ))}
                       </select>
-                      <button className='botones-azules' data-bs-toggle='modal' onClick={() => agregarServicio()}  >
+                      <button className='botones-azules' onClick={() => agregarServicio()}  >
                         <FontAwesomeIcon icon={faPlusCircle} />
                       </button>
                     </div>
@@ -392,7 +404,7 @@ const Agendamiento = () => {
                       <textarea
                         className="form-control"
                         rows="3"
-                        value={descripcionServicio}
+                        value={descripcion}
                         onChange={(e) => setDescripcionServicio(e.target.value)}
                         disabled
                         style={{ resize: 'none' }}
@@ -401,33 +413,33 @@ const Agendamiento = () => {
                   </section>
 
                   <section className="col-md-6" >
-                    <div className='input-group mb-3'>
 
-                      <div style={{ border: '1px solid', maxWidth: '135%', maxHeight: '50%', padding: '3%', overflow: 'scroll' }}>
-                        <h4>Servicios Agregados</h4>
-                        <table className='table'>
-                          <thead style={{ position: 'center', top: 0, backgroundColor: 'white' }} >
-                            <tr >
 
-                              <th>Servicio</th>
-                              <th>Acciones</th>
+                    <div style={{ maxWidth: '135%', maxHeight: '200%', padding: '3%', overflow: 'auto' }}>
+                      <h4>Servicios Agregados</h4>
+                      <table className='table'>
+                        <thead style={{ position: 'center', top: 0, backgroundColor: 'white' }} >
+                          <tr >
+
+                            <th>Servicio</th>
+                            <th>Acciones</th>
+                          </tr>
+                        </thead>
+                        <tbody >
+                          {agendamientoServicios.map((agendamiento, index) => (
+                            <tr key={index} >
+                              <td>{agendamiento.nombreServicio}</td>
+                              <td>
+                                <button type='button' onClick={() => eliminarServicio(index)} className='btn btn-danger'>
+                                  <FontAwesomeIcon icon={faTrash} />
+                                </button>
+                              </td>
                             </tr>
-                          </thead>
-                          <tbody >
-                            {agendamientoServicios.map((agendamiento, index) => (
-                              <tr key={index} >
-                                <td>{agendamiento.nombreServicio}</td>
-                                <td>
-                                  <button type='button' onClick={() => eliminarServicio(index)} className='btn btn-danger'>
-                                    <FontAwesomeIcon icon={faTrash} />
-                                  </button>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
+
                   </section>
                 </div>
               </div>
@@ -447,6 +459,155 @@ const Agendamiento = () => {
 
 
       {showModalEdit && (
+        <div
+          className="modal"
+          style={{
+            display: "block",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            position: "fixed",
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0,
+          }}
+        >
+          <div className='modal-dialog modal-dialog-centered' style={{ maxWidth: '55%', maxHeight: '200%' }}>
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">
+                  Editar Agendamiento
+                </h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => {
+                    setShowModalEdit(false);
+                    setEventTitle("");
+                    setSelectEvent(null);
+                  }}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <div className="row">
+                  <section className="col-md-6">
+
+                    <div className='input-group '>
+                      {/* <span className='input-group-text'><FontAwesomeIcon icon={faUserGear} /></span> */}
+                      <input
+                        type='text'
+                        id='id'
+                        className='form-control'
+                        placeholder='ID'
+                        value={id}
+                        onChange={(e) => setIdAgendamiento(e.target.value)}
+                        hidden
+                      />
+                    </div>
+
+                    <div className='input-group mb-3'>
+                      <span className='input-group-text'><FontAwesomeIcon icon={faMotorcycle} /></span>
+                      <input id='placa' className='input-group-text' disabled value={placa}>
+                      </input>
+                    </div>
+
+                    <div className='input-group mb-3' >
+                      <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
+                      <input
+                        disabled
+                        type='text'
+                        className='form-control'
+                        placeholder="Dia"
+                        style={{ marginRight: '12px' }}
+                        value={dayjs(selectedDate).format('DD/MM/YYYY')}
+                      />
+                      <input
+                        type='time'
+                        id='horaInicio'
+                        className='form-control'
+                        placeholder='Hora'
+                        value={hora}
+                        onChange={(e) => setHora(e.target.value)}
+                      />
+                    </div>
+
+                    <div className='input-group mb-3'>
+                      <span className='input-group-text'><FontAwesomeIcon icon={faScrewdriverWrench} /></span>
+                      <select id='idServicio' className='form-select' value={idServicio} onClick={(e) => seleccionarServicio(e.target.value)} onChange={(e) => setIdServicio(e.target.value)} style={{ marginRight: '12px' }}>
+                        <option value='' disabled>Servicios</option>
+                        {servicios.map((s) => (
+                          <option key={s.idServicio} value={s.idServicio}>{s.nombreServicio}</option>
+                        ))}
+                      </select>
+                      <button className='botones-azules' onClick={() => agregarServicio()}  >
+                        <FontAwesomeIcon icon={faPlusCircle} />
+                      </button>
+                    </div>
+
+                    <div className='input-group mb-3'>
+                      <textarea
+                        className="form-control"
+                        rows="3"
+                        value={descripcion}
+                        onChange={(e) => setDescripcionServicio(e.target.value)}
+                        disabled
+                        style={{ resize: 'none' }}
+                      ></textarea>
+                    </div>
+                  </section>
+
+                  <section className="col-md-6" >
+
+
+                    <div style={{ maxWidth: '135%', maxHeight: '200%', padding: '3%', overflow: 'auto' }}>
+                      <h4>Servicios Agregados</h4>
+                      <table className='table'>
+                        <thead style={{ position: 'center', top: 0, backgroundColor: 'white' }} >
+                          <tr >
+
+                            <th>Servicio</th>
+                            <th>Acciones</th>
+                          </tr>
+                        </thead>
+                        <tbody >
+                          {agendamientoServicios.map((agendamiento, index) => (
+                            <tr key={index} >
+                              <td>{agendamiento.nombreServicio}</td>
+                              <td>
+                                <button type='button' onClick={() => eliminarServicio(index)} className='btn btn-danger'>
+                                  <FontAwesomeIcon icon={faTrash} />
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                  </section>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="botones-azules"
+                  onClick={() => validar(2)}
+                >
+                  Editar
+                </button>
+                <button
+                  type="button"
+                  className="botones-rojos"
+                  onClick={() => deleteAgendamiento(id)}
+                >
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* {showModalEdit && (
         <div
           className="modal"
           style={{
@@ -533,7 +694,7 @@ const Agendamiento = () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 };
