@@ -39,8 +39,38 @@ const Agendamiento = () => {
 
 
 
+
   //Detalles
+  const [mostrarServicio, setMostrarServicio] = useState([]);
   const [agendamientoServicios, setAgendamientoServicios] = useState([]);
+  const getServiciosAsociados = async (idAgendamiento) => {
+
+
+    try {
+      // Obtener los detalles del agendamiento
+      const response = await axios.get(`http://localhost:8081/api/agendamientos/${idAgendamiento}`);
+      const detallesAgendamiento = response.data.detalleAgendamiento;
+
+      // Cargar todos los servicios
+      const responseServicios = await axios.get(`http://localhost:8081/api/servicio`);
+      const servicios = responseServicios.data;
+
+      // Mapear los nombres de los servicios a los detalles del agendamiento
+      const detallesActualizados = detallesAgendamiento.map(detalle => {
+        const servicio = servicios.find(servicio => servicio.idServicio == detalle.servicios_idServicio);
+        return {
+          ...detalle,
+          nombreServicio: servicio ? servicio.nombreServicio : "Servicio no encontrado"
+        };
+      });
+
+
+      setMostrarServicio(detallesActualizados);
+
+    } catch (error) {
+      console.error('Error al obtener los servicios asociados:', error.message);
+    }
+  };
 
 
 
@@ -54,7 +84,7 @@ const Agendamiento = () => {
     getAgendamientos()
     getVehiculos()
     getServicios()
-    
+
   }, [])
 
   useEffect(() => {
@@ -138,6 +168,7 @@ const Agendamiento = () => {
     setHora(dayjs('').format('HH:mm'));
   };
   const SeleccionarEvento = (event) => {
+
     setShowModalEdit(true);
     setSelectEvent(event);
     setIdAgendamiento(event.id);
@@ -145,9 +176,8 @@ const Agendamiento = () => {
     const nuevaHora = dayjs(event.start).add(5, 'hour').format('HH:mm');
     setHora(nuevaHora);
     setSelectedDate(event.start)
-    const serviciosAsociados = agendamientoServicios.filter(servicio => servicio.agendamiento_idAgendamiento  === event.id);
-    setAgendamientoServicios(serviciosAsociados);
-    console.log(serviciosAsociados)
+    getServiciosAsociados(event.id)
+
   };
 
   const localizer = dayjsLocalizer(dayjs)
@@ -190,7 +220,7 @@ const Agendamiento = () => {
       setTimeout(() => setActualizacion(true), 1000);
     } else if (operation === 2) {
 
-      parametros = { idAgendamiento: id, fecha: `${dayjs(selectEvent.start).format('YYYY-MM-DD')} ${hora}`, vehiculos_placa: placa };
+      parametros = { idAgendamiento: id, fecha: `${dayjs(selectEvent.start).format('YYYY-MM-DD')} ${hora}`, vehiculos_placa: placa, detalleAgendamiento: agendamientoServicios };
       metodo = 'PUT';
       setActualizacion(false);
       setTimeout(() => setActualizacion(true), 1000);
@@ -277,6 +307,8 @@ const Agendamiento = () => {
       });
     }
   }
+
+
 
 
 
@@ -569,6 +601,16 @@ const Agendamiento = () => {
                           </tr>
                         </thead>
                         <tbody >
+                          {mostrarServicio.map((agendamiento, index) => (
+                            <tr key={index} >
+                              <td>{agendamiento.nombreServicio}</td>
+                              <td>
+                                <button type='button' onClick={() => eliminarServicio(index)} className='btn btn-danger'>
+                                  <FontAwesomeIcon icon={faTrash} />
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
                           {agendamientoServicios.map((agendamiento, index) => (
                             <tr key={index} >
                               <td>{agendamiento.nombreServicio}</td>
@@ -660,7 +702,7 @@ const Agendamiento = () => {
                       <option key={v.placa} value={v.placa}>{v.placa}</option>
                     ))}
                   </select>
-                </div>
+                </div><
 
                 <div className='input-group mb-3'>
                   <span className='input-group-text'><FontAwesomeIcon icon={faUserGear} /></span>

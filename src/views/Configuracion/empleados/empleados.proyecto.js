@@ -222,7 +222,7 @@ const Empleados = () => {
           <div style={{ display: 'flex', }} id="Container">
 
             <div style={{ marginRight: 'auto' }}>
-              <h3>Empleados</h3>
+              <h3>Emanuel </h3>
             </div>
             <div className='input-group' style={{ marginRight: '1%' }}>
               <input className='form-control inputBuscador'
