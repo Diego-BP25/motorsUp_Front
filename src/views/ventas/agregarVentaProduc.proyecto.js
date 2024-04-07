@@ -9,7 +9,6 @@ const AgregarCompra = () => {
     const url = 'http://localhost:8081/api/ventas';
 
     // Estados del formulario
-    const [idVenta, setIdVenta] = useState('');
     const [fechaVenta, setFechaVenta] = useState('');
     const [metodoPago, setMetodoPago] = useState('');
     const [estado, setEstado] = useState('');
@@ -22,6 +21,8 @@ const AgregarCompra = () => {
     const [precioVenta, setPrecio] = useState('');
     const [productosVenta, setProductosVenta] = useState([]);
     const [consecutivo, setConsecutivo] = useState(0);
+
+    //
 
     // Obtener datos iniciales
     useEffect(() => {
