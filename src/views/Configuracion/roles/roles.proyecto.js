@@ -28,27 +28,27 @@ const Roles = () => {
     setActualizacion(false)
   }, [actualizacion ? rol : null])
 
-  useEffect(() => {
-    if (operation === 1) {
-      obtenerIdConsecutivo();
-    }
-  }, [operation]);
+  // useEffect(() => {
+  //   if (operation === 1) {
+  //     obtenerIdConsecutivo();
+  //   }
+  // }, [operation]);
 
 
-  const obtenerIdConsecutivo = async () => {
-    try {
-      const respuesta = await axios.get(url);
-      const rol = respuesta.data;
-      if (rol.length > 0) {
-        const maxId = Math.max(...rol.map(c => c.idRol));
-        setConsecutivo(maxId + 1);
-      } else {
-        setConsecutivo(1);
-      }
-    } catch (error) {
-      console.error('Error al obtener el número consecutivo más alto:', error.message);
-    }
-  };
+  // const obtenerIdConsecutivo = async () => {
+  //   try {
+  //     const respuesta = await axios.get(url);
+  //     const rol = respuesta.data;
+  //     if (rol.length > 0) {
+  //       const maxId = Math.max(...rol.map(c => c.idRol));
+  //       setConsecutivo(maxId + 1);
+  //     } else {
+  //       setConsecutivo(1);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error al obtener el número consecutivo más alto:', error.message);
+  //   }
+  // };
 
 
 
@@ -69,7 +69,7 @@ const Roles = () => {
 
     if (op === 1) {
       setTitle('Registrar Rol')
-      obtenerIdConsecutivo();
+      // obtenerIdConsecutivo();
     }
     else if (op === 2) {
       setTitle('Editar Rol')
@@ -295,7 +295,7 @@ const Roles = () => {
               <input type='hidden' id='id' ></input>
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
-                <input type='text' id='idRol' className='form-control' placeholder='ID' value={operation === 1 ? consecutivo : idRol} onChange={(e) => setIdRol(e.target.value)}  disabled></input>
+                <input type='text' id='idRol' className='form-control' placeholder='ID' value={idRol} onChange={(e) => setIdRol(e.target.value)}  ></input>
               </div>
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>

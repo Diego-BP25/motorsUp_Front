@@ -4,10 +4,10 @@ import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faTruckField, faSearch, faAddressCard, faUser, faLocationDot, faPhone, faEnvelope, faLock, faUserGear } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faTruckField, faSearch, faAddressCard, faUser, faLocationDot, faPhone, faEnvelope, faLock, faUserGear, faToggleOff } from '@fortawesome/free-solid-svg-icons'
 import { CSmartPagination } from '@coreui/react-pro'
 import { show_alerta } from 'src/fuctions.proyecto'
-import { ButtonSwitch } from 'src/components/proyect/switch.proyecto'
+
 
 const Empleados = () => {
 
@@ -117,13 +117,15 @@ const Empleados = () => {
   }
 
   const enviarSolicitud = async (metodo, parametros) => {
-    await axios({ method: metodo, url: url, data: parametros }).then(function (respuesta) {
+    try {
+      const respuesta = await axios({ method: metodo, url: url, data: parametros });
       var tipo = respuesta.data[0];
+
       if (metodo === 'POST') {
         Swal.fire({
           position: "center",
           icon: "success",
-          title: "Empleado agregado con exito",
+          title: "Empleado agregado con éxito",
           showConfirmButton: false,
           timer: 1500
         });
@@ -132,35 +134,38 @@ const Empleados = () => {
         Swal.fire({
           position: "center",
           icon: "success",
-          title: "Empleado editado con exito",
+          title: "Empleado editado con éxito",
           showConfirmButton: false,
           timer: 1500
         });
         document.getElementById('btnCerrar').click();
-      }
-      if (metodo === 'DELETE') {
+      } else if (metodo === 'DELETE') {
         Swal.fire({
           position: "center",
           icon: "success",
-          title: "Empleado eliminado con exito",
+          title: "Empleado eliminado con éxito",
           showConfirmButton: false,
           timer: 1500
         });
         document.getElementById('btnCerrar').click();
       }
 
-      setActualizacion(true)
+      setActualizacion(true);
 
       if (tipo === 'success') {
         document.getElementById('btnCerrar').click();
         // getRoles();
       }
-    })
-      .catch(function (error) {
+    } catch (error) {
+      if (error.response && error.response.status === 403) {
+        Swal.fire("No se puede eliminar un empleado con rol de Administrador");
+      } else {
         show_alerta('Error en la solicitud', 'error');
-        console.log(error);
-      });
-  }
+        console.error('Error en la solicitud:', error.message);
+      }
+    }
+  };
+
 
   const deleteEmpleado = (idEmpleado) => {
 
@@ -399,9 +404,9 @@ const Empleados = () => {
               </div>
 
               <div className='input-group mb-3'>
-                {/* <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
-                <input type='text' id='estado' className='form-control' placeholder='Estado' value={estado} onChange={(e) => setEstado(e.target.value)}></input> */}
-                <ButtonSwitch idComponente="estado" value={estado} onChange={(e) => setEstado(e.target.checked)} />
+                <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
+                <input type='text' id='estado' className='form-control' placeholder='Estado' value={estado} onChange={(e) => setEstado(e.target.value)}></input>
+
                 <span className='input-group-text'><FontAwesomeIcon icon={faEnvelope} /></span>
                 <input type='text' id='correoEmpleado' className='form-control' placeholder='Correo' value={correoEmpleado} onChange={(e) => setCorreoEmpleado(e.target.value)} style={{ marginRight: '10px' }}></input>
               </div>
