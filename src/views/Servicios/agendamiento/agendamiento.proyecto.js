@@ -81,11 +81,20 @@ const Agendamiento = () => {
 
   };
 
-  const eliminarServicioMostrar = (index) => {
-    const nuevosServicios = [...mostrarServicio];
-    nuevosServicios.splice(index, 1);
-    setMostrarServicio(nuevosServicios);
-    console.log(nuevosServicios)
+  const eliminarServicioMostrar = async (idDetalleServicioAgendamiento) => {
+    try {
+      const response = await axios.delete(`http://localhost:8081/api/agendamientos/${idDetalleServicioAgendamiento}`);
+
+      if (response.status !== 200) {
+        throw new Error('Error al eliminar el servicio');
+      }
+
+      const nuevosServicios = mostrarServicio.filter(servicio => servicio.idDetalleServicioAgendamiento !== idDetalleServicioAgendamiento);
+      setMostrarServicio(nuevosServicios);
+      console.log(nuevosServicios);
+    } catch (error) {
+      console.error('Error al eliminar el servicio:', error.message);
+    }
   };
 
   const eliminarServicioAgendamiento = (index) => {
@@ -618,14 +627,15 @@ const Agendamiento = () => {
                           </tr>
                         </thead>
                         <tbody >
-                          {mostrarServicio.map((agendamiento, index) => (
-                            <tr key={index} >
+                          {mostrarServicio.map((agendamiento) => (
+                            <tr key={agendamiento.idDetalleServicioAgendamiento}>
                               <td>{agendamiento.nombreServicio}</td>
                               <td>
                                 <button
                                   type='button'
-                                  onClick={() => eliminarServicioMostrar(index)}
-                                  className='btn btn-danger'>
+                                  onClick={() => eliminarServicioMostrar(agendamiento.idDetalleServicioAgendamiento)}
+                                  className='btn btn-danger'
+                                >
                                   <FontAwesomeIcon icon={faTrash} />
                                 </button>
                               </td>
