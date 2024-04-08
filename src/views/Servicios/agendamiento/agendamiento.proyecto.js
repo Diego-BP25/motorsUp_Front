@@ -78,7 +78,23 @@ const Agendamiento = () => {
     const nuevosServicios = [...agendamientoServicios];
     nuevosServicios.splice(index, 1);
     setAgendamientoServicios(nuevosServicios);
+
   };
+
+  const eliminarServicioMostrar = (index) => {
+    const nuevosServicios = [...mostrarServicio];
+    nuevosServicios.splice(index, 1);
+    setMostrarServicio(nuevosServicios);
+    console.log(nuevosServicios)
+  };
+
+  const eliminarServicioAgendamiento = (index) => {
+    const nuevosServicios = [...agendamientoServicios];
+    nuevosServicios.splice(index, 1);
+    setAgendamientoServicios(nuevosServicios);
+    console.log(nuevosServicios)
+  };
+
 
   useEffect(() => {
     getAgendamientos()
@@ -219,6 +235,7 @@ const Agendamiento = () => {
       setActualizacion(false);
       setTimeout(() => setActualizacion(true), 1000);
     } else if (operation === 2) {
+
 
       parametros = { idAgendamiento: id, fecha: `${dayjs(selectEvent.start).format('YYYY-MM-DD')} ${hora}`, vehiculos_placa: placa, detalleAgendamiento: agendamientoServicios };
       metodo = 'PUT';
@@ -605,7 +622,10 @@ const Agendamiento = () => {
                             <tr key={index} >
                               <td>{agendamiento.nombreServicio}</td>
                               <td>
-                                <button type='button' onClick={() => eliminarServicio(index)} className='btn btn-danger'>
+                                <button
+                                  type='button'
+                                  onClick={() => eliminarServicioMostrar(index)}
+                                  className='btn btn-danger'>
                                   <FontAwesomeIcon icon={faTrash} />
                                 </button>
                               </td>
@@ -615,7 +635,10 @@ const Agendamiento = () => {
                             <tr key={index} >
                               <td>{agendamiento.nombreServicio}</td>
                               <td>
-                                <button type='button' onClick={() => eliminarServicio(index)} className='btn btn-danger'>
+                                <button
+                                  type='button'
+                                  onClick={() => eliminarServicioAgendamiento(index)}
+                                  className='btn btn-danger'>
                                   <FontAwesomeIcon icon={faTrash} />
                                 </button>
                               </td>

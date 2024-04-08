@@ -60,7 +60,9 @@ const Login = () => {
         icon: "success",
         title: "Bienvenido.."
       });;
+      
       setTimeout(() => {
+        localStorage.setItem('Empleado',JSON.stringify(response))
         window.location.href = '/dashboard';
       }, 1500);
     } catch (error) {
