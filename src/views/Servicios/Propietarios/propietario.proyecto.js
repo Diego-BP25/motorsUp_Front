@@ -150,7 +150,10 @@ const Propietarios = () => {
   const filtrar = (terminoBusqueda) => {
     var resultadosBusqueda = propietario.filter((elemento) => {
 
-      if (elemento.nombrePropietario.toString().toLowerCase().includes(terminoBusqueda.toLowerCase())
+      if (elemento.nombrePropietario.toString().toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
+        elemento.telefonoPropietario.toString().toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
+        elemento.correoPropietario.toString().toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
+        elemento.estadoPropietario.toString().toLowerCase().includes(terminoBusqueda.toLowerCase())
       ) {
         return elemento;
       }
@@ -162,70 +165,69 @@ const Propietarios = () => {
 
     <div className='App'>
       <div className='container-fluid'>
-        <div className='row mt-3'>
-          <div className='col-md-4 offset-md-4'>
-            <div className='d-grid mx-auto'>
-              <button onClick={() => openModal(1)} className='btn btn-success ms-2' data-bs-toggle='modal' data-bs-target='#modalPropietarios'>
+        <div style={{ display: 'flex', }} id="Container">
+
+          <div style={{ marginRight: 'auto' }}>
+            <h3>Propietarios</h3>
+          </div>
+          <div className='input-group' style={{ marginRight: '1%' }}>
+            <input className='form-control inputBuscador'
+              id='buscador'
+              value={busqueda}
+              placeholder='Buscar'
+              onChange={handleChange}
+            />
+            <div className="icon-container">
+              <FontAwesomeIcon icon={faSearch} />
+            </div>
+          </div>
+
+            <button className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalPropietarios' onClick={() => [openModal(1)]} >
                 <FontAwesomeIcon icon={faPlusCircle} /> Añadir
               </button>
-            </div>
-          </div>
         </div>
-
         <div className='row mt-3'>
-          <div className='col-12 col-lg-8 offset-0 offset-lg-2'>
 
-            <div className='table-responsive'>
-              <div className='containerinput d-flex justify-content-start align-items-center'>
-                <div className='input-group'>
-                  <input className='form-control inputBuscador'
-                    id='buscador'
-                    value={busqueda}
-                    placeholder='Buscar'
-                    onChange={handleChange}
-                  />
-                  <div className="icon-container">
-                      <FontAwesomeIcon icon={faSearch} />
-                  </div>
-                </div>
-              </div>
-              <table className='table table-bordered'>
+            <div className='table-responsive' style={{ maxWidth: '100%', margin: '0 auto' }}>
+              
+              
 
-                <thead>
-                  <tr>
-                    <th>Id</th>
-                    <th>Nombre</th>
-                    <th>Telefono</th>
-                    <th>Correo</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
+                <table className='table table-striped' style={{ width: '100%' }}>
 
-                  </tr>
-                </thead>
-                <tbody className='table-group-divider'>
-                  {propietario.map((r) => (
-                    <tr key={r.idPropietario}>
-                      <td>{r.idPropietario}</td>
-                      <td>{r.nombrePropietario}</td>
-                      <td>{r.telefonoPropietario}</td>
-                      <td>{r.correoPropietario}</td>
-                      <td>{r.estadoPropietario ? 'true' : 'false'}</td>
-                      <td>
-                        <button onClick={() => openModal(2, r.idPropietario, r.nombrePropietario, r.telefonoPropietario, r.correoPropietario, r.estadoPropietario)} className='btn btn-warning'
-                          data-bs-toggle='modal' data-bs-target='#modalPropietarios'>
-                          <FontAwesomeIcon icon={faEdit} />
-                        </button>
-                        &nbsp;
-                        <button onClick={() => deletePropietario(r.idPropietario)} className='btn btn-danger'>
-                          <FontAwesomeIcon icon={faTrash} />
-                        </button>
-                      </td>
+                  <thead>
+                    <tr>
+                      <th>Id</th>
+                      <th>Nombre</th>
+                      <th>Telefono</th>
+                      <th>Correo</th>
+                      <th>Estado</th>
+                      <th>Acciones</th>
+
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                  </thead>
+                  <tbody className='table-group-divider'>
+                    {propietario.map((r) => (
+                      <tr key={r.idPropietario}>
+                        <td>{r.idPropietario}</td>
+                        <td>{r.nombrePropietario}</td>
+                        <td>{r.telefonoPropietario}</td>
+                        <td>{r.correoPropietario}</td>
+                        <td>{r.estadoPropietario ? 'true' : 'false'}</td>
+                        <td>
+                          <button onClick={() => openModal(2, r.idPropietario, r.nombrePropietario, r.telefonoPropietario, r.correoPropietario, r.estadoPropietario)} className='btn btn-warning'
+                            data-bs-toggle='modal' data-bs-target='#modalPropietarios'>
+                            <FontAwesomeIcon icon={faEdit} />
+                          </button>
+                          &nbsp;
+                          <button onClick={() => deletePropietario(r.idPropietario)} className='btn btn-danger'>
+                            <FontAwesomeIcon icon={faTrash} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
         </div>
       </div>
       <div id='modalPropietarios' className='modal fade' aria-hidden='true'>
