@@ -7,11 +7,8 @@ import { CNavGroupItems, CRow } from '@coreui/react'
 import { show_alerta } from 'src/fuctions.proyecto'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faSearch, faToggleOff, faIdCardClip, faUser, faPhone, faEnvelope, faHashtag, faCalendarDays, faDollar, faCreditCard, faEye } from '@fortawesome/free-solid-svg-icons'
-import { formatDate } from '../funcionesExtras.proyecto'
+import { faPlusCircle, faFloppyDisk, faSearch, faToggleOff, faHashtag, faCalendarDays, faDollar, faCreditCard, faEye, faBan } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom';
-
-import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
 const Ventas = () => {
   const url = 'http://localhost:8081/api/ventas'
@@ -179,13 +176,7 @@ const Ventas = () => {
               <FontAwesomeIcon icon={faSearch} />
             </div>
           </div>
-
-          <Link to="/Ventas/agregarProduc" style={{ marginRight: '1%'}}>
-            <button className='botones-azules'>
-              <FontAwesomeIcon icon={faPlusCircle} /> Añadir
-            </button>
-          </Link>
-
+          
           <Link to="/Ventas/agregarServ">
             <button className='botones-azules'>
               <FontAwesomeIcon icon={faPlusCircle} /> Añadir
@@ -205,8 +196,6 @@ const Ventas = () => {
                     <th>Metodo pago</th>
                     <th>Estado</th>
                     <th>Total</th>
-                    <th>Detalle_servicio</th>
-                    <th>Detalle_producto</th>
                     <th>Acciones</th>
 
                   </tr>
@@ -220,28 +209,17 @@ const Ventas = () => {
                       <td>{r.metodoPago}</td>
                       <td>{r.estado ? 'true' : 'false'}</td>
                       <td>{r.total}</td>
+                      
+                      
                       <td>
-                        &nbsp;
-                        <button className='btn btn-primary' >
+                      <button className='btn btn-info'>
                           <FontAwesomeIcon icon={faEye} />
-                        </button>
-                      </td>
-                      <td>
-                        &nbsp;
-                        <button className='btn btn-primary'>
-                          <FontAwesomeIcon icon={faEye} />
-                        </button>
-                      </td>
-                      <td>
-                        <button onClick={() => { openModal(2, r.idVenta, r.estado); setEstadoModal(false) }} className='btn btn-warning'
-                          data-bs-toggle='modal' data-bs-target='#modalVentas'>
-                          <FontAwesomeIcon icon={faEdit} />
-
                         </button>
                         &nbsp;
                         <button onClick={() => deleteVenta(r.idVenta)} className='btn btn-danger'>
-                          <FontAwesomeIcon icon={faTrash} />
+                          <FontAwesomeIcon icon={faBan} />
                         </button>
+                        
                       </td>
                       
                     </tr>

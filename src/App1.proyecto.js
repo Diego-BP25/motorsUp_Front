@@ -1,4 +1,4 @@
-import Tabs from './views/ventas/agregarVentaServ.proyecto'
+import Tabs from './views/ventas/agregarVentas.proyecto'
 
 function App(){
     return (

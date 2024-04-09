@@ -3,13 +3,13 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEdit, faTrash, faFloppyDisk, faCalendar, faToggleOff, faTag, faFileText, faHashtag, faBagShopping, faDollar, faUser } from '@fortawesome/free-solid-svg-icons'
-import { ContentDoble } from 'src/components/proyect/modal.proyecto';
 
-const AgregarCompra = () => {
+const AgregarVenta = () => {
     // API URL
     const url = 'http://localhost:8081/api/ventas';
 
     // Estados del formulario servicios
+    const [venta, setVenta] = useState(0);
     const [fechaVenta, setFechaVenta] = useState('');
     const [metodoPago, setMetodoPago] = useState('');
     const [estado, setEstado] = useState('');
@@ -24,6 +24,8 @@ const AgregarCompra = () => {
     const [consecutivo, setConsecutivo] = useState(0);
     const [mostrarServicios, setMostrarServicios] = useState(true);
     const [mostrarProductos, setMostrarProductos] = useState(false);
+    const [serviciosActivo, setServiciosActivo] = useState(true);
+    const [productosActivo, setProductosActivo] = useState(false);
 
     //estados formularios productos
     const [empleados, setEmpleado] = useState([]);
@@ -34,18 +36,23 @@ const AgregarCompra = () => {
     const [precioVenta, setPrecio] = useState('');
     const [productosVenta, setProductosVenta] = useState([]);
 
-    //mostrar formulario de servicios
     const toggleMostrarServicios = () => {
         setMostrarServicios(true);
         setMostrarProductos(false);
+        setServiciosActivo(true);
+        setProductosActivo(false);
     };
 
-
-    //mostrar formulario de productos
     const toggleMostrarProductos = () => {
         setMostrarServicios(false);
         setMostrarProductos(true);
+        setServiciosActivo(false);
+        setProductosActivo(true);
     };
+
+    useEffect(() => {
+        calcularTotal([...serviciosVenta, ...productosVenta]);
+    }, [...serviciosVenta, ...productosVenta]);
 
 
 
@@ -140,12 +147,15 @@ const AgregarCompra = () => {
         if (vehiculos_placa && servicios_idServicio && valorManoObra && estadoVenta) {
             const tipo = 'servicio'
             const total = parseFloat(valorManoObra);
-            setServiciosVenta([...serviciosVenta, { tipo, vehiculos_placa, servicios_idServicio, valorManoObra, estadoVenta, total }]);
+            const nuevoServicio = { tipo, vehiculos_placa, servicios_idServicio, valorManoObra, estadoVenta, total };
+
+            setServiciosVenta([...serviciosVenta, nuevoServicio]);
             setValorManoObra('');
             setIdServicio('');
             setEstadoVenta('');
             setplaca('');
-            console.log(tipo)
+            calcularTotal([...serviciosVenta, nuevoServicio]);
+
         } else {
             Swal.fire({
                 icon: 'error',
@@ -160,12 +170,14 @@ const AgregarCompra = () => {
         if (empleados_idEmpleado && productos_idProducto && cantidad && precioVenta) {
             const total = parseFloat(cantidad) * parseFloat(precioVenta);
             const tipo = "producto"
+            const nuevoProducto = { tipo, empleados_idEmpleado, productos_idProducto, cantidad, precioVenta, total };
 
-            setProductosVenta([...productosVenta, { tipo, empleados_idEmpleado, productos_idProducto, cantidad, precioVenta, total }]);
+            setProductosVenta([...productosVenta, nuevoProducto]);
             setCantidad('');
             setPrecio('');
             setIdProducto('');
             setIdEmpleado('');
+            calcularTotal([...productosVenta, nuevoProducto]);
         } else {
             Swal.fire({
                 icon: 'error',
@@ -174,10 +186,22 @@ const AgregarCompra = () => {
         }
 
     };
+    // Función para calcular el total de la venta
+    const calcularTotal = (ventas) => {
+        const totalVenta = ventas.reduce((acc, venta) => acc + venta.total, 0);
+        setVenta(totalVenta); // Actualiza el estado del total de la venta
+    }; 
+    useEffect(() => {
+        const totalServicios = serviciosVenta.reduce((acc, servicio) => acc + servicio.total, 0);
+        const totalProductos = productosVenta.reduce((acc, producto) => acc + producto.total, 0);
+        const totalVenta = totalServicios + totalProductos;
+        setVenta(totalVenta);
+    }, [serviciosVenta, productosVenta]);
+
 
     // Función para guardar la venta
     const guardarVenta = async () => {
-        try {
+        try { 
 
             const nuevaVenta = {
 
@@ -216,17 +240,20 @@ const AgregarCompra = () => {
 
 
 
+
+
+
     return (
         <div className='App' >
             <div className='container mt-5' >
-                <div style={{ marginRight: 'auto', marginTop: '-5%', }}>
+                <div style={{ marginRight: 'auto', marginTop: '-6%', }}>
                     <h3>Agregar venta</h3>
                 </div>
                 <form onSubmit={guardarVenta} >
                     <div className="container">
                         <div className="row">
-                            <div className="col" >
-                                <div className='input-group mb-3' style={{ border: '1px solid', maxWidth: '55%', paddingBottom: '1%', paddingLeft: '2%', paddingTop: '2%', paddingRight: '2%', marginLeft: '-2%' }}>
+                            <div className='col-md-6' >
+                                <div className='input-group mb-3' id='container1' style={{ border: '1px solid', maxWidth: '55%', paddingBottom: '1%', paddingLeft: '2%', paddingTop: '2%', paddingRight: '2%', marginLeft: '-2%' }}>
 
                                     <div className='input-group mb-3' onChange={obtenerIdConsecutivo()}>
                                         <label htmlFor='idVenta' className='input-group-text'><FontAwesomeIcon icon={faHashtag} /></label>
@@ -253,12 +280,18 @@ const AgregarCompra = () => {
                                         <input type='number' id='total' placeholder='Total' className="form-control" value={total} onChange={(e) => setTotal(e.target.value)} />
                                     </div>
 
-
-                                    <h4 style={{ marginRight: 'auto', }} onClick={toggleMostrarServicios}>Servicios</h4>
-                                    <h4 style={{ marginRight: 'auto', }} onClick={toggleMostrarProductos}>Productos</h4>
+                                    <h4
+                                        style={{borderRadius: '5%',paddingRight: '5%',paddingLeft: '2%', backgroundColor: serviciosActivo ? '#0073B9  ' : '#CFD8E0', color: serviciosActivo ? '#fff' : '#313335' }}
+                                        onClick={toggleMostrarServicios}
+                                    >Servicios</h4>
+                                    <h4
+                                        style={{ borderRadius: '5%',paddingRight: '5%',paddingLeft: '2%', backgroundColor: productosActivo ? '#0073B9  ' : '#CFD8E0', color: productosActivo ? '#fff' : '#313335' }}
+                                        onClick={toggleMostrarProductos}
+                                    >Productos</h4>
+                                    
 
                                     {mostrarServicios && (
-                                        <div>
+                                        <div className="row" style={{ marginLeft: '-4%'}}>
                                             <div className='input-group mb-3' >
                                                 <label htmlFor='vehiculos_placa' className='input-group-text'><FontAwesomeIcon icon={faUser} /></label>
                                                 <select id='vehiculos_placa' className="form-control" value={vehiculos_placa} onChange={(e) => setplaca(e.target.value)}>
@@ -267,7 +300,7 @@ const AgregarCompra = () => {
                                                         <option key={pro.placa} value={pro.placa}>{pro.placa}</option>
                                                     ))}
                                                 </select>
-                                            </div>
+                                            </div >
 
                                             <div className='input-group mb-3' >
                                                 <label htmlFor='servicios_idServicio' className='input-group-text'><FontAwesomeIcon icon={faBagShopping} /></label>
@@ -290,7 +323,7 @@ const AgregarCompra = () => {
                                                 <input type='text' className="form-control" id='estadoVenta' placeholder='Estado' value={estadoVenta} onChange={(e) => setEstadoVenta(e.target.value)} />
                                             </div>
 
-                                            <div key={"buttonGuardar"} className='d-grid col-6 mx-auto' style={{ width: '70%', marginTop: '3%' }} >
+                                            <div key={"buttonGuardar"} className='d-grid col-6 mx-auto' style={{ width: '70%' }} >
                                                 <button type='button' onClick={() => agregarServicio()} className='botones-azules' >
                                                     <FontAwesomeIcon icon={faFloppyDisk} /> Agregar servicio
                                                 </button>
@@ -299,14 +332,14 @@ const AgregarCompra = () => {
                                     )}
 
                                     {mostrarProductos && (
-                                        <div>
+                                       <div className="row" style={{ marginLeft: '-4%'}}>
                                             <div className='input-group mb-3' >
                                                 <label htmlFor='empleados_idEmpleado' className='input-group-text'><FontAwesomeIcon icon={faUser} /></label>
                                                 <select id='empleados_idEmpleado' className="form-control" value={empleados_idEmpleado} onChange={(e) => setIdEmpleado(e.target.value)}>
-                                                    <option value=''>Empleado relazionado</option>
-                                                        {empleados.map((pro) => (
-                                                            <option key={pro.idEmpleado} value={pro.idEmpleado}>{pro.nombreEmpleado}</option>
-                                                        ))}
+                                                    <option value=''>Empleado relacionado</option>
+                                                    {empleados.map((pro) => (
+                                                        <option key={pro.idEmpleado} value={pro.idEmpleado}>{pro.nombreEmpleado}</option>
+                                                    ))}
                                                 </select>
                                             </div>
 
@@ -334,24 +367,29 @@ const AgregarCompra = () => {
 
 
 
-                                            <div key={"buttonGuardar"} className='d-grid col-6 mx-auto' style={{ width: '70%', marginTop: '3%' }} >
+                                            <div key={"buttonGuardar"} className='d-grid col-6 mx-auto' style={{ width: '70%'}} >
                                                 <button type='button' onClick={() => agregarProducto()} className='botones-azules' >
                                                     <FontAwesomeIcon icon={faFloppyDisk} /> Agregar producto
                                                 </button>
-                                            </div>                </div>
+                                            </div>
+                                        </div>
                                     )}
 
 
 
                                 </div>
+                                <div className='input-group mb-3' style={{ marginTop: '-8.5%', marginLeft: '65.8%', maxHeight: '35px', marginBottom: '35px' }}>
+                                    <label htmlFor='total' className='input-group-text'><FontAwesomeIcon icon={faDollar} /></label>
+                                    <input type='number' className="form-control" id='total' value={venta} />
+                                </div>
                             </div>
 
                             <div className="col">
 
-                                <div style={{ border: '1px solid', maxWidth: '140%', maxHeight: '50%', marginLeft: '-5%', padding: '3%', overflow: 'scroll' }}>
-                                    <h4>servicios agregados</h4>
+                                <div id='container1' style={{ maxWidth: '135%', maxHeight: '70%', marginLeft: '-40%', padding: '3%', overflow: 'scroll' }}>
+                                    <h4>Venta</h4>
                                     <table className='table'>
-                                        <thead style={{ position: 'sticky', top: 0, backgroundColor: 'white' }} >
+                                        <thead style={{ position: 'sticky', top: 0, backgroundColor: 'white' }}>
                                             <tr >
                                                 <th>Nombre</th>
                                                 <th>Tipo</th>
@@ -365,7 +403,7 @@ const AgregarCompra = () => {
                                         </thead>
                                         <tbody >
                                             {serviciosVenta.concat(productosVenta).map((venta, index) => (
-                                                
+
                                                 <tr key={index} >
                                                     <td>{venta.tipo === 'servicio' ? venta.servicios_idServicio : venta.productos_idProducto}</td>
                                                     <td>{venta.tipo}</td>
@@ -373,10 +411,12 @@ const AgregarCompra = () => {
                                                     <td>{venta.tipo === 'servicio' ? "1" : venta.cantidad}</td>
                                                     <td>{venta.total}</td>
 
-                                                    <td>
-                                                        <button type='button' onClick={() => eliminarServicio(index)} className='btn btn-danger'>
-                                                            <FontAwesomeIcon icon={faTrash} />
-                                                        </button>
+                                                    <td>{venta.tipo === 'producto' ? <button type='button' onClick={() => { eliminarProducto(index) }} className='btn btn-danger'>
+                                                        <FontAwesomeIcon icon={faTrash} />
+                                                    </button> : <button type='button' onClick={() => { eliminarServicio(index) }} className='btn btn-danger'>
+                                                        <FontAwesomeIcon icon={faTrash} />
+                                                    </button>}
+
                                                     </td>
                                                 </tr>
                                             ))}
@@ -387,10 +427,6 @@ const AgregarCompra = () => {
                         </div>
                     </div>
 
-                    {/* <div className='input-group mb-3' style={{ marginTop: '-9.5%', marginLeft: '32%' }}>
-                        <label htmlFor='precio' className='input-group-text'><FontAwesomeIcon icon={faDollar} /></label>
-                        <input type='number' className="form-control" id='precio' value={precio} onChange={(e) => (e.target.value)} />
-                    </div> */}
 
                     <div key={"buttonGuardar"} className='col-md-4 offset-md-5' style={{ marginTop: '-5.5%', marginLeft: '76.7%' }}>
                         <button type='submit' className='botones-azules' style={{ width: '60%', marginTop: '3%' }}>
@@ -405,4 +441,4 @@ const AgregarCompra = () => {
     );
 };
 
-export default AgregarCompra;
+export default AgregarVenta;
