@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
+import { Navigate } from 'react-router-dom'
 import { show_alerta } from 'src/fuctions.proyecto';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck, faEnvelope, faPaperPlane, faLock } from '@fortawesome/free-solid-svg-icons'
@@ -15,6 +16,15 @@ const Login = () => {
   const [contrasenaNueva, setContrasenaNueva] = useState('')
   const [mensaje, setMensaje] = useState('');
   const [codigo, setCodigo] = useState('')
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+
+  useEffect(() => {
+    // Verificar si hay datos de usuario en localStorage
+    if (localStorage.getItem('Empleado')) {
+      setIsLoggedIn(true); // Establecer isLoggedIn en true si hay datos de usuario
+    }
+  }, []);
 
 
   const validarDatos = async (e) => {
@@ -106,6 +116,10 @@ const Login = () => {
       }
     }
   };
+
+  if (isLoggedIn) {
+    return <Navigate to={"/dashboard"} />
+  }
 
   const openModal = (op, correoRecuperacion, contrasenaNueva, codigo) => {
     setCorreoRecuperacion('');

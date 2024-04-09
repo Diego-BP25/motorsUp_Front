@@ -106,7 +106,7 @@ const Roles = () => {
 
     if (operation === 1) {
       console.log(idRol)
-      parametros = { idRol: idRol, nombre: nombre };
+      parametros = { nombre: nombre };
       metodo = 'POST';
     } else {
       console.log(idRol)
@@ -294,8 +294,7 @@ const Roles = () => {
             <div className='modal-body'>
               <input type='hidden' id='id' ></input>
               <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
-                <input type='text' id='idRol' className='form-control' placeholder='ID' value={idRol} onChange={(e) => setIdRol(e.target.value)}  ></input>
+                <input type='text' id='idRol' className='form-control' placeholder='ID' value={idRol} onChange={(e) => setIdRol(e.target.value)} hidden ></input>
               </div>
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
