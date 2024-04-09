@@ -7,6 +7,7 @@ import {
   CDropdownToggle,
 } from '@coreui/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+
 import { faRightToBracket } from '@fortawesome/free-solid-svg-icons'
 import avatar8 from './../../assets/images/avatars/6.jpg'
 

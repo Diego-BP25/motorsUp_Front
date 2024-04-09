@@ -3,6 +3,8 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './scss/style.scss'
 import ProtectedRoute from './views/Login/ProtectedRoute.proyecto.js'
 
+
+
 const loading = (
   <div className="pt-3 text-center">
     <div className="sk-spinner sk-spinner-pulse"></div>
