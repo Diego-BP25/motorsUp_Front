@@ -8,6 +8,7 @@ import { show_alerta } from 'src/fuctions.proyecto'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faToggleOff, faIdCardClip, faUser, faPhone, faEnvelope, faSearch } from '@fortawesome/free-solid-svg-icons'
+import { CSmartPagination } from '@coreui/react-pro'
 
 const Propietarios = () => {
   const url = 'http://localhost:8081/api/propietarios'
@@ -21,6 +22,7 @@ const Propietarios = () => {
   const [title, setTitle] = useState('')
   const [actualizacion, setActualizacion] = useState(false)
   const [busqueda, setBusqueda] = useState("");
+  const [currentPage, setCurrentPage] = useState(1)
 
   //detalle servicio
 
@@ -159,7 +161,13 @@ const Propietarios = () => {
       }
     });
     setPropietario(resultadosBusqueda);
-  }
+  };
+  // Función para obtener los propietarios de la página actual
+const getCurrentPagePropietarios = () => {
+  const startIndex = (currentPage - 1) * 5;
+  const endIndex = startIndex + 5;
+  return propietario.slice(startIndex, endIndex);
+}
 
   return (
 
@@ -206,7 +214,7 @@ const Propietarios = () => {
                     </tr>
                   </thead>
                   <tbody className='table-group-divider'>
-                    {propietario.map((r) => (
+                    {getCurrentPagePropietarios().map((r) => (
                       <tr key={r.idPropietario}>
                         <td>{r.idPropietario}</td>
                         <td>{r.nombrePropietario}</td>
@@ -228,6 +236,17 @@ const Propietarios = () => {
                   </tbody>
                 </table>
               </div>
+        </div>
+        {/* Paginación */}
+        <div className='row mt-3'>
+          <div className='col-12 col-lg-8 offset-0 offset-lg-2' >
+            <CSmartPagination
+              style={{ marginLeft: '-208px' }}
+              activePage={currentPage}
+              pages={Math.ceil(propietario.length / 5)}
+              onActivePageChange={setCurrentPage}
+            />
+          </div>
         </div>
       </div>
       <div id='modalPropietarios' className='modal fade' aria-hidden='true'>

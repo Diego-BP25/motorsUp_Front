@@ -9,6 +9,8 @@ import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPlusCircle, faFloppyDisk, faSearch, faToggleOff, faHashtag, faCalendarDays, faDollar, faCreditCard, faEye, faBan } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom';
+import { CSmartPagination } from '@coreui/react-pro'
+
 
 const Ventas = () => {
   const url = 'http://localhost:8081/api/ventas'
@@ -23,6 +25,8 @@ const Ventas = () => {
   const [actualizacion, setActualizacion] = useState(false)
   const [estadoModal, setEstadoModal] = useState(true)
   const [busqueda, setBusqueda] = useState("");
+  const [currentPage, setCurrentPage] = useState(1)
+
 
 
   useEffect(() => {
@@ -152,7 +156,14 @@ const Ventas = () => {
       }
     });
     setVenta(resultadosBusqueda);
-  }
+  };
+
+  // Función para obtener las ventas de la página actual
+const getCurrentPageVentas = () => {
+  const startIndex = (currentPage - 1) * 5;
+  const endIndex = startIndex + 5;
+  return venta.slice(startIndex, endIndex);
+}
 
 
   return (
@@ -201,7 +212,7 @@ const Ventas = () => {
                   </tr>
                 </thead>
                 <tbody className='table-group-divider'>
-                  {venta.map((r) => (
+                  {getCurrentPageVentas().map((r) => (
                     <tr key={r.idVenta} >
 
                       <td>{r.idVenta}</td>
@@ -228,6 +239,17 @@ const Ventas = () => {
               </table>
             </div>
           
+        </div>
+        {/* Paginación */}
+        <div className='row mt-3'>
+          <div className='col-12 col-lg-8 offset-0 offset-lg-2' >
+            <CSmartPagination
+              style={{ marginLeft: '-208px' }}
+              activePage={currentPage}
+              pages={Math.ceil(venta.length / 5)}
+              onActivePageChange={setCurrentPage}
+            />
+          </div>
         </div>
       </div>
       <div id='modalVentas' className='modal fade' aria-hidden='true'>
