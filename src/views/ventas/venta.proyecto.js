@@ -7,7 +7,7 @@ import { CNavGroupItems, CRow } from '@coreui/react'
 import { show_alerta } from 'src/fuctions.proyecto'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlusCircle, faFloppyDisk, faSearch, faToggleOff, faHashtag, faCalendarDays, faDollar, faCreditCard, faEye, faBan } from '@fortawesome/free-solid-svg-icons'
+import { faPlusCircle, faFloppyDisk, faSearch, faCloudDownload, faToggleOff, faHashtag, faCalendarDays, faDollar, faCreditCard, faEye, faBan } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom';
 import { CSmartPagination } from '@coreui/react-pro'
 
@@ -227,6 +227,11 @@ const getCurrentPageVentas = () => {
                           <FontAwesomeIcon icon={faEye} />
                         </button>
                         &nbsp;
+                        <button className='btn btn-success'
+                        data-bs-toggle='modal' data-bs-target='#modalCompras'>
+                        <FontAwesomeIcon icon={faCloudDownload} />
+                      </button>
+                      &nbsp;
                         <button onClick={() => deleteVenta(r.idVenta)} className='btn btn-danger'>
                           <FontAwesomeIcon icon={faBan} />
                         </button>

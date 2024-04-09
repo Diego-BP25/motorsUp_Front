@@ -140,7 +140,8 @@ const eliminarVenta = (index) => {
 
     // Función para agregar un servicio a la venta
     const agregarServicio = () => {
-        if (vehiculos_placa && servicios_idServicio && valorManoObra && estadoVenta) {
+        if (vehiculos_placa && servicios_idServicio && valorManoObra ) {
+            const estadoVenta = "true"
             const tipo = 'servicio'
             const total = parseFloat(valorManoObra);
             const nuevoServicio = { tipo, vehiculos_placa, servicios_idServicio, valorManoObra, estadoVenta, total };
@@ -198,13 +199,12 @@ const eliminarVenta = (index) => {
     // Función para guardar la venta
     const guardarVenta = async () => {
         try {
-
             const nuevaVenta = {
-
+                
                 idVenta: consecutivo,
                 fecha: fechaVenta,
                 metodoPago: metodoPago,
-                estado: estado,
+                estado: "true",
                 total: venta,
                 detalleVenta: [...serviciosVenta, ...productosVenta],
             };
@@ -234,11 +234,6 @@ const eliminarVenta = (index) => {
         }
     };
 
-
-
-
-
-
     return (
         <div className='App' >
             <div className='container mt-5' >
@@ -264,11 +259,6 @@ const eliminarVenta = (index) => {
                                     <div className='input-group mb-3' >
                                         <label htmlFor='metodoPago' className='input-group-text'><FontAwesomeIcon icon={faDollar} /></label>
                                         <input type='text' id='metodoPago' placeholder='Metodo Pago' className="form-control" value={metodoPago} onChange={(e) => setMetodoPago(e.target.value)} />
-                                    </div>
-
-                                    <div className='input-group mb-3' >
-                                        <label htmlFor='estado' className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></label>
-                                        <input type='text' id='estado' placeholder='Estado' className="form-control" value={estado} onChange={(e) => setEstado(e.target.value)} />
                                     </div>
 
                                     <h4
@@ -308,12 +298,6 @@ const eliminarVenta = (index) => {
                                                 <input type='number' className="form-control" id='valorManoObra' placeholder='Valor mano obra' value={valorManoObra} onChange={(e) => setValorManoObra(e.target.value)} />
                                             </div>
 
-
-                                            <div className='input-group mb-3' >
-                                                <label htmlFor='estadoVenta' className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></label>
-                                                <input type='text' className="form-control" id='estadoVenta' placeholder='Estado' value={estadoVenta} onChange={(e) => setEstadoVenta(e.target.value)} />
-                                            </div>
-
                                             <div key={"buttonGuardar"} className='d-grid col-6 mx-auto' style={{ width: '70%' }} >
                                                 <button type='button' onClick={() => agregarServicio()} className='botones-azules' >
                                                     <FontAwesomeIcon icon={faFloppyDisk} /> Agregar servicio
@@ -345,7 +329,6 @@ const eliminarVenta = (index) => {
 
                                             </div>
 
-
                                             <div className='input-group mb-3' >
                                                 <label htmlFor='cantidad' className='input-group-text'><FontAwesomeIcon icon={faHashtag} /></label>
                                                 <input type='number' className="form-control" id='cantidad' placeholder='Cantidad' value={cantidad} onChange={(e) => setCantidad(e.target.value)} />
@@ -365,8 +348,6 @@ const eliminarVenta = (index) => {
                                             </div>
                                         </div>
                                     )}
-
-
 
                                 </div>
                                 <div className='input-group mb-3' style={{ marginTop: '-8.5%', marginLeft: '65.8%', maxHeight: '35px', marginBottom: '35px' }}>
@@ -388,8 +369,6 @@ const eliminarVenta = (index) => {
                                                 <th>cantidad</th>
                                                 <th>Total</th>
                                                 <th>Acciones</th>
-
-
                                             </tr>
                                         </thead>
                                         <tbody >
@@ -402,13 +381,13 @@ const eliminarVenta = (index) => {
                                                     <td>{venta.tipo === 'servicio' ? "1" : venta.cantidad}</td>
                                                     <td>{venta.total}</td>
 
-                                                    <td><button
+                                                    <td>
+                                                        <button
                                                         type='button'
                                                         onClick={() => eliminarVenta(index, venta.tipo)}
-                                                        className='btn btn-danger'
-                                                    >
+                                                        className='btn btn-danger'>
                                                         <FontAwesomeIcon icon={faTrash} />
-                                                    </button>
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             ))}
