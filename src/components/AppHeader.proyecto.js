@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux'
 import {
   CContainer,
@@ -12,13 +12,23 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilBell, cilMenu } from '@coreui/icons'
-
+import { jwtDecode } from 'jwt-decode';
 
 import { AppHeaderDropdown } from './header/index'
 
 const AppHeader = () => {
   const dispatch = useDispatch()
   const sidebarShow = useSelector((state) => state.sidebarShow)
+  const [empleadoNombre, setEmpleadoNombre] = useState('');
+
+  useEffect(() => {
+    const token = localStorage.getItem('Empleado');
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      const nombre = decodedToken.empleado.nombreEmpleado
+      setEmpleadoNombre(nombre);
+    }
+  }, []);
 
   return (
     <CHeader position="sticky" className="mb-4">
@@ -46,6 +56,9 @@ const AppHeader = () => {
           </CNavItem> */}
         </CHeaderNav>
         <CHeaderNav>
+          <CNavItem>
+          <p>{empleadoNombre}</p>
+          </CNavItem>
           <CNavItem>
             <CNavLink href="#">
               <CIcon icon={cilBell} size="lg" />

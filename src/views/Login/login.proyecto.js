@@ -20,9 +20,8 @@ const Login = () => {
 
 
   useEffect(() => {
-    // Verificar si hay datos de usuario en localStorage
     if (localStorage.getItem('Empleado')) {
-      setIsLoggedIn(true); // Establecer isLoggedIn en true si hay datos de usuario
+      setIsLoggedIn(true);
     }
   }, []);
 
@@ -72,7 +71,7 @@ const Login = () => {
       });;
       
       setTimeout(() => {
-        localStorage.setItem('Empleado',JSON.stringify(response))
+        localStorage.setItem('Empleado',JSON.stringify(response.data.token))
         window.location.href = '/dashboard';
       }, 1500);
     } catch (error) {
