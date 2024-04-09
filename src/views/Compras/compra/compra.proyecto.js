@@ -1,13 +1,15 @@
-import React from 'react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, React } from 'react'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
 
 import { show_alerta } from 'src/fuctions.proyecto'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTrash, faPlusCircle, faFloppyDisk, faCalendar, faToggleOff, faEye, faSearch, faCloudDownload } from '@fortawesome/free-solid-svg-icons'
+import { faTrash, faPlusCircle, faFloppyDisk, faCalendar, faToggleOff, faEye, faSearch, faCloudDownload, faBan } from '@fortawesome/free-solid-svg-icons'
 import { ContentDoble, ContentIndividual, ModalProyecto } from 'src/components/proyect/modal.proyecto'
 import { ButtonNormal } from 'src/components/proyect/buttons.proyecto'
 import { fecha2 } from 'src/views/funcionesExtras.proyecto'
@@ -35,6 +37,8 @@ const Compras = () => {
 
   //estado para el boton info
   const [productosAsociados, setProductosAsociados] = useState([]);
+  //detalle de la compra
+  const [detalleCompraSeleccionada, setDetalleCompraSeleccionada] = useState([]);
   const [showModal, setShowModal] = useState(false);
   //buscador
   const [busqueda, setBusqueda] = useState("");
@@ -65,10 +69,6 @@ const Compras = () => {
     }
   }, [operation]);
 
-  useEffect(() => {
-    getProveedores();
-  }, []);
-
 
   const obtenerIdConsecutivo = async () => {
     try {
@@ -85,14 +85,6 @@ const Compras = () => {
     }
   };
 
-
-  useEffect(() => {
-    getProveedores()
-  }, [])
-
-  useEffect(() => {
-    getProductos()
-  }, [])
 
 
   const getProveedores = async () => {
@@ -126,32 +118,6 @@ const Compras = () => {
     }
   }
 
-  const openModal = (op, id, descripcion, estado_, fechaCompra, proveedores) => {
-    setIdCompra('');
-    setDescripcionCompra()
-    setDescripcionCompra('');
-    setEstadoCompra('');
-    setFechaCompra('');
-    setProveedores('');
-    setOperation('');
-    if (op === 1) {
-      setTitle('Registrar compra')
-      obtenerIdConsecutivo();
-    }
-    else if (op === 2) {
-      setTitle('Editar compra')
-      setIdCompra(id);
-      setDescripcionCompra(descripcion);
-      setEstadoCompra(estado_);
-      setFechaCompra(fechaCompra);
-      setProveedores_idProveedor(proveedores_idProveedor);
-      setProveedores('')
-    }
-    setOperation(op)
-    window.setTimeout(function () {
-      document.getElementById('id').focus();
-    }, 500);
-  }
 
   //detalle productos
   const [productosCompra, setProductosCompra] = useState([])
@@ -173,11 +139,14 @@ const Compras = () => {
     }
   };
 
-  const getProductosAsociados = async (idCompra) => {
+  const getProductosAsociados = async (idCompra, valor) => {
     try {
       const response = await axios.get(`http://localhost:8081/api/compras/${idCompra}`);
       setProductosAsociados(response.data.detallesCompra);
-      setShowModal(true); // Mostrar la modal de productos asociados
+      setDetalleCompraSeleccionada(response.data.compra); // Establecer los detalles de la compra seleccionada
+      if (valor == 1) {
+        setShowModal(true); // Mostrar la modal de productos asociados
+      }
     } catch (error) {
       console.error('Error al obtener los productos asociados:', error.message);
     }
@@ -333,11 +302,57 @@ const Compras = () => {
     setCompra(resultadosBusqueda);
   }
 
+  const generarPDF = async (idCompra) => {
+    try {
+      const response = await axios.get(`http://localhost:8081/api/compras/${idCompra}`);
+      const detalleCompra = response.data.compra;
+      const productosAsociados = response.data.detallesCompra;
+  
+      const doc = new jsPDF();
+  
+      // Título del PDF
+      doc.setFontSize(18);
+      doc.text("Detalles de la Compra", 14, 15);
+  
+      // Datos de la compra
+      doc.setFontSize(12);
+      doc.text(`ID Compra: ${detalleCompra.idCompra}`, 14, 30);
+      doc.text(`Descripción: ${detalleCompra.descripcionCompra}`, 14, 40);
+      doc.text(`Estado: ${detalleCompra.estadoCompra ? 'Activo' : 'Suspendido'}`, 14, 50);
+      doc.text(`Fecha Compra: ${fecha2(detalleCompra.fechaCompra)}`, 14, 60);
+      doc.text(`Proveedor: ${proveedores[detalleCompra.proveedores_idProveedor]}`, 14, 70);
+      doc.text(`Total: ${detalleCompra.total}`, 14, 80);
+  
+      // Tabla de productos asociados
+      const productosData = productosAsociados.map((producto) => [
+        producto.idDetalleCompra,
+        producto.precio,
+        producto.cantidad,
+        producto.subtotal,
+        producto.compras_idCompra,
+        producto.productos_idProducto
+      ]);
+  
+      doc.autoTable({
+        startY: 90,
+        head: [['ID', 'Precio', 'Cantidad', 'Subtotal', 'ID Compra', 'ID Producto']],
+        body: productosData,
+      });
+  
+      // Guardar o descargar el PDF
+      doc.save("detalle_compra.pdf");
+    } catch (error) {
+      console.error('Error al generar el PDF:', error.message);
+    }
+  };
+  
+
   return (
 
     <div className='App'>
 
       <div className='container-fluid'>
+
         <div style={{ display: 'flex', }} id="Container">
 
           <div style={{ marginRight: 'auto' }}>
@@ -384,17 +399,16 @@ const Compras = () => {
                     <td>{fecha2(c.fechaCompra)}</td>
                     <td>{proveedores[c.proveedores_idProveedor]}</td>
                     <td>
-                      <button className='btn btn-info' onClick={() => getProductosAsociados(c.idCompra)}>
+                      <button className='btn btn-info' onClick={() => getProductosAsociados(c.idCompra, 1)}>
                         <FontAwesomeIcon icon={faEye} />
                       </button>
                       &nbsp;
-                      <button className='btn btn-success'
-                        data-bs-toggle='modal' data-bs-target='#modalCompras'>
+                      <button className='btn btn-success' onClick={() => generarPDF(c.idCompra)}>
                         <FontAwesomeIcon icon={faCloudDownload} />
                       </button>
                       &nbsp;
                       <button onClick={() => deleteCompra(c.idCompra)} className='btn btn-danger'>
-                        <FontAwesomeIcon icon={faTrash} />
+                        <FontAwesomeIcon icon={faBan} />
                       </button>
 
                     </td>
@@ -506,9 +520,6 @@ const Compras = () => {
                 ))}
               </select>
 
-
-
-
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
                 <input type='text' id='cantidad' className='form-control' placeholder='Cantidad' value={cantidad} onChange={(e) => setCantidad(e.target.value)}></input>
@@ -531,9 +542,42 @@ const Compras = () => {
       </div>
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>Productos Asociados</Modal.Title>
+          <Modal.Title>Detalle compra</Modal.Title>
         </Modal.Header>
+
         <Modal.Body>
+          <div style={{ display: 'flex', margin: '3%', padding: '2%' }}>
+            <div style={{ alignContent: 'space-around' }}>
+              <div className='mb-3'>
+                <label htmlFor='idCompra' className='form-label'>ID Compra</label>
+                <input type='text' className='form-control' id='idCompra' value={detalleCompraSeleccionada.idCompra} readOnly />
+              </div>
+              <div className='mb-3'>
+                <label htmlFor='descripcionCompra' className='form-label'>Descripción</label>
+                <input type='text' className='form-control' id='descripcionCompra' value={detalleCompraSeleccionada.descripcionCompra} readOnly />
+              </div>
+              <div className='mb-3'>
+                <label htmlFor='total' className='form-label'>Total</label>
+                <input type='number' className='form-control' id='total' value={detalleCompraSeleccionada.total} readOnly />
+              </div>
+
+            </div>
+            <div style={{ marginLeft: '5%' }}>
+              <div className='mb-3'>
+                <label htmlFor='estadoCompra' className='form-label'>Estado</label>
+                <input type='text' className='form-control' id='estadoCompra' value={detalleCompraSeleccionada.estadoCompra ? 'Activo' : 'Suspendido'} readOnly />
+              </div>
+              <div className='mb-3'>
+                <label htmlFor='fechaCompra' className='form-label'>Fecha compra</label>
+                <input type='text' className='form-control' id='fechaCompra' value={fecha2(detalleCompraSeleccionada.fechaCompra)} readOnly />
+              </div>
+              <div className='mb-3'>
+                <label htmlFor='proveedores_idProveedor' className='form-label'>Proveedor</label>
+                <input type='text' className='form-control' id='proveedores_idProveedor' value={proveedores[detalleCompraSeleccionada.proveedores_idProveedor]} readOnly />
+              </div>
+            </div>
+          </div>
+          <div></div>
           <table className='table table-striped'>
             <thead>
               <tr>
@@ -559,9 +603,7 @@ const Compras = () => {
             </tbody>
           </table>
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant='secondary' onClick={() => setShowModal(false)}>Cerrar</Button>
-        </Modal.Footer>
+
       </Modal>
     </div>
   )

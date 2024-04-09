@@ -3,11 +3,12 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 import { show_alerta } from 'src/fuctions.proyecto'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTrash, faXmark, faIdCardClip, faPlusCircle, faFloppyDisk,faEdit, faCalendar, faToggleOff, faEye, faSearch, faCloudDownload } from '@fortawesome/free-solid-svg-icons'
+import { faTrash, faEdit, faXmark, faIdCardClip, faPlusCircle, faFloppyDisk, faCalendar, faToggleOff, faEye, faSearch, faCloudDownload } from '@fortawesome/free-solid-svg-icons'
 import { ContentDoble, ContentIndividual, ModalProyecto } from 'src/components/proyect/modal.proyecto'
 import { ButtonNormal } from 'src/components/proyect/buttons.proyecto'
 import { fecha2 } from 'src/views/funcionesExtras.proyecto'
@@ -15,110 +16,77 @@ import { Link } from 'react-router-dom';
 import { CSmartPagination } from '@coreui/react-pro';
 import Modal from 'react-bootstrap/Modal';
 
-const CategoriaProductos = () => {
+const Proveedores = () => {
+
   //api de compras
-  const url = 'http://localhost:8081/api/categoriaProductos'
-  const [categoriaP, setCategoriaP] = useState([])
-  const [idCategoriaProducto, setIdCategoriaProducto] = useState('')
-  const [nombreCategoria, setNombreCategoria] = useState('')
-  const [referenciaMoto, setReferenciaMoto] = useState('')
-  const [marca, setMarca] = useState('')
-  const [cilindraje, setCilindraje] = useState('')
+  const url = 'http://localhost:8081/api/proveedores'
+  const [proveedor, setProveedor] = useState([])
+  const [idProveedor, setIdProveedor] = useState('')
+  const [nombreProveedor, setNombreProveedor] = useState('')
+  const [direccionProveedor, setDireccionProveedor] = useState('')
+  const [telefonoProveedor, setTelefonoProveedor] = useState('')
+  const [estado, setEstado] = useState('')
+  const [correoProveedor, setCorreoProveedor] = useState('')
   const [operation, setOperation] = useState(1)
   const [title, setTitle] = useState('')
   const [actualizacion, setActualizacion] = useState(false)
 
   //const [idError, setIdError] = useState('');
   const [descripcionError, setDescripcionError] = useState('');
-  const [consecutivo, setConsecutivo] = useState(0);
 
-  //estado para el boton info
-  const [productosAsociados, setProductosAsociados] = useState([]);
-  //detalle de la compra
-  const [detalleCompraSeleccionada, setDetalleCompraSeleccionada] = useState([]);
-  const [showModal, setShowModal] = useState(false);
   //buscador
   const [busqueda, setBusqueda] = useState("");
 
   //paginado
   const [currentPage, setCurrentPage] = useState(1)
 
-
-
-  //proveedor
-  const [proveedor, setProveedor] = useState([])
-  const [proveedores, setProveedores] = useState({});
-
-  //productos
-  const [producto, setProducto] = useState([])
-  const [productos, setProductos] = useState('')
-
   useEffect(() => {
-    getCategoriaP()
+    getProveedor()
     setActualizacion(false)
-  }, [actualizacion ? categoriaP : null])
-
-  useEffect(() => {
-    if (operation === 1) {
-      obtenerIdConsecutivo();
-    }
-  }, [operation]);
+  }, [actualizacion ? proveedor : null])
 
 
-  const obtenerIdConsecutivo = async () => {
-    try {
-      const respuesta = await axios.get(url);
-      const categorias = respuesta.data;
-      if (categorias.length > 0) {
-        const maxId = Math.max(...categorias.map(c => c.idCategoriaProducto));
-        setConsecutivo(maxId + 1);
-      } else {
-        setConsecutivo(1);
-      }
-    } catch (error) {
-      console.error('Error al obtener el número consecutivo más alto:', error.message);
-    }
-  };
-
-  const getCategoriaP = async () => {
+  const getProveedor = async () => {
     try {
       const respuesta = await axios.get(url, {})
-      setCategoriaP(await respuesta.data)
+      setProveedor(await respuesta.data)
     } catch (error) {
-      console.error('Error al obtener las compras:', error.message)
+      console.error('Error al obtener los proveedores:', error.message)
     }
   }
 
-  const openModal = (op, idCategoriaProducto, nombreCategoria, referenciaMoto, marca, cilindraje) => {
-    setIdCategoriaProducto('');
-    setNombreCategoria()
-    setReferenciaMoto('');
-    setMarca('');
-    setCilindraje('');
+  const openModal = (op, idProveedor, nombreProveedor, direccionProveedor, telefonoProveedor, estado, correoProveedor) => {
+    setIdProveedor('');
+    setNombreProveedor('');
+    setDireccionProveedor('');
+    setEstado('');
+    setTelefonoProveedor('');
+    setCorreoProveedor('');
     setOperation('');
     if (op === 1) {
-      setTitle('Registrar categoria producto')
-      obtenerIdConsecutivo();
+      setTitle('Registrar proveedor')
     }
     else if (op === 2) {
-      setTitle('Editar categoria producto')
-      setIdCategoriaProducto(idCategoriaProducto);
-      setNombreCategoria(nombreCategoria);
-      setReferenciaMoto(referenciaMoto);
-      setMarca(marca);
-      setCilindraje(cilindraje);
+      setTitle('Editar proveedor')
+      setIdProveedor(idProveedor);
+      setNombreProveedor(nombreProveedor)
+      setDireccionProveedor(direccionProveedor);
+      setEstado(estado);
+      setTelefonoProveedor(telefonoProveedor);
+      setCorreoProveedor(correoProveedor);
     }
     setOperation(op)
     window.setTimeout(function () {
-      document.getElementById('idCategoriaProducto').focus();
+      document.getElementById('idProveedor').focus();
     }, 500);
   }
 
+
   // Función para obtener los roles de la página actual
-  const getCurrentPageCategoriaP = () => {
+  const getCurrentPageProveedores = () => {
     const startIndex = (currentPage - 1) * 5;
     const endIndex = startIndex + 5;
-    return categoriaP.slice(startIndex, endIndex);
+    return proveedor.slice(startIndex, endIndex);
   }
 
 
@@ -134,21 +102,23 @@ const CategoriaProductos = () => {
 
     if (operation === 1) {
       parametros = {
-        idCategoriaProducto: consecutivo,
-        nombreCategoria: nombreCategoria,
-        referenciaMoto: referenciaMoto,
-        marca: marca,
-        cilindraje: cilindraje,
+        idProveedor : idProveedor,
+        nombreProveedor: nombreProveedor,
+        direccionProveedor: direccionProveedor,
+        telefonoProveedor: telefonoProveedor,
+        estado: estado,
+        correoProveedor: correoProveedor
       };
       console.log(parametros)
       metodo = 'POST';
     } else {
       parametros = {
-        idCategoriaProducto: idCategoriaProducto,
-        nombreCategoria: nombreCategoria,
-        referenciaMoto: referenciaMoto,
-        marca: marca,
-        cilindraje: cilindraje,
+        idProveedor : idProveedor,
+        nombreProveedor: nombreProveedor,
+        direccionProveedor: direccionProveedor,
+        telefonoProveedor: telefonoProveedor,
+        estado:  (estado === 0 ? 'false' : 'true'),
+        correoProveedor: correoProveedor
       };
       metodo = 'PUT';
     }
@@ -162,7 +132,7 @@ const CategoriaProductos = () => {
         Swal.fire({
           position: "center",
           icon: "success",
-          title: "Categoria de producto agregada con exito",
+          title: "Proveedor agregado con exito",
           showConfirmButton: false,
           timer: 1500
         });
@@ -172,7 +142,7 @@ const CategoriaProductos = () => {
         Swal.fire({
           position: "center",
           icon: "success",
-          title: "Categoria de producto editada con exito",
+          title: "Proveedor editado con exito",
           showConfirmButton: false,
           timer: 1500
         });
@@ -182,7 +152,7 @@ const CategoriaProductos = () => {
         Swal.fire({
           position: "center",
           icon: "success",
-          title: "Categoria de producto eliminada con exito",
+          title: "Proveedor eliminado con exito",
           showConfirmButton: false,
           timer: 1500
         });
@@ -199,44 +169,42 @@ const CategoriaProductos = () => {
       })
   }
 
-
-
-  const deleteCategoriaP = (idCategoriaProducto) => {
+  const deleteProveedor = (idProveedor) => {
     const MySwal = withReactContent(Swal);
     MySwal.fire({
-      title: '¿Seguro de eliminar está categoria de produco?',
-      icon: 'question', text: 'No podra activar nuevamente la categoria de producto',
+      title: '¿Seguro de eliminar este proveedor?',
+      icon: 'question', text: 'No podra activar nuevamente al prveedor',
       showCancelButton: true, confirmButtonText: 'Aceptar', cancelButtonText: 'Cancelar'
     }).then((result) => {
       if (result.isConfirmed) {
-        setIdCategoriaProducto(idCategoriaProducto);
-        enviarSolicitud('DELETE', { idCategoriaProducto: idCategoriaProducto });
+        setIdProveedor(idProveedor);
+        enviarSolicitud('DELETE', { idProveedor: idProveedor });
       } else {
-        show_alerta('La categoria de producto no fue eliminada', 'info')
+        show_alerta('El proveedor no fue eliminado', 'info')
       }
     });
-  }
+  };
 
   const handleChange = (e) => {
     const valor = e.target.value;
     setBusqueda(valor); // Actualizar el estado de búsqueda
 
     if (valor.trim() === '') {
-      getCategoriaP(); // Si el valor está vacío, obtener todos los propietarios nuevamente
+      getProveedor(); // Si el valor está vacío, obtener todos los propietarios nuevamente
     } else {
       filtrar(valor); // Si hay un valor, aplicar el filtro de búsqueda
     }
   };
 
   const filtrar = (terminoBusqueda) => {
-    var resultadosBusqueda = categoriaP.filter((elemento) => {
+    var resultadosBusqueda = proveedor.filter((elemento) => {
 
-      if (elemento.nombreCategoria.toString().toLowerCase().includes(terminoBusqueda.toLowerCase())
+      if (elemento.nombreProveedor.toString().toLowerCase().includes(terminoBusqueda.toLowerCase())
       ) {
         return elemento;
       }
     });
-    setCategoriaP(resultadosBusqueda);
+    setProveedor(resultadosBusqueda);
   }
 
   return (
@@ -248,7 +216,7 @@ const CategoriaProductos = () => {
         <div style={{ display: 'flex', }} id="Container">
 
           <div style={{ marginRight: 'auto' }}>
-            <h3>Categoria productos</h3>
+            <h3>Proveedores</h3>
           </div>
           <div className='input-group' style={{ marginRight: '1%' }}>
             <input className='form-control inputBuscador'
@@ -262,7 +230,7 @@ const CategoriaProductos = () => {
             </div>
           </div>
 
-          <button className='botones-azules' onClick={() => openModal(1)} data-bs-toggle='modal' data-bs-target='#modalCategoriaProductos'>
+          <button className='botones-azules' onClick={() => openModal(1)} data-bs-toggle='modal' data-bs-target='#modalProveedores'>
             <FontAwesomeIcon icon={faPlusCircle} /> Añadir
           </button>
         </div>
@@ -273,28 +241,30 @@ const CategoriaProductos = () => {
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>nombre</th>
-                  <th>Referencia</th>
-                  <th>Marca</th>
-                  <th>Cilindraje</th>
+                  <th>Nombre</th>
+                  <th>Direccion</th>
+                  <th>Telefono</th>
+                  <th>Estado</th>
+                  <th>Correo</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
               <tbody className='table-group-divider'>
-                {getCurrentPageCategoriaP().map((c) => (
-                  <tr key={c.idCategoriaProducto}>
-                    <td>{c.idCategoriaProducto}</td>
-                    <td>{c.nombreCategoria}</td>
-                    <td>{c.referenciaMoto}</td>
-                    <td>{c.marca}</td>
-                    <td>{c.cilindraje}</td>
+                {getCurrentPageProveedores().map((p) => (
+                  <tr key={p.idProveedor }>
+                    <td>{p.idProveedor }</td>
+                    <td>{p.nombreProveedor}</td>
+                    <td>{p.direccionProveedor}</td>
+                    <td>{p.telefonoProveedor}</td>
+                    <td>{p.estado === 0 ? 'Suspendido' : 'Activo'}</td>
+                    <td>{p.correoProveedor}</td>
                     <td>
-                      <button onClick={() => openModal(2, c.idCategoriaProducto, c.nombreCategoria, c.referenciaMoto, c.marca, c.cilindraje)} className='btn btn-warning'
-                        data-bs-toggle='modal' data-bs-target='#modalCategoriaProductos'>
+                      <button onClick={() => openModal(2, p.idProveedor , p.nombreProveedor, p.direccionProveedor, p.telefonoProveedor, p.estado=== 0 ? 'Suspendido' : 'Activo' , p.correoProveedor)} className='btn btn-warning'
+                        data-bs-toggle='modal' data-bs-target='#modalProveedores'>
                         <FontAwesomeIcon icon={faEdit} />
                       </button>
                       &nbsp;
-                      <button onClick={() => deleteCategoriaP(c.idCategoriaProducto)} className='btn btn-danger'>
+                      <button onClick={() => deleteProveedor(p.idProveedor)} className='btn btn-danger'>
                         <FontAwesomeIcon icon={faTrash} />
                       </button>
                     </td>
@@ -309,13 +279,13 @@ const CategoriaProductos = () => {
           <div className='col-12 col-lg-8 offset-0 offset-lg-2'>
             <CSmartPagination
               activePage={currentPage}
-              pages={Math.ceil(categoriaP.length / 5)}
+              pages={Math.ceil(proveedor.length / 5)}
               onActivePageChange={setCurrentPage}
             />
           </div>
         </div>
       </div>
-      <div id='modalCategoriaProductos' className='modal fade' aria-hidden='true'>
+      <div id='modalProveedores' className='modal fade' aria-hidden='true'>
         <div className='modal-dialog'>
           <div className='modal-content'>
             <div className='modal-header'>
@@ -323,30 +293,35 @@ const CategoriaProductos = () => {
               <button id='btnCerrar' type='button' data-bs-dismiss='modal'><FontAwesomeIcon icon={faXmark} /></button>
             </div>
             <div className='modal-body'>
-              <input type='hidden' id='idCategoriaProducto' ></input>
+              <input type='hidden' id='idProveedor' ></input>
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faIdCardClip} /></span>
-                <input type='number' id='idCategoriaProducto' className='form-control' value={operation === 1 ? consecutivo : idCategoriaProducto} />
+                <input type='number' id='idProveedor' className='form-control' value={idProveedor } onChange={(e) => setIdProveedor(e.target.value)}/>
               </div>
 
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
-                <input type='text' id='nombreCategoria' className='form-control' placeholder='Estado' value={nombreCategoria} onChange={(e) => setNombreCategoria(e.target.value)}></input>
+                <input type='text' id='nombreProveedor' className='form-control' placeholder='Nombre' value={nombreProveedor} onChange={(e) => setNombreProveedor(e.target.value)}></input>
               </div>
 
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
-                <input type='text' id='referenciaMoto' className='form-control' placeholder='Referencia' value={referenciaMoto} onChange={(e) => setReferenciaMoto(e.target.value)}></input>
+                <input type='text' id='direccionProveedor' className='form-control' placeholder='Direccion' value={direccionProveedor} onChange={(e) => setDireccionProveedor(e.target.value)}></input>
               </div>
 
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
-                <input type='text' id='marca' className='form-control' placeholder='Marca' value={marca} onChange={(e) => setMarca(e.target.value)}></input>
+                <input type='text' id='telefonoProveedor' className='form-control' placeholder='Telefono' value={telefonoProveedor} onChange={(e) => setTelefonoProveedor(e.target.value)}></input>
               </div>
 
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
-                <input type='text' id='cilindraje' className='form-control' placeholder='Cilindraje' value={cilindraje} onChange={(e) => setCilindraje(e.target.value)}></input>
+                <input type='text' id='estado' className='form-control' placeholder='Estado' value={estado} onChange={(e) => setEstado(e.target.value)}></input>
+              </div>
+
+              <div className='input-group mb-3'>
+                <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
+                <input type='text' id='correoProveedor' className='form-control' placeholder='Correp' value={correoProveedor} onChange={(e) => setCorreoProveedor(e.target.value)}></input>
               </div>
 
               <div className='d-grid col-6 mx-auto'>
@@ -363,4 +338,4 @@ const CategoriaProductos = () => {
   )
 }
 
-export default CategoriaProductos
+export default Proveedores

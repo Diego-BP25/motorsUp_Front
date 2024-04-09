@@ -56,7 +56,7 @@ const _nav = [
       {
         component: CNavItem,
         name: 'Proveedores',
-        to: '/compras/dropdowns',
+        to: '/compras/proveedores',
       },
     ],
   },
