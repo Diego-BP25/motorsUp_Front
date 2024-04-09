@@ -14,6 +14,10 @@ const agregarserv = React.lazy(() => import('./views/ventas/agregarVentas.proyec
 const Agendamiento = React.lazy(() =>
   import('./views/Servicios/agendamiento/agendamiento.proyecto'),
 )
+const CategoriaProducto = React.lazy(() =>
+  import('./views/Compras/categoriaProductos/categoriaProductos.proyecto'),
+)
+const Proveedores = React.lazy(() => import('./views/Compras/proveedores/proveedores.proyecto'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -26,7 +30,13 @@ const routes = [
   { path: '/compras/agregar', name: 'Agregar compra', element: AgregarCompra },
   { path: '/cotizacio/cotizaciones', name: 'Cotizaciones', element: cotizaciones, exact: true },
   { path: '/compras/productos', name: 'Productos', element: Productos, exact: true },
-  { path: '/compras/proveedores', name: 'Proveedores', element: Compras },
+  {
+    path: '/compras/categoriaProductos',
+    name: 'CategoriaProductos',
+    element: CategoriaProducto,
+    exact: true,
+  },
+  { path: '/compras/proveedores', name: 'Proveedores', element: Proveedores, exact: true },
   { path: '/Servicios/propietario', name: 'Propietario', element: Propietarios },
   { path: '/Ventas/venta', name: 'Gestion Ventas', element: Ventas },
   { path: '/Servicios/agendamiento', name: 'Agendamiento', element: Agendamiento },
