@@ -71,7 +71,7 @@ const AgregarVenta = () => {
     }, []);
 
 
-
+    //obtener consecutivo de la venta
     const obtenerIdConsecutivo = async () => {
         try {
             const respuesta = await axios.get(url);
@@ -128,23 +128,20 @@ const AgregarVenta = () => {
         }
     };
 
-    // Función para eliminar un servicio de la lista de servicios agregados
-    const eliminarServicio = (index) => {
-        const nuevosServicios = [...serviciosVenta];
-        nuevosServicios.splice(index, 1);
-        setServiciosVenta(nuevosServicios);
-    };
-
-    // Función para eliminar un producto de la lista de productos agregados
-    const eliminarProducto = (index) => {
-        const nuevosProductos = [...productosVenta];
-        nuevosProductos.splice(index, 1);
-        setProductosVenta(nuevosProductos);
-    };
+    // Función para eliminar un servicio o producto de la lista de ventas
+const eliminarVenta = (index) => {
+    const nuevasVentas = [...serviciosVenta.concat(productosVenta)];
+    nuevasVentas.splice(index, 1);
+    const nuevosServicios = nuevasVentas.filter((venta) => venta.tipo === 'servicio');
+    const nuevosProductos = nuevasVentas.filter((venta) => venta.tipo === 'producto');
+    setServiciosVenta(nuevosServicios);
+    setProductosVenta(nuevosProductos);
+};
 
     // Función para agregar un servicio a la venta
     const agregarServicio = () => {
-        if (vehiculos_placa && servicios_idServicio && valorManoObra && estadoVenta) {
+        if (vehiculos_placa && servicios_idServicio && valorManoObra ) {
+            const estadoVenta = "true"
             const tipo = 'servicio'
             const total = parseFloat(valorManoObra);
             const nuevoServicio = { tipo, vehiculos_placa, servicios_idServicio, valorManoObra, estadoVenta, total };
@@ -190,7 +187,7 @@ const AgregarVenta = () => {
     const calcularTotal = (ventas) => {
         const totalVenta = ventas.reduce((acc, venta) => acc + venta.total, 0);
         setVenta(totalVenta); // Actualiza el estado del total de la venta
-    }; 
+    };
     useEffect(() => {
         const totalServicios = serviciosVenta.reduce((acc, servicio) => acc + servicio.total, 0);
         const totalProductos = productosVenta.reduce((acc, producto) => acc + producto.total, 0);
@@ -201,15 +198,14 @@ const AgregarVenta = () => {
 
     // Función para guardar la venta
     const guardarVenta = async () => {
-        try { 
-
+        try {
             const nuevaVenta = {
-
+                
                 idVenta: consecutivo,
                 fecha: fechaVenta,
                 metodoPago: metodoPago,
-                estado: estado,
-                total: total,
+                estado: "true",
+                total: venta,
                 detalleVenta: [...serviciosVenta, ...productosVenta],
             };
             console.log(nuevaVenta)
@@ -238,11 +234,6 @@ const AgregarVenta = () => {
         }
     };
 
-
-
-
-
-
     return (
         <div className='App' >
             <div className='container mt-5' >
@@ -270,28 +261,18 @@ const AgregarVenta = () => {
                                         <input type='text' id='metodoPago' placeholder='Metodo Pago' className="form-control" value={metodoPago} onChange={(e) => setMetodoPago(e.target.value)} />
                                     </div>
 
-                                    <div className='input-group mb-3' >
-                                        <label htmlFor='estado' className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></label>
-                                        <input type='text' id='estado' placeholder='Estado' className="form-control" value={estado} onChange={(e) => setEstado(e.target.value)} />
-                                    </div>
-
-                                    <div className='input-group mb-3' >
-                                        <label htmlFor='total' className='input-group-text'><FontAwesomeIcon icon={faFileText} /></label>
-                                        <input type='number' id='total' placeholder='Total' className="form-control" value={total} onChange={(e) => setTotal(e.target.value)} />
-                                    </div>
-
                                     <h4
-                                        style={{borderRadius: '5%',paddingRight: '5%',paddingLeft: '2%', backgroundColor: serviciosActivo ? '#0073B9  ' : '#CFD8E0', color: serviciosActivo ? '#fff' : '#313335' }}
+                                        style={{ borderRadius: '5%', marginTop: '8%', paddingRight: '5%', paddingLeft: '2%', backgroundColor: serviciosActivo ? '#0073B9  ' : '#CFD8E0', color: serviciosActivo ? '#fff' : '#313335' }}
                                         onClick={toggleMostrarServicios}
                                     >Servicios</h4>
                                     <h4
-                                        style={{ borderRadius: '5%',paddingRight: '5%',paddingLeft: '2%', backgroundColor: productosActivo ? '#0073B9  ' : '#CFD8E0', color: productosActivo ? '#fff' : '#313335' }}
+                                        style={{ borderRadius: '5%', marginTop: '8%', paddingRight: '5%', paddingLeft: '2%', backgroundColor: productosActivo ? '#0073B9  ' : '#CFD8E0', color: productosActivo ? '#fff' : '#313335' }}
                                         onClick={toggleMostrarProductos}
                                     >Productos</h4>
-                                    
+
 
                                     {mostrarServicios && (
-                                        <div className="row" style={{ marginLeft: '-4%'}}>
+                                        <div className="row" style={{ marginLeft: '-4%' }}>
                                             <div className='input-group mb-3' >
                                                 <label htmlFor='vehiculos_placa' className='input-group-text'><FontAwesomeIcon icon={faUser} /></label>
                                                 <select id='vehiculos_placa' className="form-control" value={vehiculos_placa} onChange={(e) => setplaca(e.target.value)}>
@@ -317,12 +298,6 @@ const AgregarVenta = () => {
                                                 <input type='number' className="form-control" id='valorManoObra' placeholder='Valor mano obra' value={valorManoObra} onChange={(e) => setValorManoObra(e.target.value)} />
                                             </div>
 
-
-                                            <div className='input-group mb-3' >
-                                                <label htmlFor='estadoVenta' className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></label>
-                                                <input type='text' className="form-control" id='estadoVenta' placeholder='Estado' value={estadoVenta} onChange={(e) => setEstadoVenta(e.target.value)} />
-                                            </div>
-
                                             <div key={"buttonGuardar"} className='d-grid col-6 mx-auto' style={{ width: '70%' }} >
                                                 <button type='button' onClick={() => agregarServicio()} className='botones-azules' >
                                                     <FontAwesomeIcon icon={faFloppyDisk} /> Agregar servicio
@@ -332,7 +307,7 @@ const AgregarVenta = () => {
                                     )}
 
                                     {mostrarProductos && (
-                                       <div className="row" style={{ marginLeft: '-4%'}}>
+                                        <div className="row" style={{ marginLeft: '-4%' }}>
                                             <div className='input-group mb-3' >
                                                 <label htmlFor='empleados_idEmpleado' className='input-group-text'><FontAwesomeIcon icon={faUser} /></label>
                                                 <select id='empleados_idEmpleado' className="form-control" value={empleados_idEmpleado} onChange={(e) => setIdEmpleado(e.target.value)}>
@@ -354,7 +329,6 @@ const AgregarVenta = () => {
 
                                             </div>
 
-
                                             <div className='input-group mb-3' >
                                                 <label htmlFor='cantidad' className='input-group-text'><FontAwesomeIcon icon={faHashtag} /></label>
                                                 <input type='number' className="form-control" id='cantidad' placeholder='Cantidad' value={cantidad} onChange={(e) => setCantidad(e.target.value)} />
@@ -367,15 +341,13 @@ const AgregarVenta = () => {
 
 
 
-                                            <div key={"buttonGuardar"} className='d-grid col-6 mx-auto' style={{ width: '70%'}} >
+                                            <div key={"buttonGuardar"} className='d-grid col-6 mx-auto' style={{ width: '70%' }} >
                                                 <button type='button' onClick={() => agregarProducto()} className='botones-azules' >
                                                     <FontAwesomeIcon icon={faFloppyDisk} /> Agregar producto
                                                 </button>
                                             </div>
                                         </div>
                                     )}
-
-
 
                                 </div>
                                 <div className='input-group mb-3' style={{ marginTop: '-8.5%', marginLeft: '65.8%', maxHeight: '35px', marginBottom: '35px' }}>
@@ -391,14 +363,12 @@ const AgregarVenta = () => {
                                     <table className='table'>
                                         <thead style={{ position: 'sticky', top: 0, backgroundColor: 'white' }}>
                                             <tr >
-                                                <th>Nombre</th>
+                                                <th>Id</th>
                                                 <th>Tipo</th>
                                                 <th>Precio</th>
                                                 <th>cantidad</th>
                                                 <th>Total</th>
                                                 <th>Acciones</th>
-
-
                                             </tr>
                                         </thead>
                                         <tbody >
@@ -411,12 +381,13 @@ const AgregarVenta = () => {
                                                     <td>{venta.tipo === 'servicio' ? "1" : venta.cantidad}</td>
                                                     <td>{venta.total}</td>
 
-                                                    <td>{venta.tipo === 'producto' ? <button type='button' onClick={() => { eliminarProducto(index) }} className='btn btn-danger'>
+                                                    <td>
+                                                        <button
+                                                        type='button'
+                                                        onClick={() => eliminarVenta(index, venta.tipo)}
+                                                        className='btn btn-danger'>
                                                         <FontAwesomeIcon icon={faTrash} />
-                                                    </button> : <button type='button' onClick={() => { eliminarServicio(index) }} className='btn btn-danger'>
-                                                        <FontAwesomeIcon icon={faTrash} />
-                                                    </button>}
-
+                                                        </button>
                                                     </td>
                                                 </tr>
                                             ))}
