@@ -363,7 +363,7 @@ const eliminarVenta = (index) => {
                                     <table className='table'>
                                         <thead style={{ position: 'sticky', top: 0, backgroundColor: 'white' }}>
                                             <tr >
-                                                <th>Nombre</th>
+                                                <th>Id</th>
                                                 <th>Tipo</th>
                                                 <th>Precio</th>
                                                 <th>cantidad</th>

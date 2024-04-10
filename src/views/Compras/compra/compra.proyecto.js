@@ -598,7 +598,7 @@ const Compras = () => {
                   <td>{producto.subtotal}</td>
                   <td>{producto.compras_idCompra}</td>
                   <td>{producto.productos_idProducto}</td>
-                </tr>
+                </tr> 
               ))}
             </tbody>
           </table>
