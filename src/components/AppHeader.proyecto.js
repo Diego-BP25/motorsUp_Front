@@ -57,23 +57,18 @@ const AppHeader = () => {
         </CHeaderNav>
         <CHeaderNav>
           <CNavItem>
-          <p>{empleadoNombre}</p>
+            <div className="d-flex align-items-center">
+              <div className="me-2">
+                <div className="bg-success rounded-circle" style={{ width: '10px', height: '10px' }}></div>
+              </div>
+              <strong><p className="mb-0">{empleadoNombre}</p></strong>
+            </div>
           </CNavItem>
           <CNavItem>
             <CNavLink href="#">
               <CIcon icon={cilBell} size="lg" />
             </CNavLink>
           </CNavItem>
-          {/* <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilList} size="lg" />
-            </CNavLink>
-          </CNavItem>
-          <CNavItem>
-            <CNavLink href="#">
-              <CIcon icon={cilEnvelopeOpen} size="lg" />
-            </CNavLink>
-          </CNavItem> */}
         </CHeaderNav>
         <CHeaderNav className="ms-3">
           <AppHeaderDropdown />

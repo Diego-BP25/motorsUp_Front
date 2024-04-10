@@ -20,8 +20,9 @@ const Login = () => {
 
 
   useEffect(() => {
+
     if (localStorage.getItem('Empleado')) {
-      setIsLoggedIn(true);
+      setIsLoggedIn(true); // Establecer isLoggedIn en true si hay datos de usuario
     }
   }, []);
 
