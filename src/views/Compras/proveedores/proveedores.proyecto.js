@@ -213,7 +213,7 @@ const Proveedores = () => {
 
       <div className='container-fluid'>
 
-        <div style={{ display: 'flex', }} id="Container">
+        <div style={{ display: 'flex', }} id='Container'>
 
           <div style={{ marginRight: 'auto' }}>
             <h3>Proveedores</h3>
@@ -285,12 +285,12 @@ const Proveedores = () => {
           </div>
         </div>
       </div>
-      <div id='modalProveedores' className='modal fade' aria-hidden='true'>
-        <div className='modal-dialog'>
+      <div id='modalProveedores' className='modal fade' aria-hidden='true' style={{ marginLeft: '8%' }}>
+        <div className='modal-dialog modal-dialog-centered' style={{ display: 'flex', alignContent: 'center' }}>
           <div className='modal-content'>
             <div className='modal-header'>
               <label className='h5'>{title}</label>
-              <button id='btnCerrar' type='button' data-bs-dismiss='modal'><FontAwesomeIcon icon={faXmark} /></button>
+              <button type="button" id="btnCerrar" className="btn-close" data-bs-dismiss='modal'></button>
             </div>
             <div className='modal-body'>
               <input type='hidden' id='idProveedor' ></input>
@@ -325,7 +325,7 @@ const Proveedores = () => {
               </div>
 
               <div className='d-grid col-6 mx-auto'>
-                <button onClick={() => validar()} className='btn btn-success'>
+                <button onClick={() => validar()} className='botones-azules'>
                   <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
                 </button>
               </div>

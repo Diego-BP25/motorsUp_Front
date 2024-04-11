@@ -89,12 +89,9 @@ const CategoriaProductos = () => {
     }
   }
 
-  const openModal = (op, idCategoriaProducto, nombreCategoria, referenciaMoto, marca, cilindraje) => {
+  const openModal = (op, idCategoriaProducto, nombreCategoria) => {
     setIdCategoriaProducto('');
-    setNombreCategoria()
-    setReferenciaMoto('');
-    setMarca('');
-    setCilindraje('');
+    setNombreCategoria();
     setOperation('');
     if (op === 1) {
       setTitle('Registrar categoria producto')
@@ -104,9 +101,6 @@ const CategoriaProductos = () => {
       setTitle('Editar categoria producto')
       setIdCategoriaProducto(idCategoriaProducto);
       setNombreCategoria(nombreCategoria);
-      setReferenciaMoto(referenciaMoto);
-      setMarca(marca);
-      setCilindraje(cilindraje);
     }
     setOperation(op)
     window.setTimeout(function () {
@@ -135,20 +129,14 @@ const CategoriaProductos = () => {
     if (operation === 1) {
       parametros = {
         idCategoriaProducto: consecutivo,
-        nombreCategoria: nombreCategoria,
-        referenciaMoto: referenciaMoto,
-        marca: marca,
-        cilindraje: cilindraje,
+        nombreCategoria: nombreCategoria
       };
       console.log(parametros)
       metodo = 'POST';
     } else {
       parametros = {
         idCategoriaProducto: idCategoriaProducto,
-        nombreCategoria: nombreCategoria,
-        referenciaMoto: referenciaMoto,
-        marca: marca,
-        cilindraje: cilindraje,
+        nombreCategoria: nombreCategoria
       };
       metodo = 'PUT';
     }
@@ -274,9 +262,6 @@ const CategoriaProductos = () => {
                 <tr>
                   <th>#</th>
                   <th>nombre</th>
-                  <th>Referencia</th>
-                  <th>Marca</th>
-                  <th>Cilindraje</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
@@ -285,11 +270,8 @@ const CategoriaProductos = () => {
                   <tr key={c.idCategoriaProducto}>
                     <td>{c.idCategoriaProducto}</td>
                     <td>{c.nombreCategoria}</td>
-                    <td>{c.referenciaMoto}</td>
-                    <td>{c.marca}</td>
-                    <td>{c.cilindraje}</td>
                     <td>
-                      <button onClick={() => openModal(2, c.idCategoriaProducto, c.nombreCategoria, c.referenciaMoto, c.marca, c.cilindraje)} className='btn btn-warning'
+                      <button onClick={() => openModal(2, c.idCategoriaProducto, c.nombreCategoria)} className='btn btn-warning'
                         data-bs-toggle='modal' data-bs-target='#modalCategoriaProductos'>
                         <FontAwesomeIcon icon={faEdit} />
                       </button>
@@ -315,12 +297,12 @@ const CategoriaProductos = () => {
           </div>
         </div>
       </div>
-      <div id='modalCategoriaProductos' className='modal fade' aria-hidden='true'>
-        <div className='modal-dialog'>
+      <div id='modalCategoriaProductos' className='modal fade' aria-hidden='true' style={{ marginLeft: '8%' }}>
+        <div className='modal-dialog modal-dialog-centered' style={{ display: 'flex', alignContent: 'center' }}>
           <div className='modal-content'>
             <div className='modal-header'>
               <label className='h5'>{title}</label>
-              <button id='btnCerrar' type='button' data-bs-dismiss='modal'><FontAwesomeIcon icon={faXmark} /></button>
+              <button type="button" id="btnCerrar" className="btn-close" data-bs-dismiss='modal'></button>
             </div>
             <div className='modal-body'>
               <input type='hidden' id='idCategoriaProducto' ></input>
@@ -331,26 +313,11 @@ const CategoriaProductos = () => {
 
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
-                <input type='text' id='nombreCategoria' className='form-control' placeholder='Estado' value={nombreCategoria} onChange={(e) => setNombreCategoria(e.target.value)}></input>
-              </div>
-
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
-                <input type='text' id='referenciaMoto' className='form-control' placeholder='Referencia' value={referenciaMoto} onChange={(e) => setReferenciaMoto(e.target.value)}></input>
-              </div>
-
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
-                <input type='text' id='marca' className='form-control' placeholder='Marca' value={marca} onChange={(e) => setMarca(e.target.value)}></input>
-              </div>
-
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
-                <input type='text' id='cilindraje' className='form-control' placeholder='Cilindraje' value={cilindraje} onChange={(e) => setCilindraje(e.target.value)}></input>
+                <input type='text' id='nombreCategoria' className='form-control' placeholder='Nombre' value={nombreCategoria} onChange={(e) => setNombreCategoria(e.target.value)}></input>
               </div>
 
               <div className='d-grid col-6 mx-auto'>
-                <button onClick={() => validar()} className='btn btn-success'>
+                <button onClick={() => validar()} className='botones-azules'>
                   <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
                 </button>
               </div>

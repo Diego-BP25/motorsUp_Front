@@ -3,26 +3,8 @@ import axios from 'axios';
 import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faCalendar, faToggleOff, faIdCardClip, faTag, faFileText, faTruckField, faHashtag, faBagShopping, faDollar } from '@fortawesome/free-solid-svg-icons'
-import {
-    CAvatar,
-    CButton,
-    CButtonGroup,
-    CCard,
-    CCardBody,
-    CCardFooter,
-    CCardHeader,
-    CCol,
-    CProgress,
-    CRow,
-    CTable,
-    CTableBody,
-    CTableDataCell,
-    CTableHead,
-    CTableHeaderCell,
-    CTableRow,
-} from '@coreui/react'
 
-import WidgetsDropdown from 'src/views/widgets/WidgetsDropdown.proyecto'
+import { formatDate } from 'src/views/funcionesExtras.proyecto'
 
 const AgregarCompra = () => {
     // API URL
@@ -40,12 +22,25 @@ const AgregarCompra = () => {
     const [cantidad, setCantidad] = useState('');
     const [precio, setPrecio] = useState('');
     const [productosCompra, setProductosCompra] = useState([]);
+    const [productosCompraName, setProductosCompraName] = useState([]);
+
+    //categorias
+    const [categoriaProductos, setCategoriaProductos] = useState([]);
+    const [idCategoriaProducto, setIdCategoriaProducto] = useState('');
+    const [categoriaName, setCategoriaName] = useState({});
+
     const [consecutivo, setConsecutivo] = useState(0);
+
+    // Agregar un nuevo estado para los productos asociados a la categoría seleccionada
+    const [productosPorCategoria, setProductosPorCategoria] = useState([]);
+    const [productoSeleccionado, setProductoSeleccionado] = useState('');
 
     // Obtener datos iniciales
     useEffect(() => {
         getProveedores();
         getProductos();
+        getNameProductos();
+        getCategorias();
     }, []);
 
     useEffect(() => {
@@ -83,6 +78,7 @@ const AgregarCompra = () => {
         try {
             const response = await axios.get('http://localhost:8081/api/productos');
             setProductos(response.data);
+            setFechaCompra(formatDate(new Date()))
         } catch (error) {
             console.error('Error al obtener los productos:', error.message);
         }
@@ -97,13 +93,14 @@ const AgregarCompra = () => {
 
     // Función para agregar un producto a la compra
     const agregarProducto = () => {
-        if (idProducto && cantidad && precio) {
+        if (idProducto && cantidad && precio && idCategoriaProducto) {
             const subtotal = parseFloat(cantidad) * parseFloat(precio);
-            setProductosCompra([...productosCompra, { idProducto, cantidad, precio, subtotal }]);
+            setProductosCompra([...productosCompra, { idProducto, cantidad, precio, subtotal, idCategoriaProducto }]);
             setCantidad('');
             setPrecio('');
             setIdProducto('');
-            calcularTotal([...productosCompra, { idProducto, cantidad, precio, subtotal }]);
+            setIdCategoriaProducto('');
+            calcularTotal([...productosCompra, { idProducto, cantidad, precio, subtotal, idCategoriaProducto }]);
         } else {
             Swal.fire({
                 icon: 'error',
@@ -125,7 +122,7 @@ const AgregarCompra = () => {
             const nuevaCompra = {
                 idCompra: consecutivo,
                 descripcionCompra: descripcion,
-                estadoCompra: estado,
+                estadoCompra: true,
                 fechaCompra: fechaCompra,
                 proveedores_idProveedor: proveedorSeleccionado,
                 total: subtotalProductos,
@@ -155,10 +152,59 @@ const AgregarCompra = () => {
         }
     };
 
+    const getNameProductos = async () => {
+        try {
+            const respuesta = await axios.get('http://localhost:8081/api/productos');
+            const datosProductos = respuesta.data.reduce((acc, p) => {
+                acc[p.idProducto] = p.nombreProducto; // Almacenar el nombre
+                return acc;
+            }, {});
+            setProductosCompraName(datosProductos);
+        } catch (error) {
+            console.error('Error al obtener los productos:', error.message);
+        }
+    };
+
+    // const getCategoriasName = async () => {
+    //     try {
+    //         const respuesta = await axios.get('http://localhost:8081/api/categoriaProductos');
+    //         const datosCategorias = respuesta.data.reduce((acc, categoria) => {
+    //             acc[categoria.idCategoriaProducto] = categoria.nombreCategoria; // Almacenar el nombre
+    //             return acc;
+    //         }, {});
+    //         setCategoriaName(datosCategorias);
+    //     } catch (error) {
+    //         console.error('Error al obtener las categorias:', error.message);
+    //     }
+    // };
+
+
+    const getCategorias = async () => {
+        try {
+            const response = await axios.get('http://localhost:8081/api/categoriaProductos');
+            setCategoriaProductos(response.data);
+        } catch (error) {
+            console.error('Error al obtener las categorias de productos;', error.message);
+        }
+    };
+
+    const filtrarProductosPorCategoria = (categoriaId) => {
+        // Convertir categoriaId a número si es necesario
+        const categoriaIdNumero = parseInt(categoriaId);
+
+        // Filtrar productos por la categoría seleccionada
+        const productosFiltrados = productos.filter(producto => producto.categoriaProducto_idCategoriaProducto === categoriaIdNumero);
+
+        console.log(productosFiltrados);
+        console.log(categoriaIdNumero);
+
+        setProductosPorCategoria(productosFiltrados);
+    };
+
     return (
         <div className='App' >
             <div className='container mt-5' >
-                <div className='row'>
+                <div className='row' >
                     <div style={{ marginRight: 'auto', marginTop: '-5%', }}>
                         <h3>Agregar compra</h3>
                     </div>
@@ -178,13 +224,8 @@ const AgregarCompra = () => {
                                     </div>
 
                                     <div className='input-group mb-3' >
-                                        <label htmlFor='estado' className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></label>
-                                        <input type='text' id='estado' className="form-control" value={estado} onChange={(e) => setEstado(e.target.value)} />
-                                    </div>
-
-                                    <div className='input-group mb-3' >
                                         <label htmlFor='fechaCompra' className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></label>
-                                        <input type='datetime-local' id='fechaCompra' className="form-control" value={fechaCompra} onChange={(e) => setFechaCompra(e.target.value)} />
+                                        <input type='datetime-local' id='fechaCompra' className="form-control" value={fechaCompra} readOnly={true} onChange={(e) => setFechaCompra(e.target.value)} />
                                     </div>
 
                                     <div className='input-group mb-3' >
@@ -200,11 +241,26 @@ const AgregarCompra = () => {
                                     <h4 style={{ marginRight: 'auto', }}>Productos</h4>
 
                                     <div className='input-group mb-3' >
+                                        <label htmlFor='idCategoriaProducto' className='input-group-text'><FontAwesomeIcon icon={faBagShopping} /></label>
+                                        <select id='idCategoriaProducto' className="form-control" value={idCategoriaProducto} onChange={(e) => { setIdCategoriaProducto(e.target.value); filtrarProductosPorCategoria(e.target.value); }}>
+                                            <option value=''>Seleccione una categoria</option>
+                                            {categoriaProductos.map((pro) => (
+                                                <option key={pro.idCategoriaProducto} value={pro.idCategoriaProducto}>{pro.nombreCategoria}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+
+                                    <div className='input-group mb-3' >
                                         <label htmlFor='idProducto' className='input-group-text'><FontAwesomeIcon icon={faBagShopping} /></label>
-                                        <select id='idProducto' className="form-control" value={idProducto} onChange={(e) => setIdProducto(e.target.value)}>
+                                        <select
+                                            id='productos'
+                                            className="form-control"
+                                            value={productoSeleccionado}
+                                            onChange={(e) => { setProductoSeleccionado(e.target.value); setIdProducto(e.target.value)}}
+                                        >
                                             <option value=''>Seleccione un producto</option>
-                                            {productos.map((pro) => (
-                                                <option key={pro.idProducto} value={pro.idProducto}>{pro.nombreProducto}</option>
+                                            {productosPorCategoria.map((producto) => (
+                                                <option key={producto.idProducto} value={producto.idProducto}>{producto.nombreProducto}</option>
                                             ))}
                                         </select>
                                     </div>
@@ -236,7 +292,7 @@ const AgregarCompra = () => {
 
                             <div className='input-group mb-3' style={{ marginTop: '-8.5%', marginLeft: '65.8%', maxHeight: '35px', marginBottom: '35px' }}>
                                 <label htmlFor='total' className='input-group-text'><FontAwesomeIcon icon={faDollar} /></label>
-                                <input type='number' className="form-control" id='total' value={total}/>
+                                <input type='number' className="form-control" id='total' value={total} />
                             </div>
                         </form>
 
@@ -249,7 +305,8 @@ const AgregarCompra = () => {
                             <table className='table'>
                                 <thead style={{ position: 'sticky', top: 0, backgroundColor: 'white' }} >
                                     <tr >
-                                        <th>ID Producto</th>
+                                        <th>Producto</th>
+                                        <th>Categoria</th>
                                         <th>Cantidad</th>
                                         <th>Precio</th>
                                         <th>Subtotal</th>
@@ -259,7 +316,8 @@ const AgregarCompra = () => {
                                 <tbody >
                                     {productosCompra.map((producto, index) => (
                                         <tr key={index} >
-                                            <td>{producto.idProducto}</td>
+                                            <td>{productosCompraName[producto.idProducto]}</td>
+                                            <td>{producto.idCategoriaProducto}</td>
                                             <td>{producto.cantidad}</td>
                                             <td>{producto.precio}</td>
                                             <td>{producto.subtotal}</td>
