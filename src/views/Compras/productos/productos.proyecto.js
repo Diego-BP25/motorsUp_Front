@@ -6,7 +6,7 @@ import withReactContent from 'sweetalert2-react-content'
 import { show_alerta } from 'src/fuctions.proyecto'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faSearch, faPlusCircle, faFloppyDisk, faCalendar, faToggleOff, faIdCardClip, faXmark } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faTrash, faSearch, faPlusCircle, faFloppyDisk, faCalendar, faToggleOff, faIdCardClip, faBagShopping } from '@fortawesome/free-solid-svg-icons'
 import { CSmartPagination } from '@coreui/react-pro';
 
 const Productos = () => {
@@ -27,6 +27,12 @@ const Productos = () => {
   const [actualizacion, setActualizacion] = useState(false)
   const [consecutivo, setConsecutivo] = useState(0);
 
+  //tipo de modal
+  const [modalType, setModalType] = useState('add');
+
+  //categorias
+  const [categoriaProductos, setCategoriaProductos] = useState([]);
+  const [categoriaName, setCategoriaName] = useState({});
 
   //buscador
   const [busqueda, setBusqueda] = useState("");
@@ -37,6 +43,8 @@ const Productos = () => {
 
   useEffect(() => {
     getProductos()
+    getCategorias()
+    getCategoriasName()
     setActualizacion(false)
   }, [actualizacion ? productos : null])
 
@@ -82,6 +90,7 @@ const Productos = () => {
     setStockMinimo('');
     setStockMaximo('');
     setOperation('');
+    setModalType(op === 1 ? 'add' : 'edit'); // Establecer el tipo de modal
     if (op === 1) {
       setTitle('Registrar producto')
       obtenerIdConsecutivo();
@@ -116,8 +125,9 @@ const Productos = () => {
     // }
 
     if (operation === 1) {
-      parametros = { idProducto: consecutivo, estadoProducto: estadoProducto, nombreProducto: nombreProducto, precioCompra: precioCompra, precioVenta: precioVenta, saldoExistencias: saldoExistencias, stockMaximo: stockMaximo, stockMinimo: stockMinimo, categoriaProducto_idCategoriaProducto: categoriaProducto_idCategoriaProducto };
+      parametros = { idProducto: consecutivo, estadoProducto: true, nombreProducto: nombreProducto, precioCompra: "0", precioVenta: "0", saldoExistencias: "0", stockMaximo: stockMaximo, stockMinimo: stockMinimo, categoriaProducto_idCategoriaProducto: categoriaProducto_idCategoriaProducto };
       metodo = 'POST';
+      console.log(parametros)
     } else {
       parametros = { idProducto: idProducto, estadoProducto: (estadoProducto === 0 ? 'false' : 'true'), nombreProducto: nombreProducto, precioCompra: precioCompra, precioVenta: precioVenta, saldoExistencias: saldoExistencias, stockMaximo: stockMaximo, stockMinimo: stockMinimo, categoriaProducto_idCategoriaProducto: categoriaProducto_idCategoriaProducto };
       metodo = 'PUT';
@@ -209,12 +219,143 @@ const Productos = () => {
     setProductos(resultadosBusqueda);
   }
 
+  const getCategoriasName = async () => {
+    try {
+      const respuesta = await axios.get('http://localhost:8081/api/categoriaProductos');
+      const datosCategorias = respuesta.data.reduce((acc, categoria) => {
+        acc[categoria.idCategoriaProducto] = categoria.nombreCategoria; // Almacenar el nombre
+        return acc;
+      }, {});
+      setCategoriaName(datosCategorias);
+    } catch (error) {
+      console.error('Error al obtener las categorias:', error.message);
+    }
+  };
+
+
+  // Obtener lista de productos
+  const getCategorias = async () => {
+    try {
+        const response = await axios.get('http://localhost:8081/api/categoriaProductos');
+        setCategoriaProductos(response.data);
+    } catch (error) {
+        console.error('Error al obtener las categorias de productos;', error.message);
+    }
+};
+
   // Función para obtener los productos de la página actual
   const getCurrentPageProductos = () => {
     const startIndex = (currentPage - 1) * 5;
     const endIndex = startIndex + 5;
     return productos.slice(startIndex, endIndex);
   }
+
+  const inputsAgregar = (
+    <>
+      <div className='input-group mb-3'  >
+        <input type='hidden' id='id' ></input>
+        <div className='input-group mb-3'>
+          <span className='input-group-text'><FontAwesomeIcon icon={faIdCardClip} /></span>
+          <input type='number' id='idProductos' className='form-control' placeholder='id' value={operation === 1 ? consecutivo : idProducto} />
+        </div>
+
+        <div className='input-group mb-3'>
+          <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
+          <input type='text' id='nombreProducto' className='form-control' placeholder='Nombre' value={nombreProducto} onChange={(e) => setNombreProducto(e.target.value)}></input>
+        </div>
+
+        <div className='input-group mb-3'>
+          <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
+          <input type='text' id='stockMaximo' className='form-control' placeholder='Stock maximo' value={stockMaximo} onChange={(e) => setStockMaximo(e.target.value)}></input>
+        </div>
+
+        <div className='input-group mb-3'>
+          <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
+          <input type='text' id='stockMinimo' className='form-control' placeholder='Stock minimo' value={stockMinimo} onChange={(e) => setStockMinimo(e.target.value)}></input>
+        </div>
+
+        <div className='input-group mb-3' >
+          <label htmlFor='categoriaProducto_idCategoriaProducto' className='input-group-text'><FontAwesomeIcon icon={faBagShopping} /></label>
+          <select id='categoriaProducto_idCategoriaProducto' className="form-control" value={categoriaProducto_idCategoriaProducto} onChange={(e) => setCategoriaProducto_idCategoriaProducto(e.target.value)}>
+            <option value=''>Seleccione una categoria</option>
+            {categoriaProductos.map((pro) => (
+              <option key={pro.idCategoriaProducto} value={pro.idCategoriaProducto}>{pro.nombreCategoria}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className='d-grid col-6 mx-auto' style={{ display: 'flex', alignContent: 'center' }} >
+          <button onClick={() => validar()} className='botones-azules'>
+            <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
+          </button>
+        </div>
+      </div>
+    </>
+  );
+
+  const inputsEditar = (
+    <>
+      <div className='input-group mb-3'  >
+        <input type='hidden' id='id' ></input>
+        <div className='input-group mb-3'>
+          <span className='input-group-text'><FontAwesomeIcon icon={faIdCardClip} /></span>
+          <input type='number' id='idProductos' className='form-control' placeholder='id' value={operation === 1 ? consecutivo : idProducto} />
+        </div>
+
+        <div className='input-group mb-3'>
+          <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
+          <input type='text' id='estadoProducto' className='form-control' placeholder='Estado' value={estadoProducto} onChange={(e) => setEstadoProducto(e.target.value)}></input>
+        </div>
+
+        <div className='input-group mb-3'>
+          <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
+          <input type='text' id='nombreProducto' className='form-control' placeholder='Nombre' value={nombreProducto} onChange={(e) => setNombreProducto(e.target.value)}></input>
+        </div>
+
+        <div className='input-group mb-3'>
+          <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
+          <input type='text' id='precioCompra' className='form-control' placeholder='Precio compra' value={precioCompra} onChange={(e) => setPrecioCompra(e.target.value)}></input>
+        </div>
+
+        <div className='input-group mb-3'>
+          <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
+          <input type='text' id='precioVenta' className='form-control' placeholder='Precio venta' value={precioVenta} onChange={(e) => setPrecioVenta(e.target.value)}></input>
+        </div>
+
+        <div className='input-group mb-3'>
+          <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
+          <input type='text' id='saldoExistencias' className='form-control' placeholder='Existencias' value={saldoExistencias} onChange={(e) => setSaldoExistencias(e.target.value)}></input>
+        </div>
+
+        <div className='input-group mb-3'>
+          <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
+          <input type='text' id='stockMaximo' className='form-control' placeholder='Stock maximo' value={stockMaximo} onChange={(e) => setStockMaximo(e.target.value)}></input>
+        </div>
+
+        <div className='input-group mb-3'>
+          <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
+          <input type='text' id='stockMinimo' className='form-control' placeholder='Stock minimo' value={stockMinimo} onChange={(e) => setStockMinimo(e.target.value)}></input>
+        </div>
+
+        <div className='input-group mb-3' >
+          <label htmlFor='categoriaProducto_idCategoriaProducto' className='input-group-text'><FontAwesomeIcon icon={faBagShopping} /></label>
+          <select id='categoriaProducto_idCategoriaProducto' className="form-control" value={categoriaProducto_idCategoriaProducto} onChange={(e) => setCategoriaProducto_idCategoriaProducto(e.target.value)}>
+            <option value=''>Seleccione una categoria</option>
+            {categoriaProductos.map((pro) => (
+              <option key={pro.idCategoriaProducto} value={pro.idCategoriaProducto}>{pro.nombreCategoria}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className='d-grid col-6 mx-auto' style={{ display: 'flex', alignContent: 'center' }} >
+          <button onClick={() => validar()} className='botones-azules'>
+            <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
+          </button>
+        </div>
+      </div>
+    </>
+  );
+
 
   return (
 
@@ -271,7 +412,7 @@ const Productos = () => {
                     <td>{p.saldoExistencias}</td>
                     <td>{p.stockMaximo}</td>
                     <td>{p.stockMinimo}</td>
-                    <td>{p.categoriaProducto_idCategoriaProducto}</td>
+                    <td>{categoriaName[p.categoriaProducto_idCategoriaProducto]}</td>
                     <td>
                       <button onClick={() => openModal(2, p.idProducto, p.estadoProducto, p.nombreProducto, p.precioCompra, p.precioVenta, p.saldoExistencias, p.stockMaximo, p.stockMinimo, p.categoriaProducto_idCategoriaProducto)} className='btn btn-warning'
                         data-bs-toggle='modal' data-bs-target='#modalProductos'>
@@ -300,67 +441,16 @@ const Productos = () => {
         </div>
       </div>
 
-      <div id='modalProductos' className='modal fade' aria-hidden='true'>
-        <div className='modal-dialog'>
-          <div className='modal-content'>
+      <div id='modalProductos' className="modal fade" style={{ marginLeft: '8%' }}>
+        <div className='modal-dialog modal-dialog-centered' style={{ display: 'flex', alignContent: 'center' }}>
+          <div className='modal-content' >
             <div className='modal-header'>
-              <label className='h5'>{title}</label>
-              <button id='btnCerrar' type='button' data-bs-dismiss='modal'><FontAwesomeIcon icon={faXmark} /></button>
+              <h5 className='modal-title'>{title}</h5>
+              <button type="button" id="btnCerrar" className="btn-close" data-bs-dismiss='modal'></button>
             </div>
-            <div className='modal-body'>
-              <input type='hidden' id='id' ></input>
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faIdCardClip} /></span>
-                <input type='number' id='idProductos' className='form-control' placeholder='id' value={operation === 1 ? consecutivo : idProducto} />
-              </div>
-
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
-                <input type='text' id='estadoProducto' className='form-control' placeholder='Estado' value={estadoProducto} onChange={(e) => setEstadoProducto(e.target.value)}></input>
-              </div>
-
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
-                <input type='text' id='nombreProducto' className='form-control' placeholder='Nombre' value={nombreProducto} onChange={(e) => setNombreProducto(e.target.value)}></input>
-              </div>
-
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
-                <input type='text' id='precioCompra' className='form-control' placeholder='Precio compra' value={precioCompra} onChange={(e) => setPrecioCompra(e.target.value)}></input>
-              </div>
-
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
-                <input type='text' id='precioVenta' className='form-control' placeholder='Precio venta' value={precioVenta} onChange={(e) => setPrecioVenta(e.target.value)}></input>
-              </div>
-
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
-                <input type='text' id='saldoExistencias' className='form-control' placeholder='Existencias' value={saldoExistencias} onChange={(e) => setSaldoExistencias(e.target.value)}></input>
-              </div>
-
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
-                <input type='text' id='stockMaximo' className='form-control' placeholder='Stock maximo' value={stockMaximo} onChange={(e) => setStockMaximo(e.target.value)}></input>
-              </div>
-
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
-                <input type='text' id='stockMinimo' className='form-control' placeholder='Stock minimo' value={stockMinimo} onChange={(e) => setStockMinimo(e.target.value)}></input>
-              </div>
-
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
-                <input type='text' id='categoriaProducto_idCategoriaProducto' className='form-control' placeholder='Categoria' value={categoriaProducto_idCategoriaProducto} onChange={(e) => setCategoriaProducto_idCategoriaProducto(e.target.value)}></input>
-              </div>
-
-              <div className='d-grid col-6 mx-auto'>
-                <button onClick={() => validar()} className='btn btn-success'>
-                  <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
-                </button>
-              </div>
+            <div className='modal-body' >
+              {modalType === 'add' ? inputsAgregar : inputsEditar}
             </div>
-
           </div>
         </div>
       </div>
