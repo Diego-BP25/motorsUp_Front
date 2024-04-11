@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faTruckField, faSearch, faAddressCard, faUser, faLocationDot, faPhone, faEnvelope, faLock, faUserGear, faToggleOff } from '@fortawesome/free-solid-svg-icons'
 import { CSmartPagination } from '@coreui/react-pro'
 import { show_alerta } from 'src/fuctions.proyecto'
+import { jwtDecode } from 'jwt-decode';
 
 
 const Empleados = () => {
@@ -23,7 +24,7 @@ const Empleados = () => {
   const [roles_idRol, setRoles_idRol] = useState('')
   const [operation, setOperation] = useState(1)
   const [title, setTitle] = useState('')
-
+  const [idE, setIdE] = useState('')
   const [actualizacion, setActualizacion] = useState(false)
   //Paginacion
   const [currentPage, setCurrentPage] = useState(1)
@@ -31,22 +32,29 @@ const Empleados = () => {
   const [busqueda, setBusqueda] = useState("");
 
   const [roles, setRoles] = useState([])
-  // const [selectedRoleId, setSelectedRoleId] = useState('')
 
   useEffect(() => {
     getEmpleados()
+    const token = localStorage.getItem('Empleado');
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      const idE = decodedToken.empleado.idEmpleado;
+      setIdE(idE);
+    }
     getRoles()
     setActualizacion(false)
+   
   }, [actualizacion ? empleado : null])
 
 
 
+  
+
   const getEmpleados = async () => {
-    console.log('fuera')
     try {
       const respuesta = await axios.get(url, {})
-      setEmpleado(await respuesta.data)
-      console.log('hh')
+      const empleadosData = respuesta.data.filter(emp => emp.idEmpleado !== idE);
+      setEmpleado(empleadosData);
     } catch (error) {
       console.error('Error al obtener los Empleados:', error.message)
     }
@@ -267,6 +275,8 @@ const Empleados = () => {
                 <tbody className='table-group-divider'>
                   {getCurrentPageEmpleados().map((e) => (
                     <tr key={e.idEmpleado}>
+                       {e.idEmpleado !== idE && (
+                        <>
                       <td>{e.idEmpleado}</td>
                       <td>{e.nombreEmpleado}</td>
                       <td>{e.direccionEmpleado}</td>
@@ -285,6 +295,8 @@ const Empleados = () => {
                           <FontAwesomeIcon icon={faTrash} />
                         </button>
                       </td>
+                        </>
+                      )}
                     </tr>
                   ))}
                 </tbody>
