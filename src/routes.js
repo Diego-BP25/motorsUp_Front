@@ -10,6 +10,8 @@ const cotizaciones = React.lazy(() => import('./views/cotizaciones/cotizaciones.
 const Propietarios = React.lazy(() => import('./views/Servicios/Propietarios/propietario.proyecto'))
 const Ventas = React.lazy(() => import('./views/ventas/venta.proyecto'))
 const agregarserv = React.lazy(() => import('./views/ventas/agregarVentas.proyecto'))
+const Servicios = React.lazy(() => import('./views/Servicios/servicios/servicios.proyecto'))
+const Vehiculo = React.lazy(() => import('./views/Servicios/vehiculos/vehiculos.proyecto'))
 
 const Agendamiento = React.lazy(() =>
   import('./views/Servicios/agendamiento/agendamiento.proyecto'),
@@ -41,6 +43,8 @@ const routes = [
   { path: '/Ventas/venta', name: 'Gestion Ventas', element: Ventas },
   { path: '/Servicios/agendamiento', name: 'Agendamiento', element: Agendamiento },
   { path: '/Ventas/agregarServ', name: 'agregar venta servicio', element: agregarserv },
+  { path: '/Servicios/GestionServicio', name: 'Servicios', element: Servicios, exact: true },
+  { path: '/Servicios/Vehiculo', name: 'Vehiculos', element: Vehiculo, exact: true },
 ]
 
 export default routes
