@@ -120,31 +120,55 @@ const Roles = () => {
     await axios({ method: metodo, url: url, data: parametros }).then(function (respuesta) {
       var tipo = respuesta.data[0];
       if (metodo === 'POST') {
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Rol agregado con exito",
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
           showConfirmButton: false,
-          timer: 1500
+          timer: 2000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
+        });
+        Toast.fire({
+          icon: "success",
+          title: "Rol agregado con exito"
         });
         document.getElementById('btnCerrar').click();
       } else if (metodo === 'PUT') {
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Rol editado con exito",
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
           showConfirmButton: false,
-          timer: 1500
+          timer: 2000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
+        });
+        Toast.fire({
+          icon: "success",
+          title: "Rol editado con exito"
         });
        document.getElementById('btnCerrar').click();
       }
       if (metodo === 'DELETE') {
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Rol eliminado con exito",
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
           showConfirmButton: false,
-          timer: 1500
+          timer: 2000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
+        });
+        Toast.fire({
+          icon: "success",
+          title: "Rol eliminado con exito"
         });
         document.getElementById('btnCerrar').click();
       }
@@ -173,8 +197,6 @@ const Roles = () => {
       if (result.isConfirmed) {
         setIdRol(idRol);
         enviarSolicitud('DELETE', { idRol: idRol });
-      } else {
-        show_alerta('El Rol no fue eliminad0', 'info')
       }
     });
 
@@ -284,7 +306,7 @@ const Roles = () => {
           </div>
         </div>
       </div>
-      <div id='modalRoles' className='modal fade' aria-hidden='true'>
+      <div id='modalRoles' className='modal fade' aria-hidden='true' data-bs-backdrop='static' data-bs-keyboard='false' >
         <div className='modal-dialog modal-dialog-centered'>
           <div className='modal-content'>
             <div className='modal-header'>
