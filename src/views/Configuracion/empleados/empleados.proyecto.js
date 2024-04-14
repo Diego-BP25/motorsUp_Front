@@ -26,6 +26,8 @@ const Empleados = () => {
   const [title, setTitle] = useState('')
   const [idE, setIdE] = useState('')
   const [actualizacion, setActualizacion] = useState(false)
+  const [showModal, setShowModal] = useState(false);
+  const [showModalEdit, setShowModalEdit] = useState(false);
   //Paginacion
   const [currentPage, setCurrentPage] = useState(1)
   //Buscador
@@ -83,6 +85,7 @@ const Empleados = () => {
     setContrasena('');
     setRoles_idRol('');
     if (op === 1) {
+      setShowModal(true)
       setTitle('Registrar Empleado')
     }
     else if (op === 2) {
@@ -112,13 +115,14 @@ const Empleados = () => {
 
     if (operation === 1) {
       parametros = { idEmpleado: idEmpleado, nombreEmpleado: nombreEmpleado, direccionEmpleado: direccionEmpleado, telefonoEmpleado: telefonoEmpleado, estado: true, correoEmpleado: correoEmpleado, contrasena: contrasena, roles_idRol: roles_idRol };
+      
 
       console.log(parametros)
       metodo = 'POST';
     } else if (operation === 2) {
       parametros = { idEmpleado: idEmpleado, nombreEmpleado: nombreEmpleado, direccionEmpleado: direccionEmpleado, telefonoEmpleado: telefonoEmpleado, estado: estado, correoEmpleado: correoEmpleado, contrasena: contrasena, roles_idRol: roles_idRol };
       metodo = 'PUT';
-
+      
       console.log(parametros)
     }
     enviarSolicitud(metodo, parametros);
@@ -130,30 +134,54 @@ const Empleados = () => {
       var tipo = respuesta.data[0];
 
       if (metodo === 'POST') {
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Empleado agregado con éxito",
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
           showConfirmButton: false,
-          timer: 1500
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
+        });
+        Toast.fire({
+          icon: "success",
+          title: "Empleado agregado con exito"
         });
         document.getElementById('btnCerrar').click();
       } else if (metodo === 'PUT') {
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Empleado editado con éxito",
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
           showConfirmButton: false,
-          timer: 1500
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
         });
-        document.getElementById('btnCerrar').click();
-      } else if (metodo === 'DELETE') {
-        Swal.fire({
-          position: "center",
+        Toast.fire({
           icon: "success",
-          title: "Empleado eliminado con éxito",
+          title: "Empleado editado con exito"
+        });
+        document.getElementById('btn-close').click();
+      } else if (metodo === 'DELETE') {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
           showConfirmButton: false,
-          timer: 1500
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
+        });
+        Toast.fire({
+          icon: "success",
+          title: "Empleado eliminado con exito"
         });
         document.getElementById('btnCerrar').click();
       }
@@ -186,8 +214,6 @@ const Empleados = () => {
       if (result.isConfirmed) {
         setIdEmpleado(idEmpleado);
         enviarSolicitud('DELETE', { idEmpleado: idEmpleado });
-      } else {
-        show_alerta('El Empleado no fue eliminad0', 'info')
       }
     });
 
@@ -317,81 +343,63 @@ const Empleados = () => {
         </div>
       </div>
 
-      <div id='modalEmpleados' className='modal fade' aria-hidden='true' >
-        {/* Inicio Modal */}
-        <div className='modal-dialog modal-dialog-centered'>
-          <div className='modal-content'>
+      <div id='modalEmpleados' className='modal fade' aria-hidden='true' data-bs-backdrop='static' data-bs-keyboard='false'>
+    {/* Inicio Modal */}
+    <div className='modal-dialog modal-dialog-centered'>
+        <div className='modal-content'>
             <div className='modal-header'>
-              <label className='h5'>{title}</label>
-              <button type='button' id="btnCerrar" className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
+                <label className='h5'>{title}</label>
+                <button type='button' id="btnCerrar" className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
             </div>
-
-            <div className='modal-body' >
-
-
-              <input type='hidden' id='id' ></input>
-
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faAddressCard} /></span>
-                <input type='text' id='idEmpleado' className='form-control' placeholder='CC' value={idEmpleado} onChange={(e) => setIdEmpleado(e.target.value)} style={{ marginRight: '10px' }}></input>
-                <span className='input-group-text'><FontAwesomeIcon icon={faUser} /></span>
-                <input type='text' id='nombreEmpleado' className='form-control' placeholder='Nombre' value={nombreEmpleado} onChange={(e) =>
-                  setNombreEmpleado(e.target.value)}></input>
-              </div>
-
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faLocationDot} /></span>
-                <input type='text' id='direccionEmpleado' className='form-control' placeholder='Dirección' value={direccionEmpleado} onChange={(e) =>
-                  setDireccionEmpleado(e.target.value)} style={{ marginRight: '10px' }} ></input>
-                <span className='input-group-text'><FontAwesomeIcon icon={faPhone} /></span>
-                <input type='text' id='telefonoEmpleado' className='form-control' placeholder='Teléfono' value={telefonoEmpleado} onChange={(e) => setTelefonoEmpleado(e.target.value)}></input>
-              </div>
-
-              <div className='input-group mb-3'>
-                {/* <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
-                <input type='text' id='estado' className='form-control' placeholder='Estado' value={estado} onChange={(e) => setEstado(e.target.value)}></input> */}
-                <span className='input-group-text'><FontAwesomeIcon icon={faEnvelope} /></span>
-                <input type='text' id='correoEmpleado' className='form-control' placeholder='Correo' value={correoEmpleado} onChange={(e) => setCorreoEmpleado(e.target.value)} style={{ marginRight: '10px' }}></input>
-                <span className='input-group-text'><FontAwesomeIcon icon={faLock} /></span>
-                <input type='text' id='contrasena' className='form-control' placeholder='Contraseña' value={contrasena} onChange={(e) => setContrasena(e.target.value)}></input>
-              </div>
-
-
-
-
-
-
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faUserGear} /></span>
-                <select id='roles_idRol' className='form-select' value={roles_idRol} onChange={(e) => setRoles_idRol(e.target.value)} style={{ marginRight: '12px' }}>
-                  <option value='' disabled>Rol</option>
-                  {roles.map((rol) => (
-                    <option key={rol.idRol} value={rol.idRol}>{rol.nombre}</option>
-                  ))}
-                </select>
-              </div>
-
-
-              <div className='d-grid col-6 mx-auto'>
-                <button onClick={() => validar()} className='botones-azules'>
-                  <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
-                </button>
-              </div>
-
+            <div className='modal-body'>
+                <input type='hidden' id='id' ></input>
+                <div className='input-group mb-3'>
+                    <span className='input-group-text'><FontAwesomeIcon icon={faAddressCard} /></span>
+                    <input type='text' id='idEmpleado' className='form-control' placeholder='CC' value={idEmpleado} onChange={(e) => setIdEmpleado(e.target.value)} style={{ marginRight: '10px' }}></input>
+                    <span className='input-group-text'><FontAwesomeIcon icon={faUser} /></span>
+                    <input type='text' id='nombreEmpleado' className='form-control' placeholder='Nombre' value={nombreEmpleado} onChange={(e) => setNombreEmpleado(e.target.value)}></input>
+                </div>
+                <div className='input-group mb-3'>
+                    <span className='input-group-text'><FontAwesomeIcon icon={faLocationDot} /></span>
+                    <input type='text' id='direccionEmpleado' className='form-control' placeholder='Dirección' value={direccionEmpleado} onChange={(e) => setDireccionEmpleado(e.target.value)} style={{ marginRight: '10px' }} ></input>
+                    <span className='input-group-text'><FontAwesomeIcon icon={faPhone} /></span>
+                    <input type='text' id='telefonoEmpleado' className='form-control' placeholder='Teléfono' value={telefonoEmpleado} onChange={(e) => setTelefonoEmpleado(e.target.value)}></input>
+                </div>
+                <div className='input-group mb-3'>
+                    <span className='input-group-text'><FontAwesomeIcon icon={faEnvelope} /></span>
+                    <input type='text' id='correoEmpleado' className='form-control' placeholder='Correo' value={correoEmpleado} onChange={(e) => setCorreoEmpleado(e.target.value)} style={{ marginRight: '10px' }}></input>
+                    <span className='input-group-text'><FontAwesomeIcon icon={faLock} /></span>
+                    <input type='text' id='contrasena' className='form-control' placeholder='Contraseña' value={contrasena} onChange={(e) => setContrasena(e.target.value)}></input>
+                </div>
+                <div className='input-group mb-3'>
+                    <span className='input-group-text'><FontAwesomeIcon icon={faUserGear} /></span>
+                    <select id='roles_idRol' className='form-select' value={roles_idRol} onChange={(e) => setRoles_idRol(e.target.value)} style={{ marginRight: '12px' }}>
+                        <option value='' disabled>Rol</option>
+                        {roles.map((rol) => (
+                            <option key={rol.idRol} value={rol.idRol}>{rol.nombre}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className='d-grid col-6 mx-auto'>
+                    <button onClick={() => validar()} className='botones-azules'>
+                        <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
+                    </button>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
+    </div>
+</div>
+
 
 
       {/* EDITAR EMPLEADO */}
 
-      <div id='modalEmpleadoEditar' className='modal fade' aria-hidden='true' >
+      <div id='modalEmpleadoEditar' className='modal fade' aria-hidden='true' data-bs-backdrop='static' data-bs-keyboard='false'>
         <div className='modal-dialog modal-dialog-centered'>
           <div className='modal-content'>
             <div className='modal-header'>
               <label className='h5'>{title}</label>
-              <button type='button' id="btnCerrar" className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
+              <button type='button' id="btn-close" className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
             </div>
 
             <div className='modal-body' >

@@ -7,110 +7,80 @@ import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faComment, faSearch } from
 import { CSmartPagination } from '@coreui/react-pro'
 import { show_alerta } from 'src/fuctions.proyecto'
 
-const Roles = () => {
+const Vehiculos = () => {
 
-  const url = 'http://localhost:8081/api/roles'
-  const [rol, setRol] = useState([])
-  const [idRol, setIdRol] = useState('')
-  const [nombre, setNombre] = useState('')
+  const url = 'http://localhost:8081/api/vehiculo'
+  const [vehiculo, setVehiculo] = useState([])
+  const [placa, setPlaca] = useState('')
+  const [referencia, setReferencia] = useState('')
+  const [modelo, setModelo] = useState('')
+  const [color, setColor] = useState('')
   const [operation, setOperation] = useState(1)
   const [title, setTitle] = useState('')
   const [actualizacion, setActualizacion] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [busqueda, setBusqueda] = useState("");
 
-  const [nombreError, setNombreError] = useState('');
+  const [propietarios, setPropietarios] = useState([])
+  const [propietarios_idPropietario, setPropietarios_idPropietario] = useState('')
 
-  const [consecutivo, setConsecutivo] = useState(0);
 
   useEffect(() => {
-    getRoles()
+    getVehiculos()
+    getPropietarios()
     setActualizacion(false)
-  }, [actualizacion ? rol : null])
+  }, [actualizacion ? vehiculo : null])
 
-  // useEffect(() => {
-  //   if (operation === 1) {
-  //     obtenerIdConsecutivo();
-  //   }
-  // }, [operation]);
-
-
-  // const obtenerIdConsecutivo = async () => {
-  //   try {
-  //     const respuesta = await axios.get(url);
-  //     const rol = respuesta.data;
-  //     if (rol.length > 0) {
-  //       const maxId = Math.max(...rol.map(c => c.idRol));
-  //       setConsecutivo(maxId + 1);
-  //     } else {
-  //       setConsecutivo(1);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error al obtener el número consecutivo más alto:', error.message);
-  //   }
-  // };
-
-
-
-
-
-  const getRoles = async () => {
+  const getVehiculos = async () => {
     try {
       const respuesta = await axios.get(url, {})
-      setRol(await respuesta.data)
+      setVehiculo(await respuesta.data)
     } catch (error) {
-      console.error('Error al obtener los roles:', error.message)
+      console.error('Error al obtener los vehiculos:', error.message)
     }
   }
 
-  const openModal = (op, idRol, nombre) => {
-    setIdRol('');
-    setNombre('');
+  const getPropietarios = async () => {
+    try {
+      const respuesta = await axios.get('http://localhost:8081/api/propietarios', {})
+      setPropietarios(await respuesta.data)
+      console.log(respuesta)
+    } catch (error) {
+      console.error('Error al obtener los propietarios:', error.message)
+    }
+  }
+
+  const openModal = (op, placa, referencia, modelo, color) => {
+    setPlaca('');
+    setReferencia('');
+    setModelo('');
+    setColor('');
 
     if (op === 1) {
-      setTitle('Registrar Rol')
-      // obtenerIdConsecutivo();
+      setTitle('Registrar Vehiculo')
     }
     else if (op === 2) {
-      setTitle('Editar Rol')
-      setIdRol(idRol);
-      setNombre(nombre);
+      setTitle('Editar Vehiculo')
+      setPlaca(placa);
+      setReferencia(referencia);
+      setModelo(modelo);
+      setColor(color);
     }
     setOperation(op)
     window.setTimeout(function () {
-      document.getElementById('idRol').focus();
+      document.getElementById('placa').focus();
     }, 500);
   }
-
-  const validarCamposObligatorios = () => {
-    let hayErrores = false;
-    if (!nombre.trim()) {
-      setNombreError('El campo nombre obligatorio');
-      hayErrores = true;
-    } else {
-      setNombreError('');
-    }
-    return hayErrores;
-  };
 
   const validar = () => {
     var parametros;
     var metodo;
 
-
-    const camposObligatoriosInvalidos = validarCamposObligatorios();
-
-    if (camposObligatoriosInvalidos) {
-      return;
-    }
-
     if (operation === 1) {
-      console.log(idRol)
-      parametros = { nombre: nombre };
+      parametros = { placa: placa, referencia: referencia, modelo: modelo, color: color, propietarios_idPropietario: propietarios_idPropietario };
       metodo = 'POST';
     } else {
-      console.log(idRol)
-      parametros = { idRol: idRol, nombre: nombre };
+      parametros = { placa: placa, referencia: referencia, modelo: modelo, color: color, propietarios_idPropietario: propietarios_idPropietario };
       metodo = 'PUT';
     }
     enviarSolicitud(metodo, parametros);
@@ -133,7 +103,7 @@ const Roles = () => {
         });
         Toast.fire({
           icon: "success",
-          title: "Rol agregado con exito"
+          title: "Vehiculo agregado con exito"
         });
         document.getElementById('btnCerrar').click();
       } else if (metodo === 'PUT') {
@@ -150,9 +120,9 @@ const Roles = () => {
         });
         Toast.fire({
           icon: "success",
-          title: "Rol editado con exito"
+          title: "Vehiculo editado con exito"
         });
-       document.getElementById('btnCerrar').click();
+        document.getElementById('btnCerrar').click();
       }
       if (metodo === 'DELETE') {
         const Toast = Swal.mixin({
@@ -168,7 +138,7 @@ const Roles = () => {
         });
         Toast.fire({
           icon: "success",
-          title: "Rol eliminado con exito"
+          title: "Vehiculo eliminado con exito"
         });
         document.getElementById('btnCerrar').click();
       }
@@ -177,7 +147,7 @@ const Roles = () => {
 
       if (tipo === 'success') {
         document.getElementById('btnCerrar').click();
-        getRoles();
+        getVehiculos();
       }
     })
       .catch(function (error) {
@@ -186,17 +156,17 @@ const Roles = () => {
       });
   }
 
-  const deleteRol = (idRol) => {
+  const deleteVehiculo = (placa) => {
 
     const MySwal = withReactContent(Swal);
     MySwal.fire({
-      title: '¿Seguro de eliminar este Rol?',
-      icon: 'question', text: 'No podra activar nuevamente el Rol',
+      title: '¿Seguro de eliminar este Vehiculo?',
+      icon: 'question', text: 'No podra activar nuevamente el Vehiculo',
       showCancelButton: true, confirmButtonText: 'Aceptar', cancelButtonText: 'Cancelar'
     }).then((result) => {
       if (result.isConfirmed) {
-        setIdRol(idRol);
-        enviarSolicitud('DELETE', { idRol: idRol });
+        setPlaca(placa);
+        enviarSolicitud('DELETE', { placa: placa });
       }
     });
 
@@ -207,30 +177,29 @@ const Roles = () => {
     setBusqueda(valor); // Actualizar el estado de búsqueda
 
     if (valor.trim() === '') {
-      getRoles(); // Si el valor está vacío, obtener todos los propietarios nuevamente
+      getVehiculos(); // Si el valor está vacío, obtener todos los propietarios nuevamente
     } else {
       filtrar(valor); // Si hay un valor, aplicar el filtro de búsqueda
     }
   };
 
   const filtrar = (terminoBusqueda) => {
-    var resultadosBusqueda = rol.filter((elemento) => {
+    var resultadosBusqueda = vehiculo.filter((elemento) => {
 
-      if (elemento.nombre.toString().toLowerCase().includes(terminoBusqueda.toLowerCase())
+      if (elemento.placa.toString().toLowerCase().includes(terminoBusqueda.toLowerCase())
       ) {
         return elemento;
       }
     });
-    setRol(resultadosBusqueda);
+    setVehiculo(resultadosBusqueda);
   }
 
 
 
-  // Función para obtener los roles de la página actual
-  const getCurrentPageRoles = () => {
+  const getCurrentPageVehiculos = () => {
     const startIndex = (currentPage - 1) * 5;
     const endIndex = startIndex + 5;
-    return rol.slice(startIndex, endIndex);
+    return vehiculo.slice(startIndex, endIndex);
   }
 
   return (
@@ -239,8 +208,8 @@ const Roles = () => {
         <div >
           <div style={{ display: 'flex', }} id="Container">
 
-          <div style={{ marginRight: 'auto' }}>
-              <h3>Roles</h3>
+            <div style={{ marginRight: 'auto' }}>
+              <h3>Vehiculos</h3>
             </div>
             <div className='input-group' style={{ marginRight: '1%' }}>
               <input className='form-control inputBuscador'
@@ -256,7 +225,7 @@ const Roles = () => {
 
 
             <div style={{ marginRight: '-0.1%' }}>
-              <button className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalRoles' onClick={() => openModal(1)} >
+              <button className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalVehiculo' onClick={() => openModal(1)} >
                 <FontAwesomeIcon icon={faPlusCircle} /> Añadir
               </button>
             </div>
@@ -268,22 +237,26 @@ const Roles = () => {
               <table className='table table-striped'>
                 <thead>
                   <tr>
-                    <th>ID</th>
-                    <th>Nombre</th>
+                    <th>Placa</th>
+                    <th>Referencia</th>
+                    <th>Modelo</th>
+                    <th>Color</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody className='table-group-divider'>
-                  {getCurrentPageRoles().map((r) => (
-                    <tr key={r.idRol}>
-                      <td>{r.idRol}</td>
-                      <td>{r.nombre}</td>
+                  {getCurrentPageVehiculos().map((v) => (
+                    <tr key={v.placa}>
+                      <td>{v.placa}</td>
+                      <td>{v.referencia}</td>
+                      <td>{v.modelo}</td>
+                      <td>{v.color}</td>
                       <td>
-                        <button onClick={() => openModal(2, r.idRol, r.nombre)} className='btn btn-warning' data-bs-toggle='modal' data-bs-target='#modalRoles'>
+                        <button onClick={() => openModal(2, v.placa, v.nombre, v.referencia, v.modelo, v.color)} className='btn btn-warning' data-bs-toggle='modal' data-bs-target='#modalVehiculo'>
                           <FontAwesomeIcon icon={faEdit} />
                         </button>
                         &nbsp;
-                        <button onClick={() => deleteRol(r.idRol)} className='btn btn-danger'>
+                        <button onClick={() => deleteVehiculo(v.placa)} className='btn btn-danger'>
                           <FontAwesomeIcon icon={faTrash} />
                         </button>
                       </td>
@@ -300,13 +273,13 @@ const Roles = () => {
             <CSmartPagination
               style={{ marginLeft: '-208px' }}
               activePage={currentPage}
-              pages={Math.ceil(rol.length / 5)}
+              pages={Math.ceil(vehiculo.length / 5)}
               onActivePageChange={setCurrentPage}
             />
           </div>
         </div>
       </div>
-      <div id='modalRoles' className='modal fade' aria-hidden='true' data-bs-backdrop='static' data-bs-keyboard='false' >
+      <div id='modalVehiculo' className='modal fade' aria-hidden='true' data-bs-backdrop='static' data-bs-keyboard='false' >
         <div className='modal-dialog modal-dialog-centered'>
           <div className='modal-content'>
             <div className='modal-header'>
@@ -314,16 +287,30 @@ const Roles = () => {
               <button type='button' id='btnCerrar' className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
             </div>
             <div className='modal-body'>
-              <input type='hidden' id='id' ></input>
+
               <div className='input-group mb-3'>
-                <input type='text' id='idRol' className='form-control' placeholder='ID' value={idRol} onChange={(e) => setIdRol(e.target.value)} hidden ></input>
+                <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
+                <input type='text' id='placa' className='form-control' placeholder='Placa' value={placa} onChange={(e) => setPlaca(e.target.value)} ></input>
+                <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
+                <input type='text' id='referencia' className='form-control' placeholder='Referencia' value={referencia} onChange={(e) => setReferencia(e.target.value)} ></input>
               </div>
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
-                <input type='text' id='nombre' className={`form-control ${nombreError ? 'is-invalid' : ''}`} placeholder='Nombre Rol' value={nombre} onChange={(e) => {
-                  setNombreError('')
-                  setNombre(e.target.value)}}></input>
+                <input type='text' id='modelo' className='form-control' placeholder='Modelo' value={modelo} onChange={(e) => setModelo(e.target.value)}></input>
+                <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
+                <input type='text' id='color' className='form-control' placeholder='Color' value={color} onChange={(e) => setColor(e.target.value)}></input>
               </div>
+
+              <div className='input-group mb-3'>
+                <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
+                <select id='propietarios_idPropietario' className='form-select' value={propietarios_idPropietario} onChange={(e) => setPropietarios_idPropietario(e.target.value)} style={{ marginRight: '12px' }}>
+                  <option value='' disabled>Propietario</option>
+                  {propietarios.map((p) => (
+                    <option key={p.idPropietario} value={p.idPropietario}>{p.nombrePropietario}</option>
+                  ))}
+                </select>
+              </div>
+
               <div className='d-grid col-6 mx-auto'>
                 <button onClick={() => validar()} className='botones-azules'>
                   <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
@@ -337,4 +324,4 @@ const Roles = () => {
   )
 }
 
-export default Roles
+export default Vehiculos

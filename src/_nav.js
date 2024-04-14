@@ -77,8 +77,8 @@ const _nav = [
     items: [
       {
         component: CNavItem,
-        name: 'Gestion Servicio',
-        to: '/buttons/buttons',
+        name: 'Servicios',
+        to: '/Servicios/GestionServicio',
       },
       {
         component: CNavItem,
@@ -87,8 +87,8 @@ const _nav = [
       },
       {
         component: CNavItem,
-        name: 'Vehiculo',
-        to: '/buttons/button-groups',
+        name: 'Vehiculos',
+        to: '/Servicios/Vehiculo',
       },
       {
         component: CNavItem,

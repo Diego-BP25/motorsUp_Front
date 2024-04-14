@@ -6,6 +6,7 @@ import {
   CDropdownMenu,
   CDropdownToggle, CContainer
 } from '@coreui/react'
+import withReactContent from 'sweetalert2-react-content'
 import axios from 'axios'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { jwtDecode } from 'jwt-decode';
@@ -13,7 +14,7 @@ import { show_alerta } from 'src/fuctions.proyecto'
 import Swal from 'sweetalert2'
 
 import { faRightToBracket, faUser, faAddressCard, faFloppyDisk, faLocationDot, faPhone, faEnvelope, faLock, faCaretDown } from '@fortawesome/free-solid-svg-icons'
-import avatar8 from './../../assets/images/avatars/6.jpg'
+import avatar8 from './../../assets/images/avatars/mecanico2.jpg'
 
 const AppHeaderDropdown = () => {
   const url = 'http://localhost:8081/api/empleados'
@@ -72,17 +73,28 @@ const AppHeaderDropdown = () => {
 
   }
   const validar = () => {
-    var parametros;
-    var metodo;
+    const MySwal = withReactContent(Swal);
+    MySwal.fire({
+      title: '¿Seguro de editar este perfil?',
+      icon: 'question', text: 'Se cerrara la sesion luego de editar',
+      showCancelButton: true, confirmButtonText: 'Aceptar', cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        var parametros;
+        var metodo;
 
 
+        parametros = { idEmpleado: idEmpleado, nombreEmpleado: nombreEmpleado, direccionEmpleado: direccionEmpleado, telefonoEmpleado: telefonoEmpleado, estado: estado, correoEmpleado: correoEmpleado };
+        metodo = 'PUT';
 
-    parametros = { idEmpleado: idEmpleado, nombreEmpleado: nombreEmpleado, direccionEmpleado: direccionEmpleado, telefonoEmpleado: telefonoEmpleado, estado: estado, correoEmpleado: correoEmpleado };
-    metodo = 'PUT';
+        console.log(parametros)
 
-    console.log(parametros)
+        enviarSolicitud(metodo, parametros);
+      } else {
 
-    enviarSolicitud(metodo, parametros);
+      }
+    });
+
   }
 
   const enviarSolicitud = async (metodo, parametros) => {
@@ -91,17 +103,45 @@ const AppHeaderDropdown = () => {
 
 
       if (metodo === 'PUT') {
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Empleado editado con exito",
+        setShowModal(false);
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
           showConfirmButton: false,
-          timer: 1500
+          timer: 1500,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
         });
+        Toast.fire({
+          icon: "success",
+          title: "Perfil editado con exito"
+        });
+        setTimeout(() => {
+          const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 2000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.onmouseenter = Swal.stopTimer;
+              toast.onmouseleave = Swal.resumeTimer;
+            }
+          });
+          Toast.fire({
+            icon: "warning",
+            title: "Cerrando sesion..."
+          });
+
+
+        }, 1500);
         setTimeout(() => {
           localStorage.removeItem('Empleado');
           window.location.href = '/login';
-        }, 1500);
+        }, 4000)
         //document.getElementById('btn-close').click();
       }
 
@@ -132,7 +172,7 @@ const AppHeaderDropdown = () => {
         <CDropdownToggle placement="bottom-end" className="py-0" caret={false}>
           <CAvatar src={avatar8} size="md" />
 
-          <FontAwesomeIcon icon={faCaretDown} />
+          <FontAwesomeIcon icon={faCaretDown} style={{ marginLeft: '8px' }} />
         </CDropdownToggle>
         <CDropdownMenu className="pt-0" placement="bottom-end">
           <CDropdownItem onClick={perfilEmpleado}>
@@ -169,7 +209,7 @@ const AppHeaderDropdown = () => {
                   <label className='h5'>Editar Perfil</label>
                   <button type="button" className="btn-close" onClick={() => {
                     setShowModal(false);
-               
+
                   }} data-bs-dismiss='modal'></button>
                 </div>
 
@@ -180,7 +220,7 @@ const AppHeaderDropdown = () => {
 
                   <div className='input-group mb-3'>
                     <span className='input-group-text'><FontAwesomeIcon icon={faAddressCard} /></span>
-                    
+
                     <input type='text' id='idEmpleado' className='form-control' placeholder='CC' value={idEmpleado} onChange={(e) => setIdEmpleado(e.target.value)} style={{ marginRight: '10px' }} disabled></input>
                     <span className='input-group-text'><FontAwesomeIcon icon={faUser} /></span>
                     <input type='text' id='nombreEmpleado' className='form-control' placeholder='Nombre' value={nombreEmpleado} onChange={(e) =>

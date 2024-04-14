@@ -26,7 +26,8 @@ const Agendamiento = () => {
   const [id, setIdAgendamiento] = useState("");
   const [operation, setOperation] = useState(1)
   const [actualizacion, setActualizacion] = useState(false)
-  const [consecutivo, setConsecutivo] = useState(0);
+  const [selectedDateEdit, setSelectedDateEdit] = useState(null);
+
 
   //Vehiculos
   const [vehiculos, setVehiculos] = useState([])
@@ -121,13 +122,6 @@ const Agendamiento = () => {
     }
   }, [actualizacion]);
 
-
-  useEffect(() => {
-    if (operation === 1) {
-      obtenerIdConsecutivo();
-    }
-  }, [operation]);
-
   const seleccionarServicio = (idServicio) => {
     setIdServicio(idServicio);
 
@@ -139,20 +133,6 @@ const Agendamiento = () => {
     }
   };
 
-  const obtenerIdConsecutivo = async () => {
-    try {
-      const respuesta = await axios.get(url);
-      const agendamiento = respuesta.data;
-      if (agendamiento.length > 0) {
-        const maxId = Math.max(...agendamiento.map(c => c.idAgendamiento));
-        setConsecutivo(maxId + 1);
-      } else {
-        setConsecutivo(1);
-      }
-    } catch (error) {
-      console.error('Error al obtener el número consecutivo más alto:', error.message);
-    }
-  };
 
   const getAgendamientos = async () => {
     try {
@@ -200,19 +180,21 @@ const Agendamiento = () => {
     setPlaca(event.title);
     const nuevaHora = dayjs(event.start).add(5, 'hour').format('HH:mm');
     setHora(nuevaHora);
-    setSelectedDate(event.start)
+    setSelectedDateEdit(event.start);
     getServiciosAsociados(event.id)
 
   };
 
   const localizer = dayjsLocalizer(dayjs)
 
-  const events = agendamiento.map(item => ({
+  const eventosFiltrados = agendamiento.filter(item => item.estado);
+
+  const events = eventosFiltrados.map(item => ({
     start: dayjs(item.fecha).toDate(),
     end: dayjs(item.fecha).add(1, 'hour').toDate(),
     title: item.vehiculos_placa,
     id: item.idAgendamiento
-  }))
+  }));
 
   const validar = (operation) => {
     var parametros;
@@ -237,7 +219,7 @@ const Agendamiento = () => {
       }
 
 
-      parametros = { idAgendamiento: consecutivo, fecha: fechaHora, vehiculos_placa: placa, detalleAgendamientos: agendamientoServicios };
+      parametros = { estado: true,  fecha: fechaHora, vehiculos_placa: placa, detalleAgendamientos: agendamientoServicios };
 
       console.log(parametros)
       metodo = 'POST';
@@ -245,8 +227,12 @@ const Agendamiento = () => {
       setTimeout(() => setActualizacion(true), 1000);
     } else if (operation === 2) {
 
-
-      parametros = { idAgendamiento: id, fecha: `${dayjs(selectEvent.start).format('YYYY-MM-DD')} ${hora}`, vehiculos_placa: placa, detalleAgendamiento: agendamientoServicios };
+      const fechaHora = selectedDateEdit ? `${dayjs(selectedDateEdit).format('YYYY-MM-DD')} ${hora}` : null;
+    if (!fechaHora) {
+      console.error('Por favor selecciona una fecha.');
+      return;
+    }
+      parametros = { idAgendamiento: id, fecha: fechaHora, vehiculos_placa: placa, detalleAgendamiento: agendamientoServicios };
       metodo = 'PUT';
       setActualizacion(false);
       setTimeout(() => setActualizacion(true), 1000);
@@ -259,40 +245,67 @@ const Agendamiento = () => {
     await axios({ method: metodo, url: url, data: parametros }).then(function (respuesta) {
       var tipo = respuesta.data[0];
       if (metodo === 'POST') {
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Agendamiento agregado con exito",
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
           showConfirmButton: false,
-          timer: 1500
+          timer: 2000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
+        });
+        Toast.fire({
+          icon: "success",
+          title: "Agendamiento agregado con exito"
         });
         // document.getElementById('btnCerrar').click();
       }
       else if (metodo === 'PUT') {
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Agendamiento editado con exito",
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
           showConfirmButton: false,
-          timer: 1500
+          timer: 2000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
+        });
+        Toast.fire({
+          icon: "success",
+          title: "Agendamiento editado con exito"
         });
         // document.getElementById('btnCerrar').click();
       }
       if (metodo === 'DELETE') {
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Agendamiento eliminado con exito",
+      
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
           showConfirmButton: false,
-          timer: 1500
+          timer: 2000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
         });
+        Toast.fire({
+          icon: "success",
+          title: "Agendamiento eliminado con exito"
+        });
+        setActualizacion(false);
+      setTimeout(() => setActualizacion(true), 1000);
         // document.getElementById('btnCerrar').click();
       }
 
 
 
       if (tipo === 'success') {
-        // document.getElementById('btnCerrar').click();
+
       }
     })
       .catch(function (error) {
@@ -329,7 +342,7 @@ const Agendamiento = () => {
     } else {
       Swal.fire({
         icon: 'error',
-        text: 'Todos los campos del producto son obligatorios',
+        text: 'Debe de seleccionar un servicio para agendar',
       });
     }
   }
@@ -406,7 +419,7 @@ const Agendamiento = () => {
                         id='id'
                         className='form-control'
                         placeholder='ID'
-                        value={consecutivo}
+                        value={id}
                         onChange={(e) => setIdAgendamiento(e.target.value)}
                         hidden
                       />
@@ -571,13 +584,13 @@ const Agendamiento = () => {
                     <div className='input-group mb-3' >
                       <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
                       <input
-                        disabled
-                        type='text'
-                        className='form-control'
-                        placeholder="Dia"
-                        style={{ marginRight: '12px' }}
-                        value={dayjs(selectedDate).format('DD/MM/YYYY')}
-                      />
+  type='date'
+  className='form-control'
+  placeholder="Dia"
+  style={{ marginRight: '12px' }}
+  value={selectedDateEdit ? dayjs(selectedDateEdit).format('YYYY-MM-DD') : ''}
+  onChange={(e) => setSelectedDateEdit(dayjs(e.target.value))}
+/>
                       <input
                         type='time'
                         id='horaInicio'
@@ -616,7 +629,7 @@ const Agendamiento = () => {
                   <section className="col-md-6" >
 
 
-                    <div style={{ maxWidth: '135%', maxHeight: '200%', padding: '3%', overflow: 'auto' }}>
+                    <div style={{ maxWidth: '135%', maxHeight: '200%', padding: '3%', overflow: 'scroll' }}>
                       <h4>Servicios Agregados</h4>
                       <table className='table'>
                         <thead style={{ position: 'center', top: 0, backgroundColor: 'white' }} >
