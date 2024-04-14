@@ -9,10 +9,6 @@ const _nav = [
     name: 'Inicio',
     to: '/dashboard',
     icon: <CIcon icon={cilHome} customClassName='nav-icon' />,
-    badge: {
-      color: 'info',
-      text: '1',
-    },
   },
   {
     component: CNavGroup,

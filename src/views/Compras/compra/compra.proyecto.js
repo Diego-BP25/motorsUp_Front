@@ -55,11 +55,13 @@ const Compras = () => {
   //productos
   const [producto, setProducto] = useState([])
   const [productos, setProductos] = useState('')
+  const [productosName, setProductosName] = useState({});
 
   useEffect(() => {
     getCompras()
     getProductos()
     getProveedores()
+    getProductosName()
     setActualizacion(false)
   }, [actualizacion ? compra : null])
 
@@ -97,6 +99,19 @@ const Compras = () => {
       setProveedores(datosProveedores);
     } catch (error) {
       console.error('Error al obtener los proveedores:', error.message);
+    }
+  };
+
+  const getProductosName = async () => {
+    try {
+      const respuesta = await axios.get('http://localhost:8081/api/productos');
+      const datosProductos = respuesta.data.reduce((acc, producto) => {
+        acc[producto.idProducto] = producto.nombreProducto; 
+        return acc;
+      }, {});
+      setProductosName(datosProductos);
+    } catch (error) {
+      console.error('Error al obtener el nombre de los productos', error.message);
     }
   };
 
@@ -307,13 +322,13 @@ const Compras = () => {
       const response = await axios.get(`http://localhost:8081/api/compras/${idCompra}`);
       const detalleCompra = response.data.compra;
       const productosAsociados = response.data.detallesCompra;
-  
+
       const doc = new jsPDF();
-  
+
       // Título del PDF
       doc.setFontSize(18);
       doc.text("Detalles de la Compra", 14, 15);
-  
+
       // Datos de la compra
       doc.setFontSize(12);
       doc.text(`ID Compra: ${detalleCompra.idCompra}`, 14, 30);
@@ -321,31 +336,29 @@ const Compras = () => {
       doc.text(`Estado: ${detalleCompra.estadoCompra ? 'Activo' : 'Suspendido'}`, 14, 50);
       doc.text(`Fecha Compra: ${fecha2(detalleCompra.fechaCompra)}`, 14, 60);
       doc.text(`Proveedor: ${proveedores[detalleCompra.proveedores_idProveedor]}`, 14, 70);
-      doc.text(`Total: ${detalleCompra.total}`, 14, 80);
-  
+      doc.text(`Total compra: ${detalleCompra.total}`, 14, 80);
+
       // Tabla de productos asociados
       const productosData = productosAsociados.map((producto) => [
-        producto.idDetalleCompra,
-        producto.precio,
+        productosName[producto.productos_idProducto],
+        producto.preciocompra,
         producto.cantidad,
-        producto.subtotal,
-        producto.compras_idCompra,
-        producto.productos_idProducto
+        producto.subtotal
       ]);
-  
+
       doc.autoTable({
         startY: 90,
-        head: [['ID', 'Precio', 'Cantidad', 'Subtotal', 'ID Compra', 'ID Producto']],
+        head: [['Producto', 'Valor unitario', 'Cantidad', 'Total']],
         body: productosData,
       });
-  
+
       // Guardar o descargar el PDF
       doc.save("detalle_compra.pdf");
     } catch (error) {
       console.error('Error al generar el PDF:', error.message);
     }
   };
-  
+
 
   return (
 
@@ -386,7 +399,7 @@ const Compras = () => {
                   <th>Descripcion</th>
                   <th>Estado</th>
                   <th>Fecha</th>
-                  <th>Id proveedor</th>
+                  <th>Proveedor</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
@@ -540,6 +553,7 @@ const Compras = () => {
           </div>
         </div>
       </div>
+
       <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Detalle compra</Modal.Title>
@@ -557,7 +571,7 @@ const Compras = () => {
                 <input type='text' className='form-control' id='descripcionCompra' value={detalleCompraSeleccionada.descripcionCompra} readOnly />
               </div>
               <div className='mb-3'>
-                <label htmlFor='total' className='form-label'>Total</label>
+                <label htmlFor='total' className='form-label'>Total compra</label>
                 <input type='number' className='form-control' id='total' value={detalleCompraSeleccionada.total} readOnly />
               </div>
 
@@ -581,24 +595,20 @@ const Compras = () => {
           <table className='table table-striped'>
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Precio</th>
+                <th>Producto</th>
+                <th>Valor unitario</th>
                 <th>Cantidad</th>
-                <th>subtotal</th>
-                <th>Id compra</th>
-                <th>Id producto</th>
+                <th>Total</th>
               </tr>
             </thead>
             <tbody>
               {productosAsociados.map((producto) => (
                 <tr key={producto.idDetalleCompra}>
-                  <td>{producto.idDetalleCompra}</td>
-                  <td>{producto.precio}</td>
+                  <td>{productosName[producto.productos_idProducto]}</td>
+                  <td>{producto.preciocompra}</td>
                   <td>{producto.cantidad}</td>
                   <td>{producto.subtotal}</td>
-                  <td>{producto.compras_idCompra}</td>
-                  <td>{producto.productos_idProducto}</td>
-                </tr> 
+                </tr>
               ))}
             </tbody>
           </table>

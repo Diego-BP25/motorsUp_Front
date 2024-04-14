@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faCalendar, faToggleOff, faIdCardClip, faTag, faFileText, faTruckField, faHashtag, faBagShopping, faDollar } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faTrash, faFloppyDisk, faCalendar, faList, faCartArrowDown, faTag, faFileText, faTruckField, faHashtag, faBagShopping, faDollar } from '@fortawesome/free-solid-svg-icons'
 
 import { formatDate } from 'src/views/funcionesExtras.proyecto'
 
@@ -20,7 +20,8 @@ const AgregarCompra = () => {
     const [productos, setProductos] = useState([]);
     const [idProducto, setIdProducto] = useState('');
     const [cantidad, setCantidad] = useState('');
-    const [precio, setPrecio] = useState('');
+    const [preciocompra, setPreciocompra] = useState('');
+    const [precioventa, setPrecioventa] = useState('');
     const [productosCompra, setProductosCompra] = useState([]);
     const [productosCompraName, setProductosCompraName] = useState([]);
 
@@ -41,6 +42,7 @@ const AgregarCompra = () => {
         getProductos();
         getNameProductos();
         getCategorias();
+        getCategoriasName();
     }, []);
 
     useEffect(() => {
@@ -93,14 +95,26 @@ const AgregarCompra = () => {
 
     // Función para agregar un producto a la compra
     const agregarProducto = () => {
-        if (idProducto && cantidad && precio && idCategoriaProducto) {
-            const subtotal = parseFloat(cantidad) * parseFloat(precio);
-            setProductosCompra([...productosCompra, { idProducto, cantidad, precio, subtotal, idCategoriaProducto }]);
+        if (idProducto && cantidad && preciocompra && precioventa && idCategoriaProducto) {
+            const productoExistenteIndex = productosCompra.findIndex(producto => producto.idProducto === idProducto);
+            if (productoExistenteIndex !== -1) {
+                // Si el producto ya existe en la lista, actualiza la cantidad y el subtotal
+                const nuevosProductos = [...productosCompra];
+                nuevosProductos[productoExistenteIndex].cantidad = parseFloat(nuevosProductos[productoExistenteIndex].cantidad) + parseFloat(cantidad);
+                nuevosProductos[productoExistenteIndex].subtotal = parseFloat(nuevosProductos[productoExistenteIndex].cantidad) * parseFloat(nuevosProductos[productoExistenteIndex].preciocompra);
+                setProductosCompra(nuevosProductos);
+            } else {
+                // Si el producto no existe en la lista, agrégalo
+                const subtotal = parseFloat(cantidad) * parseFloat(preciocompra);
+                setProductosCompra([...productosCompra, { idProducto, cantidad, preciocompra, precioventa, subtotal, idCategoriaProducto }]);
+            }
             setCantidad('');
-            setPrecio('');
+            setPreciocompra('');
+            setPrecioventa('');
             setIdProducto('');
+            setProductoSeleccionado('');
             setIdCategoriaProducto('');
-            calcularTotal([...productosCompra, { idProducto, cantidad, precio, subtotal, idCategoriaProducto }]);
+            calcularTotal([...productosCompra, { idProducto, cantidad, preciocompra, precioventa, total, idCategoriaProducto }]);
         } else {
             Swal.fire({
                 icon: 'error',
@@ -108,6 +122,9 @@ const AgregarCompra = () => {
             });
         }
     };
+
+
+
     const calcularTotal = (productos) => {
         const totalCompra = productos.reduce((acc, producto) => acc + producto.subtotal, 0);
         setTotal(totalCompra);
@@ -165,18 +182,18 @@ const AgregarCompra = () => {
         }
     };
 
-    // const getCategoriasName = async () => {
-    //     try {
-    //         const respuesta = await axios.get('http://localhost:8081/api/categoriaProductos');
-    //         const datosCategorias = respuesta.data.reduce((acc, categoria) => {
-    //             acc[categoria.idCategoriaProducto] = categoria.nombreCategoria; // Almacenar el nombre
-    //             return acc;
-    //         }, {});
-    //         setCategoriaName(datosCategorias);
-    //     } catch (error) {
-    //         console.error('Error al obtener las categorias:', error.message);
-    //     }
-    // };
+    const getCategoriasName = async () => {
+        try {
+            const respuesta = await axios.get('http://localhost:8081/api/categoriaProductos');
+            const datosCategorias = respuesta.data.reduce((acc, categoria) => {
+                acc[categoria.idCategoriaProducto] = categoria.nombreCategoria; // Almacenar el nombre
+                return acc;
+            }, {});
+            setCategoriaName(datosCategorias);
+        } catch (error) {
+            console.error('Error al obtener las categorias:', error.message);
+        }
+    };
 
 
     const getCategorias = async () => {
@@ -209,23 +226,18 @@ const AgregarCompra = () => {
                         <h3>Agregar compra</h3>
                     </div>
                     <div className='col-md-6' >
-                        <form onSubmit={guardarCompra} className="flex-grow-1 mr-3" >
+                        <form onSubmit={guardarCompra} className="flex-grow-1 mr-3">
                             <div className="container">
-                                <div className='input-group mb-3' id='container1' style={{ maxWidth: '55%', padding: '3.5%', marginTop: '-1%', marginLeft: '-2%' }}>
+                                <div className='input-group mb-3' id='container1' style={{ maxWidth: '55%', padding: '3.5%', marginTop: '-1%', marginLeft: '-2%' }} >
 
-                                    <div className='input-group mb-3' onChange={obtenerIdConsecutivo()}>
-                                        <label htmlFor='idCompra' className='input-group-text'><FontAwesomeIcon icon={faIdCardClip} /></label>
-                                        <input type='number' id='idCompra' className="form-control" value={consecutivo} />
+                                    <div className='input-group mb-3' >
+                                        <label htmlFor='fechaCompra' className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></label>
+                                        <input type='datetime-local' id='fechaCompra' className="form-control" value={fechaCompra} readOnly={true} onChange={(e) => setFechaCompra(e.target.value)} />
                                     </div>
 
                                     <div className='input-group mb-3' >
                                         <label htmlFor='descripcion' className='input-group-text'><FontAwesomeIcon icon={faFileText} /></label>
                                         <input type='text' id='descripcion' placeholder='Descripcion' className="form-control" value={descripcion} onChange={(e) => setDescripcion(e.target.value)} />
-                                    </div>
-
-                                    <div className='input-group mb-3' >
-                                        <label htmlFor='fechaCompra' className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></label>
-                                        <input type='datetime-local' id='fechaCompra' className="form-control" value={fechaCompra} readOnly={true} onChange={(e) => setFechaCompra(e.target.value)} />
                                     </div>
 
                                     <div className='input-group mb-3' >
@@ -241,7 +253,7 @@ const AgregarCompra = () => {
                                     <h4 style={{ marginRight: 'auto', }}>Productos</h4>
 
                                     <div className='input-group mb-3' >
-                                        <label htmlFor='idCategoriaProducto' className='input-group-text'><FontAwesomeIcon icon={faBagShopping} /></label>
+                                        <label htmlFor='idCategoriaProducto' className='input-group-text'><FontAwesomeIcon icon={faList} /></label>
                                         <select id='idCategoriaProducto' className="form-control" value={idCategoriaProducto} onChange={(e) => { setIdCategoriaProducto(e.target.value); filtrarProductosPorCategoria(e.target.value); }}>
                                             <option value=''>Seleccione una categoria</option>
                                             {categoriaProductos.map((pro) => (
@@ -256,8 +268,7 @@ const AgregarCompra = () => {
                                             id='productos'
                                             className="form-control"
                                             value={productoSeleccionado}
-                                            onChange={(e) => { setProductoSeleccionado(e.target.value); setIdProducto(e.target.value)}}
-                                        >
+                                            onChange={(e) => { setProductoSeleccionado(e.target.value); setIdProducto(e.target.value) }}>
                                             <option value=''>Seleccione un producto</option>
                                             {productosPorCategoria.map((producto) => (
                                                 <option key={producto.idProducto} value={producto.idProducto}>{producto.nombreProducto}</option>
@@ -271,11 +282,14 @@ const AgregarCompra = () => {
                                     </div>
 
                                     <div className='input-group mb-3' >
-                                        <label htmlFor='precio' className='input-group-text'><FontAwesomeIcon icon={faTag} /></label>
-                                        <input type='number' className="form-control" id='precio' placeholder='Precio' value={precio} onChange={(e) => setPrecio(e.target.value)} />
+                                        <label htmlFor='preciocompra' className='input-group-text'><FontAwesomeIcon icon={faCartArrowDown} /></label>
+                                        <input type='number' className="form-control" id='preciocompra' placeholder='Precio compra' value={preciocompra} onChange={(e) => setPreciocompra(e.target.value)} />
                                     </div>
 
-
+                                    <div className='input-group mb-3' >
+                                        <label htmlFor='precioventa' className='input-group-text'><FontAwesomeIcon icon={faTag} /></label>
+                                        <input type='number' className="form-control" id='precioventa' placeholder='Precio venta' value={precioventa} onChange={(e) => setPrecioventa(e.target.value)} />
+                                    </div>
 
                                     <div key={"buttonGuardar"} className='d-grid col-6 mx-auto' style={{ width: '70%', marginTop: '3%' }} >
                                         <button type='button' onClick={() => agregarProducto()} className='botones-azules' >
@@ -291,7 +305,7 @@ const AgregarCompra = () => {
                             </div>
 
                             <div className='input-group mb-3' style={{ marginTop: '-8.5%', marginLeft: '65.8%', maxHeight: '35px', marginBottom: '35px' }}>
-                                <label htmlFor='total' className='input-group-text'><FontAwesomeIcon icon={faDollar} /></label>
+                                <label htmlFor='total' className='input-group-text'>Total</label>
                                 <input type='number' className="form-control" id='total' value={total} />
                             </div>
                         </form>
@@ -300,26 +314,24 @@ const AgregarCompra = () => {
 
                     <div className='col-md-6' >
 
-                        <div id='container1' style={{ maxWidth: '135%', maxHeight: '70%', marginLeft: '-40%', padding: '3%', overflow: 'scroll' }}>
+                        <div id='container1' style={{ maxWidth: '135%', maxHeight: '430px', marginLeft: '-40%', padding: '3%', overflowY: 'auto' }}>
                             <h4>Productos agregados</h4>
-                            <table className='table'>
+                            <table className='table' style={{ width: '100%' }}>
                                 <thead style={{ position: 'sticky', top: 0, backgroundColor: 'white' }} >
-                                    <tr >
+                                    <tr>
                                         <th>Producto</th>
-                                        <th>Categoria</th>
+                                        <th>Valor unitario</th>
                                         <th>Cantidad</th>
-                                        <th>Precio</th>
-                                        <th>Subtotal</th>
+                                        <th>Total</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody >
                                     {productosCompra.map((producto, index) => (
-                                        <tr key={index} >
+                                        <tr key={index}>
                                             <td>{productosCompraName[producto.idProducto]}</td>
-                                            <td>{producto.idCategoriaProducto}</td>
+                                            <td>{producto.preciocompra}</td>
                                             <td>{producto.cantidad}</td>
-                                            <td>{producto.precio}</td>
                                             <td>{producto.subtotal}</td>
                                             <td>
                                                 <button type='button' onClick={() => eliminarProducto(index)} className='btn btn-danger'>
