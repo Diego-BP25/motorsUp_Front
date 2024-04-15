@@ -379,6 +379,9 @@ const Empleados = () => {
                             <option key={rol.idRol} value={rol.idRol}>{rol.nombre}</option>
                         ))}
                     </select>
+                    <button className='botones-azules'>
+                        <FontAwesomeIcon icon={faPlusCircle} /> Añadir
+                      </button>
                 </div>
                 <div className='d-grid col-6 mx-auto'>
                     <button onClick={() => validar()} className='botones-azules'>

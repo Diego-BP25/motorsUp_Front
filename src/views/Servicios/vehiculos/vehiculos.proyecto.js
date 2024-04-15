@@ -3,7 +3,7 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faComment, faSearch } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faComment, faSearch, faCaretDown } from '@fortawesome/free-solid-svg-icons'
 import { CSmartPagination } from '@coreui/react-pro'
 import { show_alerta } from 'src/fuctions.proyecto'
 
@@ -20,6 +20,9 @@ const Vehiculos = () => {
   const [actualizacion, setActualizacion] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [busqueda, setBusqueda] = useState("");
+  const [estado, setEstado]= useState("")
+
+  const [filtradoPorEstado, setFiltradoPorEstado] = useState(false);
 
   const [propietarios, setPropietarios] = useState([])
   const [propietarios_idPropietario, setPropietarios_idPropietario] = useState('')
@@ -34,7 +37,8 @@ const Vehiculos = () => {
   const getVehiculos = async () => {
     try {
       const respuesta = await axios.get(url, {})
-      setVehiculo(await respuesta.data)
+      const vehiculosData = respuesta.data.filter(veh => veh.estado == true);
+      setVehiculo(vehiculosData)
     } catch (error) {
       console.error('Error al obtener los vehiculos:', error.message)
     }
@@ -49,8 +53,12 @@ const Vehiculos = () => {
       console.error('Error al obtener los propietarios:', error.message)
     }
   }
+  const nombreIdPropietario = (propietarioId) => {
+    const propietario = propietarios.find(propietario => propietario.idPropietario === propietarioId);
+    return propietario ? propietario.nombrePropietario : '';
+  };
 
-  const openModal = (op, placa, referencia, modelo, color) => {
+  const openModal = (op, placa, referencia, modelo, color, propietarios_idPropietario) => {
     setPlaca('');
     setReferencia('');
     setModelo('');
@@ -65,6 +73,7 @@ const Vehiculos = () => {
       setReferencia(referencia);
       setModelo(modelo);
       setColor(color);
+      setPropietarios_idPropietario(propietarios_idPropietario)
     }
     setOperation(op)
     window.setTimeout(function () {
@@ -77,9 +86,9 @@ const Vehiculos = () => {
     var metodo;
 
     if (operation === 1) {
-      parametros = { placa: placa, referencia: referencia, modelo: modelo, color: color, propietarios_idPropietario: propietarios_idPropietario };
+      parametros = { placa: placa, referencia: referencia, modelo: modelo, color: color, estado: true, propietarios_idPropietario: propietarios_idPropietario };
       metodo = 'POST';
-    } else {
+    } else if (operation === 2) {
       parametros = { placa: placa, referencia: referencia, modelo: modelo, color: color, propietarios_idPropietario: propietarios_idPropietario };
       metodo = 'PUT';
     }
@@ -241,7 +250,14 @@ const Vehiculos = () => {
                     <th>Referencia</th>
                     <th>Modelo</th>
                     <th>Color</th>
+                    <th>
+                      Estado
+                      <FontAwesomeIcon icon={faCaretDown} style={{ marginLeft: '8px' }} />
+                    </th>
+
+                    <th>Propietario</th>
                     <th>Acciones</th>
+
                   </tr>
                 </thead>
                 <tbody className='table-group-divider'>
@@ -251,8 +267,10 @@ const Vehiculos = () => {
                       <td>{v.referencia}</td>
                       <td>{v.modelo}</td>
                       <td>{v.color}</td>
+                      <td><span className={!v.estado ? 'estado-inactivo' : 'estado-activo'}>{!v.estado ? 'Inactivo' : 'Activo'}</span></td>
+                      <td>{nombreIdPropietario(v.propietarios_idPropietario)}</td>
                       <td>
-                        <button onClick={() => openModal(2, v.placa, v.nombre, v.referencia, v.modelo, v.color)} className='btn btn-warning' data-bs-toggle='modal' data-bs-target='#modalVehiculo'>
+                        <button onClick={() => openModal(2, v.placa, v.referencia, v.modelo, v.color, v.estado, v.propietarios_idPropietario)} className='btn btn-warning' data-bs-toggle='modal' data-bs-target='#modalVehiculoEditar'>
                           <FontAwesomeIcon icon={faEdit} />
                         </button>
                         &nbsp;
@@ -309,6 +327,9 @@ const Vehiculos = () => {
                     <option key={p.idPropietario} value={p.idPropietario}>{p.nombrePropietario}</option>
                   ))}
                 </select>
+                <button className='botones-azules'>
+                  <FontAwesomeIcon icon={faPlusCircle} /> Añadir
+                </button>
               </div>
 
               <div className='d-grid col-6 mx-auto'>
@@ -320,6 +341,59 @@ const Vehiculos = () => {
           </div>
         </div>
       </div>
+
+
+
+
+
+      <div id='modalVehiculoEditar' className='modal fade' aria-hidden='true' data-bs-backdrop='static' data-bs-keyboard='false' >
+        <div className='modal-dialog modal-dialog-centered'>
+          <div className='modal-content'>
+            <div className='modal-header'>
+              <label className='h5'>{title}</label>
+              <button type='button' id='btnCerrar' className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
+            </div>
+            <div className='modal-body'>
+
+              <div className='input-group mb-3'>
+                <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
+                <input type='text' id='placa' className='form-control' placeholder='Placa' value={placa} onChange={(e) => setPlaca(e.target.value)} ></input>
+                <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
+                <input type='text' id='referencia' className='form-control' placeholder='Referencia' value={referencia} onChange={(e) => setReferencia(e.target.value)} ></input>
+              </div>
+              <div className='input-group mb-3'>
+                <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
+                <input type='text' id='modelo' className='form-control' placeholder='Modelo' value={modelo} onChange={(e) => setModelo(e.target.value)}></input>
+                <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
+                <input type='text' id='color' className='form-control' placeholder='Color' value={color} onChange={(e) => setColor(e.target.value)}></input>
+              </div>
+
+              <div className='input-group mb-3'>
+                <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
+                <select id='propietarios_idPropietario' className='form-select' value={propietarios_idPropietario} onChange={(e) => setPropietarios_idPropietario(e.target.value)} style={{ marginRight: '12px' }}>
+                  <option value='' disabled>Propietario</option>
+                  {propietarios.map((p) => (
+                    <option key={p.idPropietario} value={p.idPropietario}>{p.nombrePropietario}</option>
+                  ))}
+                </select>
+                <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
+                <select id='estado' className='form-select' value={estado} onChange={(e) => setEstado(e.target.value)} style={{ marginRight: '12px' }}>
+                  <option value={true}>Activo</option>
+                  <option value={false}>Inactivo</option>
+                </select>
+              </div>
+
+              <div className='d-grid col-6 mx-auto'>
+                <button onClick={() => validar()} className='botones-azules'>
+                  <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
     </div>
   )
 }

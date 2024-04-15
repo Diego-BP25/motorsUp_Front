@@ -205,7 +205,7 @@ const Servicios = () => {
 
 
 
-   
+
     const getCurrentPageServicios = () => {
         const startIndex = (currentPage - 1) * 5;
         const endIndex = startIndex + 5;
@@ -351,7 +351,10 @@ const Servicios = () => {
                             </div>
                             <div className='input-group mb-3'>
                                 <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
-                                <input type='text' id='estado' className='form-control' placeholder='Estado Servicio' value={estado} onChange={(e) => {setEstado(e.target.value)}}></input>
+                                <select id='estado' className='form-select' value={estado} onChange={(e) => setEstado(e.target.value)} >
+                                    <option value={true}>Activo</option>
+                                    <option value={false}>Inactivo</option>
+                                </select>
                             </div>
                             <div className='d-grid col-6 mx-auto'>
                                 <button onClick={() => validar()} className='botones-azules'>
