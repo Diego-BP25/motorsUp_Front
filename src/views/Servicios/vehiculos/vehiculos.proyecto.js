@@ -77,7 +77,7 @@ const Vehiculos = () => {
     return propietario ? propietario.nombrePropietario : '';
   };
 
-  const openModal = (op, placa, referencia, modelo, color, propietarios_idPropietario) => {
+  const openModal = (op, placa, referencia, modelo, color, estado, propietarios_idPropietario) => {
     setPlaca('');
     setReferencia('');
     setModelo('');
@@ -108,7 +108,7 @@ const Vehiculos = () => {
       parametros = { placa: placa, referencia: referencia, modelo: modelo, color: color, estado: true, propietarios_idPropietario: propietarios_idPropietario };
       metodo = 'POST';
     } else if (operation === 2) {
-      parametros = { placa: placa, referencia: referencia, modelo: modelo, color: color, propietarios_idPropietario: propietarios_idPropietario };
+      parametros = { placa: placa, referencia: referencia, modelo: modelo, color: color, estado: estado, propietarios_idPropietario: propietarios_idPropietario };
       metodo = 'PUT';
     }
     enviarSolicitud(metodo, parametros);
