@@ -3,7 +3,7 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faComment, faSearch } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faComment, faSearch, faCaretDown } from '@fortawesome/free-solid-svg-icons'
 import { CSmartPagination } from '@coreui/react-pro'
 import { show_alerta } from 'src/fuctions.proyecto'
 
@@ -21,25 +21,42 @@ const Servicios = () => {
     const [operation, setOperation] = useState(1)
     const [title, setTitle] = useState('')
 
+    const [filtradoPorEstado, setFiltradoPorEstado] = useState(false);
+    const [estadoFiltrado, setEstadoFiltrado] = useState(true);
+
     useEffect(() => {
         getServicios()
         setActualizacion(false)
     }, [actualizacion ? servicio : null])
 
 
-
+    useEffect(() => {
+        getServicios()
+    }, [filtradoPorEstado, estadoFiltrado]);
 
 
 
 
     const getServicios = async () => {
-        try {
-            const respuesta = await axios.get(url, {})
-            setServicio(await respuesta.data)
-        } catch (error) {
-            console.error('Error al obtener los servicios:', error.message)
-        }
+    try {
+      const respuesta = await axios.get(url, {});
+      let serviciosData = respuesta.data.filter(ser => ser.estado === true); // Filtrar vehículos con estado true
+      if (filtradoPorEstado && !estadoFiltrado) {
+        serviciosData = respuesta.data.filter(ser => ser.estado === false); // Filtrar vehículos con estado false si está activado el filtro por estado inactivo
+      }
+      setServicio(serviciosData);
+    } catch (error) {
+      console.error('Error al obtener los servicios:', error.message);
     }
+  };
+
+    const filtroEstado = () => {
+        setFiltradoPorEstado(!filtradoPorEstado);
+        // Si ya está filtrado por estado, alternar entre true y false
+        if (filtradoPorEstado) {
+            setEstadoFiltrado(!estadoFiltrado);
+        }
+    };
 
     const openModal = (op, idServicio, nombreServicio, descripcion, estado,) => {
         setIdServicio('')
@@ -250,7 +267,11 @@ const Servicios = () => {
                                         <th>ID</th>
                                         <th>Nombre</th>
                                         <th>Descripcion</th>
-                                        <th>Estado</th>
+                                        <th onClick={filtroEstado} title="Haz clic para filtrar por estado"  style={{ cursor: 'pointer' }}>
+                                            Estado
+                                            <FontAwesomeIcon icon={faCaretDown} style={{ marginLeft: '8px' }} />
+                                        </th>
+
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>

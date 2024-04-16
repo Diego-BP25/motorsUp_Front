@@ -22,7 +22,10 @@ const Vehiculos = () => {
   const [busqueda, setBusqueda] = useState("");
   const [estado, setEstado]= useState("")
 
+
+  //Filtrar estado
   const [filtradoPorEstado, setFiltradoPorEstado] = useState(false);
+  const [estadoFiltrado, setEstadoFiltrado] = useState(true);
 
   const [propietarios, setPropietarios] = useState([])
   const [propietarios_idPropietario, setPropietarios_idPropietario] = useState('')
@@ -34,15 +37,31 @@ const Vehiculos = () => {
     setActualizacion(false)
   }, [actualizacion ? vehiculo : null])
 
+  useEffect(() => {
+    getVehiculos();
+  }, [filtradoPorEstado, estadoFiltrado]);
+
   const getVehiculos = async () => {
     try {
-      const respuesta = await axios.get(url, {})
-      const vehiculosData = respuesta.data.filter(veh => veh.estado == true);
-      setVehiculo(vehiculosData)
+      const respuesta = await axios.get(url, {});
+      let vehiculosData = respuesta.data.filter(veh => veh.estado === true); // Filtrar vehículos con estado true
+      if (filtradoPorEstado && !estadoFiltrado) {
+        vehiculosData = respuesta.data.filter(veh => veh.estado === false); // Filtrar vehículos con estado false si está activado el filtro por estado inactivo
+      }
+      setVehiculo(vehiculosData);
     } catch (error) {
-      console.error('Error al obtener los vehiculos:', error.message)
+      console.error('Error al obtener los vehiculos:', error.message);
     }
-  }
+  };
+
+   //Filtro por estado
+   const filtroEstado = () => {
+    setFiltradoPorEstado(!filtradoPorEstado);
+    // Si ya está filtrado por estado, alternar entre true y false
+    if (filtradoPorEstado) {
+      setEstadoFiltrado(!estadoFiltrado);
+    }
+  };
 
   const getPropietarios = async () => {
     try {
@@ -204,6 +223,7 @@ const Vehiculos = () => {
   }
 
 
+ 
 
   const getCurrentPageVehiculos = () => {
     const startIndex = (currentPage - 1) * 5;
@@ -250,7 +270,7 @@ const Vehiculos = () => {
                     <th>Referencia</th>
                     <th>Modelo</th>
                     <th>Color</th>
-                    <th>
+                    <th onClick={filtroEstado} title="Haz clic para filtrar por estado"  style={{ cursor: 'pointer' }}>
                       Estado
                       <FontAwesomeIcon icon={faCaretDown} style={{ marginLeft: '8px' }} />
                     </th>
