@@ -4,7 +4,7 @@ import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faTruckField, faSearch, faAddressCard, faUser, faLocationDot, faPhone, faEnvelope, faLock, faUserGear, faToggleOff } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faCaretDown, faSearch, faAddressCard, faUser, faLocationDot, faPhone, faEnvelope, faLock, faUserGear, faToggleOff } from '@fortawesome/free-solid-svg-icons'
 import { CSmartPagination } from '@coreui/react-pro'
 import { show_alerta } from 'src/fuctions.proyecto'
 import { jwtDecode } from 'jwt-decode';
@@ -21,7 +21,6 @@ const Empleados = () => {
   const [estado, setEstado] = useState('')
   const [correoEmpleado, setCorreoEmpleado] = useState('')
   const [contrasena, setContrasena] = useState('')
-  const [roles_idRol, setRoles_idRol] = useState('')
   const [operation, setOperation] = useState(1)
   const [title, setTitle] = useState('')
   const [idE, setIdE] = useState('')
@@ -32,9 +31,14 @@ const Empleados = () => {
   const [currentPage, setCurrentPage] = useState(1)
   //Buscador
   const [busqueda, setBusqueda] = useState("");
-
+  //Roles
   const [roles, setRoles] = useState([])
+  const [roles_idRol, setRoles_idRol] = useState('')
+  //Estado
+  const [filtradoPorEstado, setFiltradoPorEstado] = useState(false);
+  const [estadoFiltrado, setEstadoFiltrado] = useState(true);
 
+  
   useEffect(() => {
     getEmpleados()
     const token = localStorage.getItem('Empleado');
@@ -48,19 +52,39 @@ const Empleados = () => {
    
   }, [actualizacion ? empleado : null])
 
-
+  useEffect(() => {
+    getEmpleados()
+}, [filtradoPorEstado, estadoFiltrado]);
 
   
 
-  const getEmpleados = async () => {
-    try {
-      const respuesta = await axios.get(url, {})
-      const empleadosData = respuesta.data.filter(emp => emp.idEmpleado !== idE);
-      setEmpleado(empleadosData);
-    } catch (error) {
-      console.error('Error al obtener los Empleados:', error.message)
+const getEmpleados = async () => {
+  try {
+    const respuesta = await axios.get(url, {})
+    let empleadosData = respuesta.data.filter(emp => emp.idEmpleado !== idE);
+    
+    // Aplicar filtro por estado activo si es necesario
+    if (!filtradoPorEstado || estadoFiltrado) {
+      empleadosData = empleadosData.filter(emp => emp.estado === true);
+    } else {
+      // Aplicar filtro por estado inactivo si está activado
+      empleadosData = empleadosData.filter(emp => emp.estado === false);
     }
+    
+    setEmpleado(empleadosData)
+  } catch (error) {
+    console.error('Error al obtener los Empleados:', error.message)
   }
+}
+
+
+  const filtroEstado = () => {
+    setFiltradoPorEstado(!filtradoPorEstado);
+    // Si ya está filtrado por estado, alternar entre true y false
+    if (filtradoPorEstado) {
+      setEstadoFiltrado(!estadoFiltrado);
+    }
+  };
 
   const getRoles = async () => {
     try {
@@ -291,7 +315,10 @@ const Empleados = () => {
                     <th>Nombre</th>
                     <th>Direccion</th>
                     <th>Telefono</th>
-                    <th>Estado</th>
+                    <th onClick={filtroEstado} title="Haz clic para filtrar por estado"  style={{ cursor: 'pointer' }}>
+                      Estado
+                      <FontAwesomeIcon icon={faCaretDown} style={{ marginLeft: '8px' }} />
+                    </th>
                     <th>Correo</th>
                     <th>Rol</th>
                     <th>Acciones</th>
@@ -379,6 +406,9 @@ const Empleados = () => {
                             <option key={rol.idRol} value={rol.idRol}>{rol.nombre}</option>
                         ))}
                     </select>
+                    <button className='botones-azules'>
+                        <FontAwesomeIcon icon={faPlusCircle} /> Añadir
+                      </button>
                 </div>
                 <div className='d-grid col-6 mx-auto'>
                     <button onClick={() => validar()} className='botones-azules'>
