@@ -3,11 +3,13 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import '@fortawesome/fontawesome-free'
+import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faCaretDown, faSearch, faAddressCard, faUser, faLocationDot, faPhone, faEnvelope, faLock, faUserGear, faToggleOff } from '@fortawesome/free-solid-svg-icons'
 import { CSmartPagination } from '@coreui/react-pro'
 import { show_alerta } from 'src/fuctions.proyecto'
 import { jwtDecode } from 'jwt-decode';
+
 
 
 const Empleados = () => {
@@ -414,9 +416,11 @@ const Empleados = () => {
                     <option key={rol.idRol} value={rol.idRol}>{rol.nombre}</option>
                   ))}
                 </select>
-                <button className='botones-azules'>
+                
+                <button   onClick={() => { window.location.href = '/Configuracion/rol'; }} className='botones-azules'>
                   <FontAwesomeIcon icon={faPlusCircle} /> Añadir
                 </button>
+                
               </div>
               <div className='d-grid col-6 mx-auto'>
                 <button onClick={() => validar()} className='botones-azules'>

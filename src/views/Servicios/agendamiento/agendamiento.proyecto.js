@@ -433,7 +433,7 @@ const Agendamiento = () => {
                           <option key={v.placa} value={v.placa}>{v.placa}</option>
                         ))}
                       </select>
-                      <button className='botones-azules'>
+                      <button onClick={() => { window.location.href = '/Servicios/Vehiculo'; }} className='botones-azules'>
                         <FontAwesomeIcon icon={faPlusCircle} /> Añadir
                       </button>
                     </div>

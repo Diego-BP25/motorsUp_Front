@@ -347,7 +347,7 @@ const Vehiculos = () => {
                     <option key={p.idPropietario} value={p.idPropietario}>{p.nombrePropietario}</option>
                   ))}
                 </select>
-                <button className='botones-azules'>
+                <button onClick={() => { window.location.href = '/Servicios/propietario'; }} className='botones-azules'>
                   <FontAwesomeIcon icon={faPlusCircle} /> Añadir
                 </button>
               </div>
