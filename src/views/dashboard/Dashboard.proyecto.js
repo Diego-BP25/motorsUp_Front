@@ -1,30 +1,134 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React from 'react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { curveCardinal } from 'd3-shape';
+import CIcon from '@coreui/icons-react'
+import { cilCart } from '@coreui/icons'
 
 const Dashboard = () => {
+  const data = [
+    { name: 'Page A', uv: 4000, pv: 2400, amt: 2400 },
+    { name: 'Page B', uv: 3000, pv: 1398, amt: 2210 },
+    { name: 'Page C', uv: 2000, pv: 9800, amt: 2290 },
+    { name: 'Page D', uv: 2780, pv: 3908, amt: 2000 },
+    { name: 'Page E', uv: 1890, pv: 4800, amt: 2181 },
+    { name: 'Page F', uv: 2390, pv: 3800, amt: 2500 },
+    { name: 'Page G', uv: 3490, pv: 4300, amt: 2100 },
+  ];
 
+  const cardinal = curveCardinal.tension(0.2);
 
- 
-  
   return (
-    <div className="card card-warning">
+    <>
+      <div className="row">
+        <div className="col-lg-3 col-6">
+          <div className="small-box bg-info">
+            <div className="inner">
+              <h3>150</h3>
+
+              <p>Compras</p>
+            </div>
+            <div className="icon">
+              <i className="fas fa-shopping-cart"></i>
+            </div>
+            <a href="#" className="small-box-footer">
+              Más <i className="fas fa-arrow-circle-right"></i>
+            </a>
+          </div>
+        </div>
+
+
+        <div className="col-lg-3 col-6">
+          <div className="small-box bg-success">
+            <div className="inner">
+              <h3>150</h3>
+
+              <p>Ventas</p>
+            </div>
+            <div className="icon">
+              <i className="fas fa-shopping-cart"></i>
+            </div>
+            <a href="#" className="small-box-footer">
+              Más <i className="fas fa-arrow-circle-right"></i>
+            </a>
+          </div>
+        </div>
+
+
+        <div className="col-lg-3 col-6">
+          <div className="small-box bg-warning">
+            <div className="inner">
+              <h3>150</h3>
+
+              <p>Usuarios</p>
+            </div>
+            <div className="icon">
+              <i className="fas fa-shopping-cart"></i>
+            </div>
+            <a href="#" className="small-box-footer">
+              More info <i className="fas fa-arrow-circle-right"></i>
+            </a>
+          </div>
+        </div>
+
+
+
+
+        <div className="col-lg-3 col-6">
+          <div className="small-box bg-danger">
+            <div className="inner">
+              <h3>150</h3>
+
+              <p>Productos</p>
+            </div>
+            <div className="icon">
+              <i className="fas fa-shopping-cart"></i>
+            </div>
+            <a href="#" className="small-box-footer">
+              More info <i className="fas fa-arrow-circle-right"></i>
+            </a>
+          </div>
+        </div>
+
+
+
+
+      </div>
+
+
+
+
+      <div className="card card-warning">
         <div className="card-header">
-        <div className="card-tools">
-        <button type="button" className="btn btn-tool" data-card-widget="collapse">
-         <i className="fas fa-minus" />
-         </button>
+          <div className="card-tools">
+            <button type="button" className="btn btn-tool" data-card-widget="collapse">
+              <i className="fas fa-minus" />
+            </button>
+          </div>
+          <h3 className="card-title">Productos más vendidos</h3>
         </div>
-        <h3 className="card-title"> Productos más vendidos</h3>
-
+        <div className="card-body">
+          <ResponsiveContainer width="100%" height={350}>
+            <AreaChart
+              width={500}
+              height={400}
+              data={data}
+              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="name" />
+              <YAxis />
+              <Tooltip />
+              <Area type="monotone" dataKey="uv" stroke="#8884d8" fill="#8884d8" fillOpacity={0.3} />
+              <Area type={cardinal} dataKey="pv" stroke="#82ca9d" fill="#82ca9d" fillOpacity={0.3} />
+            </AreaChart>
+          </ResponsiveContainer>
+          <p>
+            <strong>Total de productos:</strong>
+          </p>
         </div>
-       
+      </div>
+    </>
+  );
+};
 
-        <div className="card-body"> 
-        <canvas  style={{ minHeight: 350, height: 350, maxHeight: 350, maxWidth: '100%' }} />
-      <p><strong>Total de productos:</strong> </p>
-       
-     </div>
-    </div>
-  )
-}
-
-export default Dashboard
+export default Dashboard;
