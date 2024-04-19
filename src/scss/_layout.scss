@@ -85,3 +85,41 @@ background-color: transparentize($color: #ffffffb3, $amount: 0);
 // }
 
 
+.titulo {
+  font-size: 250%;
+  color: white;
+  margin-left: 5%;
+  margin-top: 1%;
+}
+
+
+.subtitulo{
+  font-size: 125%;
+  color: white;
+  margin-left: 5%;
+}
+
+#enlace{
+  background-color: rgba(0,0,0,.1);
+  color: white;
+  display: block;
+  padding: 3px 0;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  z-index: 10;
+}
+
+.icon{
+  display: flex;
+  align-items: center;
+}
+.iconos{
+  font-size: 80px;
+  margin-left: 1000%;
+  opacity: 0.5;
+}
+
+
+
+

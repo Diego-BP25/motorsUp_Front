@@ -11,7 +11,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="row">
+      <div className="row" style={{marginBottom:'4%'}}>
         <Reportes/>
       </div>
       <div className='scrollDashBoard'>
