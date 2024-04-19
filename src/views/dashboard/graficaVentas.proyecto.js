@@ -1,17 +1,46 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { curveCardinal } from 'd3-shape';
+import axios from 'axios'
+
+
 
 const GraficaVentas = () => {
-    const data = [
-        { name: 'Page A', uv: 4000, pv: 2400, amt: 2400 },
-        { name: 'Page B', uv: 3000, pv: 1398, amt: 2210 },
-        { name: 'Page C', uv: 2000, pv: 9800, amt: 2290 },
-        { name: 'Page D', uv: 2780, pv: 3908, amt: 2000 },
-        { name: 'Page E', uv: 1890, pv: 4800, amt: 2181 },
-        { name: 'Page F', uv: 2390, pv: 3800, amt: 2500 },
-        { name: 'Page G', uv: 3490, pv: 4300, amt: 2100 },
-    ];
+   
+    const [ventas, setVentas] = useState([])
+
+    const data = ventas.map(item =>({
+        name: item.metodoPago, total: item.total
+    }));
+
+
+
+    useEffect(() => {
+        getVentas()
+    }, []);
+
+
+const getVentas = async () => {
+  try {
+    const fecha_actual = new Date();
+    const mes_actual = fecha_actual.getMonth() + 1; // Obtiene el mes actual (los meses en JavaScript van de 0 a 11)
+    const anio_actual = fecha_actual.getFullYear(); // Obtiene el año actual
+
+    const respuesta = await axios.get('http://localhost:8081/api/ventas', {});
+    const ventasMensuales = respuesta.data.filter(venta => {
+      const fechaVenta = new Date(venta.fecha);
+      return fechaVenta.getMonth() + 1 === mes_actual && fechaVenta.getFullYear() === anio_actual;
+    });
+
+    setVentas(ventasMensuales); 
+
+  } catch (error) {
+    console.error('Error al obtener las ventas:', error.message);
+  }
+};
+
+
+
 
     const cardinal = curveCardinal.tension(0.2);
 
@@ -39,8 +68,8 @@ const GraficaVentas = () => {
                             <XAxis dataKey="name" />
                             <YAxis />
                             <Tooltip />
-                            <Area type="monotone" dataKey="uv" stroke="#8884d8" fill="#8884d8" fillOpacity={0.3} />
-                            <Area type={cardinal} dataKey="pv" stroke="#82ca9d" fill="#82ca9d" fillOpacity={0.3} />
+                    
+                            <Area type={cardinal} dataKey="total" stroke="#82ca9d" fill="#82ca9d" fillOpacity={0.3} />
                         </AreaChart>
                     </ResponsiveContainer>
                     <p>

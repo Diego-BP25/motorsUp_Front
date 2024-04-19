@@ -1,18 +1,21 @@
 import React, { useEffect, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowRight, faCartShopping, faMoneyCheckDollar, faUsers, faScrewdriverWrench } from '@fortawesome/free-solid-svg-icons'
+import { faArrowRight, faCartShopping, faMoneyCheckDollar, faUsers, faCalendarDays } from '@fortawesome/free-solid-svg-icons'
 import axios from 'axios'
 
 
 const Reportes = () => {
 
+
   const [empleado, setEmpleado] = useState([])
-  const [productos, setProducto] = useState([])
+  const [agendamiento, setAgendamiento] = useState([])
   const [compras, setCompras] = useState([])
   const [ventas, setVentas] = useState([])
+  const fechaActual = new Date().toISOString().slice(0, 10);
+
   useEffect(() => {
     getEmpleados()
-    getProductos()
+    getAgendamientos()
     getCompras()
     getVentas()
   }, []);
@@ -34,10 +37,12 @@ const Reportes = () => {
     }
 
   }
-  const getProductos = async () => {
+  const getAgendamientos = async () => {
     try {
-      const respuesta = await axios.get('http://localhost:8081/api/productos', {})
-      setProducto(await respuesta.data)
+      
+      const respuesta = await axios.get('http://localhost:8081/api/agendamientos', {})
+      let agendamientosData = respuesta.data.filter(ag => ag.fecha.startsWith(fechaActual));
+      setAgendamiento(agendamientosData)
     } catch (error) {
       console.error('Error al obtener las ventas:', error.message)
     }
@@ -45,7 +50,8 @@ const Reportes = () => {
   const getCompras = async () => {
     try {
       const respuesta = await axios.get('http://localhost:8081/api/compras', {})
-      setCompras(await respuesta.data)
+      let comprasData = respuesta.data.filter(co => co.fechaCompra.startsWith(fechaActual));
+      setCompras(comprasData)
     } catch (error) {
       console.error('Error al obtener las ventas:', error.message)
     }
@@ -53,7 +59,8 @@ const Reportes = () => {
   const getVentas = async () => {
     try {
       const respuesta = await axios.get('http://localhost:8081/api/ventas', {})
-      setVentas(await respuesta.data)
+      let ventasData = respuesta.data.filter(ve => ve.fecha.startsWith(fechaActual));
+      setVentas(ventasData)
     } catch (error) {
       console.error('Error al obtener las ventas:', error.message)
     }
@@ -128,11 +135,11 @@ const Reportes = () => {
       <div className="col-lg-3 col-6">
         <div className="small-box bg-danger">
           <div className="inner">
-            <h3 className="titulo">{productos.length}</h3>
+            <h3 className="titulo">{agendamiento.length}</h3>
             <div className="icon" >
-              <FontAwesomeIcon icon={faScrewdriverWrench} className='iconos' />
+              <FontAwesomeIcon icon={faCalendarDays} className='iconos' />
             </div>
-            <p className="subtitulo">Productos</p>
+            <p className="subtitulo">Citas</p>
           </div>
 
 

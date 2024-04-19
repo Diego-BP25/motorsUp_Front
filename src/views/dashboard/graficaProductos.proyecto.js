@@ -1,9 +1,13 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent, useEffect, useState } from 'react';
 import { PieChart, Pie, Legend, Tooltip, ResponsiveContainer } from 'recharts';
-
+import axios from 'axios'
 
 const GraficaProductos = () => {
-    const data = [
+    const [productos, setProductos]= useState([])
+    const data = productos.map(item =>({
+        name: item.nombreProducto, value: item.saldoExistencias
+    }));
+    const dataa = [
         { name: 'Group A', value: 400 },
         { name: 'Group B', value: 300 },
         { name: 'Group C', value: 300 },
@@ -12,9 +16,20 @@ const GraficaProductos = () => {
         { name: 'Group F', value: 189 },
       ];
 
+      useEffect(() => {
+        getProductos()
+      }, []);
 
-    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+      const getProductos = async () => {
+        try {
+          
+          const respuesta = await axios.get('http://localhost:8081/api/productos', {})
 
+          setProductos(respuesta.data)
+        } catch (error) {
+          console.error('Error al obtener las ventas:', error.message)
+        }
+      }
     return (
         <>
             <div className="card card-warning">
@@ -36,7 +51,7 @@ const GraficaProductos = () => {
             cx="50%"
             cy="50%"
             outerRadius={80}
-            fill="#8884d8"
+            fill="blue"
             label
           />
           <Tooltip />
