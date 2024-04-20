@@ -12,11 +12,13 @@ const GraficaCitas = () => {
   const getAgendamientos = async () => {
     try {
       const respuesta = await axios.get('http://localhost:8081/api/agendamientos', {});
-      setAgendamientos(respuesta.data);
+
+      const agendamientosFiltrados = respuesta.data.filter(agendamiento => agendamiento.estado == true);
+      setAgendamientos(agendamientosFiltrados);
     } catch (error) {
       console.error('Error al obtener las citas:', error.message);
     }
-  };
+  }; 
 
   // Función para filtrar agendamientos de la semana actual
   const filterCurrentWeekAgendamientos = () => {
@@ -52,7 +54,7 @@ const GraficaCitas = () => {
     const data = [];
 
     for (let i = 0; i < 7; i++) {
-      data.push({ name: getDayName(i), value: countByDay[i] || 0 });
+      data.push({ name: getDayName(i), total: countByDay[i] || 0 });
     }
 
     return data;
@@ -96,11 +98,11 @@ const GraficaCitas = () => {
               <Tooltip />
               <Legend />
 
-              <Line type="monotone" dataKey="value" stroke="#82ca9d" />
+              <Line type="monotone" dataKey="total" stroke="#82ca9d" />
             </LineChart>
           </ResponsiveContainer>
           <p>
-            <strong>Total de Citas:</strong> {data.reduce((total, day) => total + day.value, 0)}
+            <strong>Total de Citas:</strong> {data.reduce((total, day) => total + day.total, 0)}
           </p>
         </div>
       </div>

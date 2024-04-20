@@ -21,7 +21,7 @@ const GraficaCompras = () => {
       const respuesta = await axios.get('http://localhost:8081/api/compras', {});
       const comprasMensuales = respuesta.data.filter(compra => {
         const fechaCompra = new Date(compra.fechaCompra);
-        return fechaCompra.getMonth() + 1 === mes_actual && fechaCompra.getFullYear() === anio_actual;
+        return fechaCompra.getMonth() + 1 === mes_actual && fechaCompra.getFullYear() === anio_actual && compra.estadoCompra == true;
       });
   
       console.log(comprasMensuales);
@@ -41,7 +41,7 @@ const GraficaCompras = () => {
 
 
   return (
-    <div className="card card-warning">
+    <div className="card card-warning" style={{marginBottom: '8%'}}>
       <div className="card-header">
         <div className="card-tools">
           <button type="button" className="btn btn-tool" data-card-widget="collapse">

@@ -24,7 +24,7 @@ const GraficaProductos = () => {
         try {
           
           const respuesta = await axios.get('http://localhost:8081/api/productos', {})
-
+          
           setProductos(respuesta.data)
         } catch (error) {
           console.error('Error al obtener las ventas:', error.message)

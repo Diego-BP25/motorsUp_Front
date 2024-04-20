@@ -30,8 +30,8 @@ const Reportes = () => {
 
 
       const respuesta = await axios.get('http://localhost:8081/api/empleados', { headers: headers })
-
-      setEmpleado(await respuesta.data)
+      let empleadosData = respuesta.data.filter(em => em.estado == true);
+      setEmpleado(empleadosData)
     } catch (error) {
       console.error('Error al obtener los Empleados:', error.message)
     }
@@ -41,7 +41,7 @@ const Reportes = () => {
     try {
       
       const respuesta = await axios.get('http://localhost:8081/api/agendamientos', {})
-      let agendamientosData = respuesta.data.filter(ag => ag.fecha.startsWith(fechaActual));
+      let agendamientosData = respuesta.data.filter(ag => ag.fecha.startsWith(fechaActual) && ag.estado == true);
       setAgendamiento(agendamientosData)
     } catch (error) {
       console.error('Error al obtener las ventas:', error.message)
@@ -50,7 +50,7 @@ const Reportes = () => {
   const getCompras = async () => {
     try {
       const respuesta = await axios.get('http://localhost:8081/api/compras', {})
-      let comprasData = respuesta.data.filter(co => co.fechaCompra.startsWith(fechaActual));
+      let comprasData = respuesta.data.filter(co => co.fechaCompra.startsWith(fechaActual) && co.estadoCompra == true);
       setCompras(comprasData)
     } catch (error) {
       console.error('Error al obtener las ventas:', error.message)
@@ -59,13 +59,12 @@ const Reportes = () => {
   const getVentas = async () => {
     try {
       const respuesta = await axios.get('http://localhost:8081/api/ventas', {})
-      let ventasData = respuesta.data.filter(ve => ve.fecha.startsWith(fechaActual));
+      let ventasData = respuesta.data.filter(ve => ve.fecha.startsWith(fechaActual) && ve.estado == true);
       setVentas(ventasData)
     } catch (error) {
       console.error('Error al obtener las ventas:', error.message)
     }
   }
-
 
   return (
     <>

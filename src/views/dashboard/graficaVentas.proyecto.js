@@ -29,7 +29,7 @@ const getVentas = async () => {
     const respuesta = await axios.get('http://localhost:8081/api/ventas', {});
     const ventasMensuales = respuesta.data.filter(venta => {
       const fechaVenta = new Date(venta.fecha);
-      return fechaVenta.getMonth() + 1 === mes_actual && fechaVenta.getFullYear() === anio_actual;
+      return fechaVenta.getMonth() + 1 === mes_actual && fechaVenta.getFullYear() === anio_actual && venta.estado === true;
     });
 
     setVentas(ventasMensuales); 
@@ -47,7 +47,7 @@ const getVentas = async () => {
     return (
         <>
 
-            <div className="card card-warning">
+            <div className="card card-warning" style={{marginBottom: '8%'}}>
                 <div className="card-header">
                     <div className="card-tools">
                         <button type="button" className="btn btn-tool" data-card-widget="collapse">
