@@ -15,6 +15,7 @@ import { Link } from 'react-router-dom';
 import { CSmartPagination } from '@coreui/react-pro';
 import Modal from 'react-bootstrap/Modal';
 
+
 const CategoriaProductos = () => {
   //api de compras
   const url = 'http://localhost:8081/api/categoriaProductos'

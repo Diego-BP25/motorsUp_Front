@@ -57,17 +57,10 @@ const _nav = [
     ],
   },
   {
-    component: CNavGroup,
+    component: CNavItem,
     name: 'Cotizacion',
-    to: '/cotizacion',
+    to: '/cotizacio/cotizaciones',
     icon: <CIcon icon={cilTag} customClassName='nav-icon' />,
-    items: [
-      {
-        component: CNavItem,
-        name: 'Cotizaciones',
-        to: '/cotizacio/cotizaciones',
-      },
-    ],
   },
   {
     component: CNavGroup,
@@ -98,17 +91,10 @@ const _nav = [
     ],
   },
   {
-    component: CNavGroup,
+    component: CNavItem,
     name: 'Ventas',
-    to: '/buttons',
+    to: '/Ventas/venta',
     icon: <CIcon icon={cilCreditCard} customClassName='nav-icon' />,
-    items: [
-      {
-        component: CNavItem,
-        name: 'Gestion Ventas',
-        to: '/Ventas/venta',
-      },
-    ],
   },
 ]
 

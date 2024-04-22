@@ -3,8 +3,12 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faCheck, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
-
+import { faEye, faCloudDownload, faIdCardClip, faToggleOff, faPlusCircle, faEdit, faFloppyDisk, faCheck, faSearch, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import Modal from 'react-bootstrap/Modal';
+import { fecha2 } from 'src/views/funcionesExtras.proyecto'
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
+import { CSmartPagination } from '@coreui/react-pro';
 import { actualizarCamposConsultas, formatDate } from '../funcionesExtras.proyecto'
 import { ContentDoble, ContentIndividual, ModalProyecto } from 'src/components/proyect/modal.proyecto'
 import { ButtonSwitch } from 'src/components/proyect/switch.proyecto'
@@ -13,352 +17,415 @@ import { SeletedOption } from 'src/components/proyect/select.proyecto'
 import { getDataRouterId, peticionPost } from 'src/https/peticiones.proyecto'
 import { ListView } from 'src/clases/tables/listView.proyecto'
 import { addTablaDetalle, mainTablaDetalleCotizacion } from 'src/clases/tables/fucionesListView.proyecto'
+import { Link } from 'react-router-dom';
+import { show_alerta } from 'src/fuctions.proyecto'
+import Swal from 'sweetalert2'
 
 const Cotizaciones = () => {
   const url = 'http://localhost:8081/api/cotizacion'
   const [cotizacion, setCotizacion] = useState([])
-  const [descripcion, setDescripcion] = useState('')
-  const [estado, setEstado] = useState(true)
-  const [fecha, setFecha] = useState('')
-  const [vehiculos_placa, setPlacaVehiculo] = useState('')
+  const [actualizacion, setActualizacion] = useState(false)
+  const [title, setTitle] = useState('')
+  const [estado, setEstado] = useState('')
+  const [operation, setOperation] = useState(1)
+  const [idCotizacion, setIdCotizacion] = useState('')
 
-  const [valorManoObra, setValorManoObra] = useState('$ 0')
-  const [valorCotizacion, setValorCotizacion] = useState('$ 0')
+  //estado para el boton info
+  const [cotizacionAsociadas, setCotizacionAsociadas] = useState([]);
+  //detalle de la compra
+  const [detalleCotizacionSeleccionada, setDetalleCotizacionSeleccionada] = useState({
+    idCotizacion: '',
+    descripcion: '',
+    total: '',
+    estado: '',
+    fecha: '',
+    valorCotizacion: '',
+    vehiculos_placa: '',
+  });
+  const [showModal, setShowModal] = useState(false);
 
-  // Detalle servicio.
-  const [servicio, setServicio] = useState([])
-  const [nombreservicio, setNombreServicio] = useState()
-  const [cantidad, setCantidadServicio] = useState('')
-  const [idservicio, setIdServicio] = useState()
-  const [precioservicio, setPrecioServicio] = useState('$ 0')
-  const [tablaDetalleCotizacionServicio, setTablaDetalleCotizacionServicio] = useState(new ListView());
+  //buscador
+  const [busqueda, setBusqueda] = useState("");
 
-  // Detalle productos
-  const [producto, setProducto] = useState([])
-  const [nombreProducto, setNombreProducto] = useState()
-  const [cantidadProducto, setCantidadPrducto] = useState('')
-  const [idProducto, setIdProducto] = useState()
-  const [precioProducto, setPrecioProducto] = useState('$ 0')
-  const [tablaDetalleCotizacionProducto, setTablaDetalleCotizacionProducto] = useState(new ListView());
+  //paginado
+  const [currentPage, setCurrentPage] = useState(1)
 
-  const [countServicio, setcountServicio] = useState(0)
-  const [countProducto, setcountProducto] = useState(0)
-  const [tablaDetalleActul, setTablaDetalleActual] = useState(false)
+  const [productosName, setProductosName] = useState({});
+
+  const [serviciosName, setServiciosName] = useState({});
 
   useEffect(() => {
     getCotizaciones()
-  }, [])
-
-  useEffect(() => {
-    if (idservicio !== undefined) getDataRouterId(`servicio/id?idServicio=${idservicio}`, setServicio);
-  }, [idservicio])
-
-  useEffect(() => {
-    if (idProducto !== undefined) getDataRouterId(`productos/id?idProducto=${idProducto}`, setProducto);
-  }, [idProducto])
-
-  useEffect(() => {
-    if (idservicio !== undefined) actualizarCamposConsultas([setPrecioServicio, setNombreServicio], servicio, ['precioServicio', 'nombreServicio']);
-  }, [servicio])
-
-  useEffect(() => {
-    if (idProducto !== undefined) actualizarCamposConsultas([setPrecioProducto, setNombreProducto], producto, ['precioVenta', 'nombreProducto']);
-  }, [producto])
-
-  useEffect(() => {
-    mainTablaDetalleCotizacion();
-    setTablaDetalleActual(false)
-  }, [tablaDetalleActul])
+    setActualizacion(false)
+    getProductosName()
+    getServiciosName()
+  }, [actualizacion ? cotizacion : null])
 
   const getCotizaciones = async () => {
     try {
       const respuesta = await axios.get(url, {})
-      setCotizacion(respuesta.data)
+      setCotizacion(await respuesta.data)
     } catch (error) {
-      console.error('Error al obtener las compras:', error.message)
+      console.error('Error al obtener las cotizaciones', error.message)
     }
+  }
+
+  const handleChange = (e) => {
+    const valor = e.target.value;
+    setBusqueda(valor);
+
+    if (valor.trim() === '') {
+      getCotizaciones();
+    } else {
+      filtrar(valor);
+    }
+  };
+
+  const filtrar = (terminoBusqueda) => {
+    var resultadosBusqueda = cotizacion.filter((elemento) => {
+
+      if (elemento.descripcion.toString().toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
+        elemento.estado.toString().toLowerCase().includes(terminoBusqueda.toLowerCase()) ||
+        elemento.vehiculos_placa.toString().toLowerCase().includes(terminoBusqueda.toLowerCase())
+      ) {
+        return elemento;
+      }
+    });
+    setCotizacion(resultadosBusqueda);
+  }
+
+  const getCotizacionAsociadas = async (idCotizacion, valor) => {
+    try {
+      const response = await axios.get(`http://localhost:8081/api/cotizacion/${idCotizacion}`);
+      const data = response.data;
+
+      // Verificar si la respuesta contiene los detalles de venta y actualizar los estados correspondientes
+      if (data && data.detalleCotizacion) {
+        setCotizacionAsociadas(data.detalleCotizacion);
+      }
+      if (data && data.cotizacion) {
+        setDetalleCotizacionSeleccionada(data.cotizacion);
+      }
+      if (valor == 1) {
+        setShowModal(true);
+      }
+    } catch (error) {
+      console.error('Error al obtener las cotizaciones asociadas:', error.message);
+    }
+  };
+
+  const getProductosName = async () => {
+    try {
+      const respuesta = await axios.get('http://localhost:8081/api/productos');
+      const datosProductos = respuesta.data.reduce((acc, producto) => {
+        acc[producto.idProducto] = producto.nombreProducto;
+        return acc;
+      }, {});
+      setProductosName(datosProductos);
+    } catch (error) {
+      console.error('Error al obtener el nombre de los productos', error.message);
+    }
+  };
+
+  const getServiciosName = async () => {
+    try {
+      const respuesta = await axios.get('http://localhost:8081/api/servicio');
+      const datosServicios = respuesta.data.reduce((acc, servicio) => {
+        acc[servicio.idServicio] = servicio.nombreServicio;
+        return acc;
+      }, {});
+      setServiciosName(datosServicios);
+    } catch (error) {
+      console.error('Error al obtener el nombre de los servicios', error.message);
+    }
+  };
+
+
+
+  const generarPDF = async (idCotizacion) => {
+    try {
+      const response = await axios.get(`http://localhost:8081/api/cotizacion/${idCotizacion}`);
+      const detalleCotizacion = response.data.cotizacion;
+      const productosAsociados = response.data.detalleCotizacion;
+
+      const doc = new jsPDF();
+
+      // Título del PDF
+      doc.setFontSize(18);
+      doc.text("Detalles de la Cotizacion", 14, 15);
+
+      // Datos de la cotizacion
+      doc.setFontSize(12);
+      doc.text(`ID cotizacion: ${detalleCotizacion.idCotizacion}`, 14, 30);
+      doc.text(`Descripción: ${detalleCotizacion.descripcion}`, 14, 40);
+      doc.text(`Estado: ${detalleCotizacion.estado}`, 14, 50);
+      doc.text(`Fecha: ${fecha2(detalleCotizacion.fecha)}`, 14, 60);
+      doc.text(`Vehiculo: ${cotizacionAsociadas.map((cotizacion) => (cotizacion.vehiculos_placa))}`, 14, 70);
+      doc.text(`Total cotizacion: ${detalleCotizacion.total}`, 14, 80);
+
+      // Tabla de productos asociados
+      const productosData = productosAsociados.map((cotizacion) => [
+        productosName[cotizacion.productos_idProducto] || serviciosName[cotizacion.servicios_idServicio],
+        cotizacion.Array === cotizacion.idDetalleCotizacionProducto ? "Servicio" : "Producto",
+        cotizacion.valorManoObra || cotizacion.precioVenta,
+        cotizacion.cantidad || "1",
+        cotizacion.total
+      ]);
+
+
+
+      doc.autoTable({
+        startY: 90,
+        head: [['Nombre', 'tipo', 'Valor unitario', 'Cantidad', 'Total']],
+        body: productosData,
+      });
+
+      // Guardar o descargar el PDF
+      doc.save("detalle_compra.pdf");
+    } catch (error) {
+      console.error('Error al generar el PDF:', error.message);
+    }
+  };
+
+  // Función para obtener las cotizaciones de la página actual
+  const getCurrentPageCotizaciones = () => {
+    const startIndex = (currentPage - 1) * 5;
+    const endIndex = startIndex + 5;
+    return cotizacion.slice(startIndex, endIndex);
+  }
+
+  const openModal = (op, estado, idCotizacion) => {
+    setEstado('');
+    setIdCotizacion('');
+    if (op === 2) {
+      setTitle('Editar cotizacion')
+      setIdCotizacion(idCotizacion);
+      setEstado(estado);
+      setOperation('');
+    }
+    setOperation(op)
+    window.setTimeout(function () {
+      document.getElementById('estado').focus();
+    }, 500);
+  }
+
+  const validar = () => {
+    var parametros;
+    var metodo;
+
+
+    if (operation === 2) {
+      parametros = { idCotizacion: idCotizacion, estado: estado };
+      metodo = 'PUT';
+    }
+    enviarSolicitud(metodo, parametros);
+
+  }
+
+  const enviarSolicitud = async (metodo, parametros) => {
+    await axios({ method: metodo, url: url, data: parametros }).then(function (respuesta) {
+      if (metodo === 'PUT') {
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Cotizacion editada con exito",
+          showConfirmButton: false,
+          timer: 1500
+        });
+        document.getElementById('btnCerrar').click();
+      }
+      setActualizacion(true)
+    })
+      .catch(function (error) {
+        show_alerta('Error en la solicitud', 'error');
+        console.log(error);
+      })
   }
 
   return (
     <div className='App'>
       <div className='container-fluid'>
-        <div className='row mt-3'>
-          <div className='col-md-4 offset-md-4'>
-            <div className='d-grid mx-auto'>
-              <button className='btn btn-dark' data-bs-toggle='modal' data-bs-target='#modalCotizaciones' onClick={() => { setFecha(formatDate(new Date())) }}>
-                <FontAwesomeIcon icon={faPlusCircle} /> Nueva cotización
-              </button>
+        <div style={{ display: 'flex', }} id="Container">
+
+          <div style={{ marginRight: 'auto' }}>
+            <h3>Cotizaciones</h3>
+          </div>
+          <div className='input-group' style={{ marginRight: '1%' }}>
+            <input className='form-control inputBuscador'
+              id='buscador'
+              value={busqueda}
+              placeholder='Buscar'
+              onChange={handleChange}
+            />
+            <div className="icon-container">
+              <FontAwesomeIcon icon={faSearch} />
             </div>
           </div>
+
+          <Link to="/cotizacion/agregar">
+            <button className='botones-azules'>
+              <FontAwesomeIcon icon={faPlusCircle} /> Añadir
+            </button>
+          </Link>
         </div>
+
         <div className='row mt-3'>
-          <div className='col-12 col-lg-8 offset-0 offset-lg-2'>
-            <div className='table-responsive'>
-              <table className='table table-bordered'>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Descripcion</th>
-                    <th>Estado</th>
-                    <th>Mano de obra</th>
-                    <th>Valor insumos</th>
-                    <th>Metodo de pago</th>
-                    <th>Fecha</th>
-                    <th>Vehiculo</th>
-                    <th>Servicios</th>
-                    <th>productos</th>
-                    <th>Acciones</th>
+          <div className="table-responsive" style={{ maxWidth: '100%', margin: '0 auto' }}>
+            <table className='table table-striped' style={{ width: '100%' }}>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Descripcion</th>
+                  <th>Fecha</th>
+                  <th>Valor cotizacion</th>
+                  <th>Total</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              {/* ref={tableRef} */}
+              <tbody className='table-group-divider'>
+                {getCurrentPageCotizaciones().map((c) => (
+                  <tr key={c.idCotizacion}>
+                    <td>{c.idCotizacion}</td>
+                    <td>{c.descripcion}</td>
+                    <td>{fecha2(c.fecha)}</td>
+                    <td>{c.valorCotizacion}</td>
+                    <td>{c.total}</td>
+                    <td>{c.estado}</td>
+                    <td>
+                      <button className='btn btn-info' onClick={() => getCotizacionAsociadas(c.idCotizacion, 1)}>
+                        <FontAwesomeIcon icon={faEye} />
+                      </button>
+                      &nbsp;
+                      <button className='btn btn-success' onClick={() => generarPDF(c.idCotizacion)}>
+                        <FontAwesomeIcon icon={faCloudDownload} />
+                      </button>
+                      &nbsp;
+                      <button onClick={() => openModal(2, c.estado, c.idCotizacion)} className='btn btn-warning'
+                        data-bs-toggle='modal' data-bs-target='#modalCotizaciones'>
+                        <FontAwesomeIcon icon={faEdit} />
+                      </button>
+                    </td>
                   </tr>
-                </thead>
-                {/* ref={tableRef} */}
-                <tbody className='table-group-divider'>
-                  {cotizacion.map((c) => (
-                    <tr key={c.idCotizacion}>
-                      <td>{c.idCotizacion}</td>
-                      <td>{c.descripcion}</td>
-                      <td>{c.estado ? "activo" : "desactivado"}</td>
-                      <td>{c.valorManoObra}</td>
-                      <td>{c.valorCotizacion}</td>
-                      <td>{c.metodoPago}</td>
-                      <td>{c.fecha}</td>
-                      <td>{c.vehiculos_placa}</td>
-                      <td>
-                        <button className='btn' style={{ color: "blue", cursor: "pointer" }}>Ver</button>
-                      </td>
-                      <td>
-                        <button className='btn' style={{ color: "blue", cursor: "pointer" }}>Ver</button>
-                      </td>
-                      <td>
-                        <button className='btn btn-warning'>
-                          <FontAwesomeIcon icon={faEdit} />
-                        </button>
-                        &nbsp;
-                        <button className='btn btn-danger'>
-                          <FontAwesomeIcon icon={faTrash} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        {/* Paginación */}
+        <div className='row mt-3' style={{ marginLeft: '-21.5%' }}>
+          <div className='col-12 col-lg-8 offset-0 offset-lg-2'>
+            <CSmartPagination
+              activePage={currentPage}
+              pages={Math.ceil(cotizacion.length / 5)}
+              onActivePageChange={setCurrentPage}
+            />
           </div>
         </div>
       </div>
 
-      <ModalProyecto
-        title='Nueva cotización'
-        idModal='modalCotizaciones'
-        inputs={[
-          <ContentDoble key="fechaCotizacionYButtonSwitch" componentes={[
-            <ContentIndividual key="fechaYHora" componentes={[
-              <span key="title">Fecha y hora</span>,
-              <input key="componente" className="form-control" type='datetime-local' readOnly={true} id='fechaCotizacion' value={fecha} onChange={(e) => setFecha(e.target.value)}></input>
-            ]} />,
-            <ContentIndividual key="estado" componentes={[
-              <span key="title"> Estado</span>,
-              <ButtonSwitch key="componente" idComponente="estadoCotizacion" estado_componente={estado} onChange={(e) => setEstado(e.target.checked)} />
-            ]} />
-          ]} />,
+      <div id='modalCotizaciones' className='modal fade' aria-hidden='true' data-bs-backdrop='static' data-bs-keyboard='false' >
+        <div className='modal-dialog modal-dialog-centered'>
+          <div className='modal-content'>
+            <div className='modal-header'>
+              <label className='h5'>{title}</label>
+              <button type='button' id='btnCerrar' className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
+            </div>
+            <div className='modal-body'>
 
-          <ContentDoble key="valorManoObraYValorInsumos" componentes={[
-            <ContentIndividual key="valorManoObra" componentes={[
-              <span key="title">Mano de obra</span>,
-              <input key="componente" className="form-control" type='text' readOnly={true} id='valorManoObra' value={valorManoObra} onChange={(e) => setValorManoObra(e.target.value)}></input>
-            ]} />,
-            <ContentIndividual key="valorInsumos" componentes={[
-              <span key="title">Valor insumos</span>,
-              <input key="componente" className="form-control" type='text' readOnly={true} id='valorInsumos' value={valorCotizacion} onChange={(e) => setValorCotizacion(e.target.value)}></input>
-            ]} />
-          ]} />,
-          <ContentDoble key="vehiculoOpcionesCotizacion" componentes={[
-            <ContentIndividual key="vehiculo" componentes={[
-              <span key="title">Vehiculo</span>,
+              <div className='input-group mb-3'>
+                <span className='input-group-text'><FontAwesomeIcon icon={faIdCardClip} /></span>
+                <input type='text' id='estado' className='form-control' value={idCotizacion} onChange={(e) => setIdCotizacion(e.target.value)} disabled />
+              </div>
 
-              <select key="componente" className="form-control" id='vehiculos' value={vehiculos_placa} onChange={(e) => setPlacaVehiculo(e.target.value)}>
-                <option key="default" value="default">Seleccione el vehiculo</option>
-                <SeletedOption key='options' tabla='vehiculos' columna='placa' />
-              </select>
+              <div className='input-group mb-3' >
+                <label htmlFor='estado' className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></label>
+                <select id='estado' className="form-control" value={estado} onChange={(e) => setEstado(e.target.value)}>
+                  <option  disabled>Seleccione un estado</option>
+                  <option value='Venta'>Venta</option>
+                  <option value='Cotizacion'>Cotizacion</option>
+                </select>
+              </div>
 
-            ]} />,
-            <ContentIndividual key="options" componentes={[
-              <span key="title">opciones</span>,
-              <ContentIndividual key="opcionesButton" componentes={[
-                <ButtonNormal key="buttonCoServivcio" idComponent="buttonCoServivcio" idModal='#modalCotizacionServicio' title="Cotizar Servicio" />,
-                <ButtonNormal key="buttonCoProcucto" idComponent="buttonCoProducto" title="Cotizar Producto" idModal='#modalCotizacionProducto' />
-              ]} flexDirectionContents='row' justifyContents='space-between' />
-            ]} />,
-          ]} />,
-          <ContentIndividual key="descripcioContents" componentes={[
-            <span key="title">Descripcion</span>,
-            <ContentIndividual key="contentsDescripcion" componentes={[
-              <textarea key="descripcion" className="form-control"
-                style={{
-                  flex: '1',
-                  padding: '5px',
-                }} value={descripcion} onChange={(e) => setDescripcion(e.target.value)} ></textarea>,
-            ]} widthContents='600px' />
-          ]} />,
-          <div key="buttonGuardar" className='d-grid col-6 mx-auto'>
-            <button className='btn btn-success' onClick={() => {
-              peticionPost(['cotizacion', 'detalleCotizacionServicio', 'detalleCotizacionProducto'],
-                [{ "descripcion": descripcion, "estado": estado, "valorManoObra": parseInt(valorManoObra.substring(1, valorManoObra.length)), "valorCotizacion": parseInt(valorCotizacion.substring(1, valorCotizacion.length)), "metodoPago": "Efectivo", "fecha": fecha, "vehiculos_placa": vehiculos_placa },
-                tablaDetalleCotizacionServicio.getAObjetos(), tablaDetalleCotizacionProducto.getAObjetos()],
-                ["max(idCotizacion)", "cotizaciones"]
-              )
-            }}>
-              <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
-            </button>
+              <div className='d-grid col-6 mx-auto'>
+                <button onClick={() => validar()} className='botones-azules'>
+                  <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
+                </button>
+              </div>
+            </div>
           </div>
-        ]} widthContents='650px' />
+        </div>
+      </div>
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Detalle cotizacion</Modal.Title>
+        </Modal.Header>
 
-      <ModalProyecto
-        title='Agregar servicio a cotizar'
-        idModal='modalCotizacionServicio'
-        inputs={[
-          <ContentDoble key="fechaCotizacionYButtonSwitch" componentes={[
-            <ContentIndividual key="vehiculo" componentes={[
-              <span key="title">Nombre servicio</span>,
-              <select key="componente" className="form-control" id='idServicios' onChange={(e) => { setIdServicio(e.target.value) }}>
-                <option value="defaut">Selecione un servicio</option>
-                <SeletedOption key='options' tabla='servicios' columna='idServicio, nombreServicio' />
-              </select>
-            ]} />, <ContentIndividual key="valorManoObra" componentes={[
-              <span key="title">Precio de servicio</span>,
-              <input key="componente" className="form-control" type='text' id='inputPrecioServicio' value={precioservicio} onChange={(e) => setPrecioServicio(e.target.value)}></input>
-            ]} />,
-          ]} />,
-          <ContentDoble key="valorManoObraYValorInsumos" componentes={[
-            <ContentIndividual key="valorInsumos" componentes={[
-              <span key="title">Cantidad</span>,
-              <input key="componente" className="form-control" type='number' max={3} id='inputCantidadCotizacion' value={cantidad} onChange={(e) => setCantidadServicio(e.target.value)}></input>
-            ]} />,
-            <ContentIndividual key="opciones" componentes={[
-              <span key="title" style={{ margin: '0 auto' }}>opciones</span>,
-              <ContentIndividual key="opcionesButton" componentes={[
-                <ButtonNormal key="buttonAddServivcio" idComponent="buttonAddServivcio" funcionButton={
-                  () => {
-                    addTablaDetalle(tablaDetalleCotizacionServicio,
-                      { codigo: countServicio, nombre: nombreservicio, precio: precioservicio, cantidad: cantidad, subTotal: (parseInt(precioservicio.substring(1, precioservicio.length)) * parseInt(cantidad)), identificador: idservicio },
-                      setValorManoObra, (parseInt(valorManoObra.substring(1, valorManoObra.length)) + (parseInt(precioservicio.substring(1, precioservicio.length)) * parseInt(cantidad))).toString())
-                    setcountServicio(countServicio + 1)
-                    setPrecioServicio("$ 0")
-                    setCantidadServicio("0")
-                  }}
-                  title="agregar Servicio" />,
-                <ButtonNormal key="buttonCoProcucto" idComponent="buttonCoProducto" idModal='#modalServiciosCotizados' title="Ver servicios" />
-              ]} flexDirectionContents='row' justifyContents='space-evenly' />,
-            ]} marginContent='0 auto' />,
-          ]} />,
-          <div key="buttonGuardar" className='d-grid col-6 mx-auto'>
-            <button className='btn btn-success' data-bs-toggle='modal' data-bs-target='#modalCotizaciones'>
-              Acceptar <FontAwesomeIcon icon={faCheck} />
-            </button>
-          </div>,
+        <Modal.Body>
+          <div style={{ display: 'flex', margin: '3%', padding: '2%' }}>
+            <div style={{ alignContent: 'space-around' }}>
+              <div className='mb-3'>
+                <label htmlFor='idCotizacion' className='form-label'>ID cotizacion</label>
+                <input type='text' className='form-control' id='idCotizacion' value={detalleCotizacionSeleccionada?.idCotizacion} readOnly />
+              </div>
+              <div className='mb-3'>
+                <label htmlFor='descripcion' className='form-label'>Descripcion</label>
+                <input type='text' className='form-control' id='descripcion' value={detalleCotizacionSeleccionada?.descripcion} readOnly />
+              </div>
 
-        ]} widthContents='650px' />
+              <div className='mb-3'>
+                <label htmlFor='estado' className='form-label'>Vehiculo</label>
+                <input type='text' className='form-control' id='estado' readOnly />
+              </div>
 
-      <ModalProyecto
-        title='Servicios cotizados'
-        idModal='modalServiciosCotizados'
-        inputs={[
-          <button key="volver" className='btn' data-bs-toggle='modal' data-bs-target='#modalCotizacionServicio'>
-            <FontAwesomeIcon icon={faArrowLeft} />
-          </button>,
-          <table key="tableDetalles" className='table table-bordered'>
+            </div>
+            <div style={{ marginLeft: '5%' }}>
+              <div className='mb-3'>
+                <label htmlFor='fecha' className='form-label'>Fecha cotizacion</label>
+                <input type='text' className='form-control' id='fecha' value={fecha2(detalleCotizacionSeleccionada?.fecha)} readOnly />
+              </div>
+
+              <div className='mb-3'>
+                <label htmlFor='total' className='form-label'>Total cotizacion</label>
+                <input type='text' className='form-control' id='total' value={detalleCotizacionSeleccionada?.total} readOnly />
+              </div>
+
+              <div className='mb-3'>
+                <label htmlFor='valorCotizacion' className='form-label'>Valor cotizacion</label>
+                <input type='text' className='form-control' id='valorCotizacion' value={detalleCotizacionSeleccionada?.valorCotizacion} readOnly />
+              </div>
+
+
+            </div>
+          </div>
+          <div></div>
+          <table className='table table-striped'>
             <thead>
               <tr>
-                <th>#</th>
-                <th>Nombre servicio</th>
-                <th>Precio servicio</th>
+                <th>Nombre</th>
+                <th>Tipo</th>
+                <th>Precio</th>
                 <th>Cantidad</th>
-                <th>SubTotal</th>
-                <th>Identificador</th>
-                <th>Acciones</th>
+                <th>Total</th>
               </tr>
             </thead>
-            {/* ref={tableRef} */}
-            <tbody className='table-group-divider'>
-              {
-                mainTablaDetalleCotizacion(tablaDetalleCotizacionServicio, valorManoObra, setValorManoObra, setTablaDetalleActual)
-              }
+            <tbody>
+              {Array.isArray(cotizacionAsociadas) && cotizacionAsociadas.map((cotizacion) => (
+                <tr key={cotizacion.idDetalleCotizacionProducto || cotizacion.idDetalleCotizacionServicio}>
+                  <td>{productosName[cotizacion.productos_idProducto] || serviciosName[cotizacion.servicios_idServicio]}</td>
+                  <td>{cotizacion.Array === cotizacion.idDetalleCotizacionProducto ? "Servicio" : "Producto"}</td>
+                  <td>{cotizacion.valorManoObra || cotizacion.precioVenta}</td>
+                  <td>{cotizacion.cantidad || "1"}</td>
+                  <td>{cotizacion.total}</td>
+                </tr>
+              ))}
             </tbody>
           </table>
-        ]} widthContents='630px' />
+        </Modal.Body>
 
-      <ModalProyecto
-        title='Agregar producto a cotizar'
-        idModal='modalCotizacionProducto'
-        inputs={[
-          <ContentDoble key="fechaCotizacionYButtonSwitch" componentes={[
-            <ContentIndividual key="nameProducto" componentes={[
-              <span key="title">Nombre producto</span>,
-              <select key="componente" className="form-control" id='nombreProducto' onChange={(e) => { setIdProducto(e.target.value) }}>
-                <option value="defaut">Seleccione un producto</option>
-                <SeletedOption key='options' tabla='productos' columna='idProducto, nombreProducto' />
-              </select>
-            ]} />, <ContentIndividual key="valorManoObra" componentes={[
-              <span key="title">Precio de producto</span>,
-              <input key="componente" className="form-control" type='text' id='inputPrecioProducto' value={precioProducto} onChange={(e) => setPrecioProducto(e.target.value)}></input>
-            ]} />,
-          ]} />,
-          <ContentDoble key="valorManoObraYValorInsumos" componentes={[
-            <ContentIndividual key="valorInsumos" componentes={[
-              <span key="title">Cantidad</span>,
-              <input key="componente" className="form-control" type='number' max={3} id='inputCantidadCotizacionProducto' value={cantidadProducto} onChange={(e) => setCantidadPrducto(e.target.value)}></input>
-            ]} />,
-            <ContentIndividual key="opciones" componentes={[
-              <span key="title" style={{ margin: '0 auto' }}>opciones</span>,
-              <ContentIndividual key="opcionesButton" componentes={[
-                <ButtonNormal key="buttonAddProducto" idComponent="buttonAddProducto" funcionButton={() => {
-                  addTablaDetalle(tablaDetalleCotizacionProducto,
-                    { codigo: countProducto, nombre: nombreProducto, precio: precioProducto, cantidad: cantidadProducto, subTotal: (parseInt(precioProducto.substring(1, precioProducto.length)) * parseInt(cantidadProducto)), identificador: idProducto },
-                    setValorCotizacion, (parseInt(valorCotizacion.substring(1, valorCotizacion.length)) + (parseInt(precioProducto.substring(1, precioProducto.length)) * parseInt(cantidadProducto))).toString())
-                  setcountProducto(countProducto + 1)
-                  setPrecioProducto("$ 0")
-                  setCantidadPrducto("0")
-                }} title="Agregar Producto" />,
-                <ButtonNormal key="buttonCoProcucto" idComponent="buttonCoProducto" idModal='#modalProductosCotizados' title="Ver productos" />
-              ]} flexDirectionContents='row' justifyContents='space-evenly' />,
-            ]} marginContent='0 auto' />,
-          ]} />,
-          <div key="buttonGuardar" className='d-grid col-6 mx-auto'>
-            <button className='btn btn-success' data-bs-toggle='modal' data-bs-target='#modalCotizaciones'>
-              Acceptar <FontAwesomeIcon icon={faCheck} />
-            </button>
-          </div>,
-
-        ]} widthContents='650px' />
-
-      <ModalProyecto
-        title='Productos cotizados'
-        idModal='modalProductosCotizados'
-        inputs={[
-          <button key="volver" className='btn' data-bs-toggle='modal' data-bs-target='#modalCotizacionProducto'>
-            <FontAwesomeIcon icon={faArrowLeft} />
-          </button>,
-          <table key="tableDetalles" className='table table-bordered'>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Nombre producto</th>
-                <th>Precio producto</th>
-                <th>Cantidad</th>
-                <th>SubTotal</th>
-                <th>Identificador</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            {/* ref={tableRef} */}
-            <tbody className='table-group-divider'>
-              {
-                mainTablaDetalleCotizacion(tablaDetalleCotizacionProducto, valorCotizacion, setValorCotizacion, setTablaDetalleActual)
-              }
-            </tbody>
-          </table>
-        ]} widthContents='630px' />
-
-    </div>
+      </Modal>
+    </div >
   )
 }
 

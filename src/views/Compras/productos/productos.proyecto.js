@@ -256,7 +256,7 @@ const Productos = () => {
         <input type='hidden' id='id' ></input>
         <div className='input-group mb-3'>
           <span className='input-group-text'><FontAwesomeIcon icon={faIdCardClip} /></span>
-          <input type='number' id='idProductos' className='form-control' placeholder='id' value={operation === 1 ? consecutivo : idProducto} />
+          <input type='number' id='idProductos' className='form-control' placeholder='Id' value={operation === 1 ? consecutivo : idProducto} />
         </div>
 
         <div className='input-group mb-3'>
@@ -389,13 +389,13 @@ const Productos = () => {
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Estado</th>
                   <th>Nombre</th>
+                  <th>Saldo existencia</th>
                   <th>Precio compra</th>
                   <th>Precio venta</th>
-                  <th>Saldo existencia</th>
                   <th>Stock maximo</th>
                   <th>Stock minimo</th>
+                  <th>Estado</th>
                   <th>Categoria</th>
                   <th>Acciones</th>
                 </tr>
@@ -405,13 +405,13 @@ const Productos = () => {
 
                   <tr key={p.idProducto}>
                     <td>{p.idProducto}</td>
-                    <td>{p.estadoProducto === 0 ? 'Suspendido' : 'Activo'}</td>
                     <td>{p.nombreProducto}</td>
+                    <td>{p.saldoExistencias}</td>                    
                     <td>{p.precioCompra}</td>
                     <td>{p.precioVenta}</td>
-                    <td>{p.saldoExistencias}</td>
                     <td>{p.stockMaximo}</td>
                     <td>{p.stockMinimo}</td>
+                    <td>{p.estadoProducto === 0 ? 'Suspendido' : 'Activo'}</td>
                     <td>{categoriaName[p.categoriaProducto_idCategoriaProducto]}</td>
                     <td>
                       <button onClick={() => openModal(2, p.idProducto, p.estadoProducto, p.nombreProducto, p.precioCompra, p.precioVenta, p.saldoExistencias, p.stockMaximo, p.stockMinimo, p.categoriaProducto_idCategoriaProducto)} className='btn btn-warning'
