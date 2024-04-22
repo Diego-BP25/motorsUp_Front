@@ -105,7 +105,7 @@ const Vehiculos = () => {
     var metodo;
 
     if (operation === 1) {
-      parametros = { placa: placa, referencia: referencia, modelo: modelo, color: color, estado: true, propietarios_idPropietario: propietarios_idPropietario };
+      parametros = { placa: placa, referencia: referencia, modelo: modelo, estado: true, color: color, propietarios_idPropietario: propietarios_idPropietario };
       metodo = 'POST';
     } else if (operation === 2) {
       parametros = { placa: placa, referencia: referencia, modelo: modelo, color: color, estado: estado, propietarios_idPropietario: propietarios_idPropietario };
