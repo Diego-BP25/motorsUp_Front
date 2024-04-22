@@ -3,11 +3,13 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import '@fortawesome/fontawesome-free'
+import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faTruckField, faSearch, faAddressCard, faUser, faLocationDot, faPhone, faEnvelope, faLock, faUserGear, faToggleOff } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faCaretDown, faSearch, faAddressCard, faUser, faLocationDot, faPhone, faEnvelope, faLock, faUserGear, faToggleOff } from '@fortawesome/free-solid-svg-icons'
 import { CSmartPagination } from '@coreui/react-pro'
 import { show_alerta } from 'src/fuctions.proyecto'
 import { jwtDecode } from 'jwt-decode';
+
 
 
 const Empleados = () => {
@@ -21,7 +23,6 @@ const Empleados = () => {
   const [estado, setEstado] = useState('')
   const [correoEmpleado, setCorreoEmpleado] = useState('')
   const [contrasena, setContrasena] = useState('')
-  const [roles_idRol, setRoles_idRol] = useState('')
   const [operation, setOperation] = useState(1)
   const [title, setTitle] = useState('')
   const [idE, setIdE] = useState('')
@@ -32,8 +33,13 @@ const Empleados = () => {
   const [currentPage, setCurrentPage] = useState(1)
   //Buscador
   const [busqueda, setBusqueda] = useState("");
-
+  //Roles
   const [roles, setRoles] = useState([])
+  const [roles_idRol, setRoles_idRol] = useState('')
+  //Estado
+  const [filtradoPorEstado, setFiltradoPorEstado] = useState(false);
+  const [estadoFiltrado, setEstadoFiltrado] = useState(true);
+
 
   useEffect(() => {
     getEmpleados()
@@ -45,22 +51,50 @@ const Empleados = () => {
     }
     getRoles()
     setActualizacion(false)
-   
+
   }, [actualizacion ? empleado : null])
 
+  useEffect(() => {
+    getEmpleados()
+  }, [filtradoPorEstado, estadoFiltrado]);
 
 
-  
 
   const getEmpleados = async () => {
     try {
-      const respuesta = await axios.get(url, {})
-      const empleadosData = respuesta.data.filter(emp => emp.idEmpleado !== idE);
-      setEmpleado(empleadosData);
+      const token = localStorage.getItem('Empleado');
+
+      const tokenSinComillas = token.slice(1, -1);
+      const headers = {
+        'x-token': tokenSinComillas
+      };
+      
+      
+      const respuesta = await axios.get(url, {headers: headers})
+      let empleadosData = respuesta.data.filter(emp => emp.idEmpleado !== idE);
+
+      // Aplicar filtro por estado activo si es necesario
+      if (!filtradoPorEstado || estadoFiltrado) {
+        empleadosData = empleadosData.filter(emp => emp.estado === true);
+      } else {
+        // Aplicar filtro por estado inactivo si está activado
+        empleadosData = empleadosData.filter(emp => emp.estado === false);
+      }
+
+      setEmpleado(empleadosData)
     } catch (error) {
       console.error('Error al obtener los Empleados:', error.message)
     }
   }
+
+
+  const filtroEstado = () => {
+    setFiltradoPorEstado(!filtradoPorEstado);
+    // Si ya está filtrado por estado, alternar entre true y false
+    if (filtradoPorEstado) {
+      setEstadoFiltrado(!estadoFiltrado);
+    }
+  };
 
   const getRoles = async () => {
     try {
@@ -115,14 +149,14 @@ const Empleados = () => {
 
     if (operation === 1) {
       parametros = { idEmpleado: idEmpleado, nombreEmpleado: nombreEmpleado, direccionEmpleado: direccionEmpleado, telefonoEmpleado: telefonoEmpleado, estado: true, correoEmpleado: correoEmpleado, contrasena: contrasena, roles_idRol: roles_idRol };
-      
+
 
       console.log(parametros)
       metodo = 'POST';
     } else if (operation === 2) {
       parametros = { idEmpleado: idEmpleado, nombreEmpleado: nombreEmpleado, direccionEmpleado: direccionEmpleado, telefonoEmpleado: telefonoEmpleado, estado: estado, correoEmpleado: correoEmpleado, contrasena: contrasena, roles_idRol: roles_idRol };
       metodo = 'PUT';
-      
+
       console.log(parametros)
     }
     enviarSolicitud(metodo, parametros);
@@ -291,7 +325,10 @@ const Empleados = () => {
                     <th>Nombre</th>
                     <th>Direccion</th>
                     <th>Telefono</th>
-                    <th>Estado</th>
+                    <th onClick={filtroEstado} title="Haz clic para filtrar por estado" style={{ cursor: 'pointer' }}>
+                      Estado
+                      <FontAwesomeIcon icon={faCaretDown} style={{ marginLeft: '8px' }} />
+                    </th>
                     <th>Correo</th>
                     <th>Rol</th>
                     <th>Acciones</th>
@@ -301,26 +338,26 @@ const Empleados = () => {
                 <tbody className='table-group-divider'>
                   {getCurrentPageEmpleados().map((e) => (
                     <tr key={e.idEmpleado}>
-                       {e.idEmpleado !== idE && (
+                      {e.idEmpleado !== idE && (
                         <>
-                      <td>{e.idEmpleado}</td>
-                      <td>{e.nombreEmpleado}</td>
-                      <td>{e.direccionEmpleado}</td>
-                      <td>{e.telefonoEmpleado}</td>
-                      <td>
-                        <span className={!e.estado ? 'estado-inactivo' : 'estado-activo'}>{!e.estado ? 'Inactivo' : 'Activo'}</span></td>
-                      <td>{e.correoEmpleado}</td>
-                      <td>{nombreIdRol(e.roles_idRol)}</td>
-                      <td>
-                        <button onClick={() => openModal(2, e.idEmpleado, e.nombreEmpleado, e.direccionEmpleado, e.telefonoEmpleado, e.estado, e.correoEmpleado, e.contrasena, e.roles_idRol)} className='btn btn-warning'
-                          data-bs-toggle='modal' data-bs-target='#modalEmpleadoEditar'>
-                          <FontAwesomeIcon icon={faEdit} />
-                        </button>
-                        &nbsp;
-                        <button onClick={() => deleteEmpleado(e.idEmpleado)} className='btn btn-danger'>
-                          <FontAwesomeIcon icon={faTrash} />
-                        </button>
-                      </td>
+                          <td>{e.idEmpleado}</td>
+                          <td>{e.nombreEmpleado}</td>
+                          <td>{e.direccionEmpleado}</td>
+                          <td>{e.telefonoEmpleado}</td>
+                          <td>
+                            <span className={!e.estado ? 'estado-inactivo' : 'estado-activo'}>{!e.estado ? 'Inactivo' : 'Activo'}</span></td>
+                          <td>{e.correoEmpleado}</td>
+                          <td>{nombreIdRol(e.roles_idRol)}</td>
+                          <td>
+                            <button onClick={() => openModal(2, e.idEmpleado, e.nombreEmpleado, e.direccionEmpleado, e.telefonoEmpleado, e.estado, e.correoEmpleado, e.contrasena, e.roles_idRol)} className='btn btn-warning'
+                              data-bs-toggle='modal' data-bs-target='#modalEmpleadoEditar'>
+                              <FontAwesomeIcon icon={faEdit} />
+                            </button>
+                            &nbsp;
+                            <button onClick={() => deleteEmpleado(e.idEmpleado)} className='btn btn-danger'>
+                              <FontAwesomeIcon icon={faTrash} />
+                            </button>
+                          </td>
                         </>
                       )}
                     </tr>
@@ -344,51 +381,56 @@ const Empleados = () => {
       </div>
 
       <div id='modalEmpleados' className='modal fade' aria-hidden='true' data-bs-backdrop='static' data-bs-keyboard='false'>
-    {/* Inicio Modal */}
-    <div className='modal-dialog modal-dialog-centered'>
-        <div className='modal-content'>
+        {/* Inicio Modal */}
+        <div className='modal-dialog modal-dialog-centered'>
+          <div className='modal-content'>
             <div className='modal-header'>
-                <label className='h5'>{title}</label>
-                <button type='button' id="btnCerrar" className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
+              <label className='h5'>{title}</label>
+              <button type='button' id="btnCerrar" className='btn-close' data-bs-dismiss='modal' aria-label='close'></button>
             </div>
             <div className='modal-body'>
-                <input type='hidden' id='id' ></input>
-                <div className='input-group mb-3'>
-                    <span className='input-group-text'><FontAwesomeIcon icon={faAddressCard} /></span>
-                    <input type='text' id='idEmpleado' className='form-control' placeholder='CC' value={idEmpleado} onChange={(e) => setIdEmpleado(e.target.value)} style={{ marginRight: '10px' }}></input>
-                    <span className='input-group-text'><FontAwesomeIcon icon={faUser} /></span>
-                    <input type='text' id='nombreEmpleado' className='form-control' placeholder='Nombre' value={nombreEmpleado} onChange={(e) => setNombreEmpleado(e.target.value)}></input>
-                </div>
-                <div className='input-group mb-3'>
-                    <span className='input-group-text'><FontAwesomeIcon icon={faLocationDot} /></span>
-                    <input type='text' id='direccionEmpleado' className='form-control' placeholder='Dirección' value={direccionEmpleado} onChange={(e) => setDireccionEmpleado(e.target.value)} style={{ marginRight: '10px' }} ></input>
-                    <span className='input-group-text'><FontAwesomeIcon icon={faPhone} /></span>
-                    <input type='text' id='telefonoEmpleado' className='form-control' placeholder='Teléfono' value={telefonoEmpleado} onChange={(e) => setTelefonoEmpleado(e.target.value)}></input>
-                </div>
-                <div className='input-group mb-3'>
-                    <span className='input-group-text'><FontAwesomeIcon icon={faEnvelope} /></span>
-                    <input type='text' id='correoEmpleado' className='form-control' placeholder='Correo' value={correoEmpleado} onChange={(e) => setCorreoEmpleado(e.target.value)} style={{ marginRight: '10px' }}></input>
-                    <span className='input-group-text'><FontAwesomeIcon icon={faLock} /></span>
-                    <input type='text' id='contrasena' className='form-control' placeholder='Contraseña' value={contrasena} onChange={(e) => setContrasena(e.target.value)}></input>
-                </div>
-                <div className='input-group mb-3'>
-                    <span className='input-group-text'><FontAwesomeIcon icon={faUserGear} /></span>
-                    <select id='roles_idRol' className='form-select' value={roles_idRol} onChange={(e) => setRoles_idRol(e.target.value)} style={{ marginRight: '12px' }}>
-                        <option value='' disabled>Rol</option>
-                        {roles.map((rol) => (
-                            <option key={rol.idRol} value={rol.idRol}>{rol.nombre}</option>
-                        ))}
-                    </select>
-                </div>
-                <div className='d-grid col-6 mx-auto'>
-                    <button onClick={() => validar()} className='botones-azules'>
-                        <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
-                    </button>
-                </div>
+              <input type='hidden' id='id' ></input>
+              <div className='input-group mb-3'>
+                <span className='input-group-text'><FontAwesomeIcon icon={faAddressCard} /></span>
+                <input type='text' id='idEmpleado' className='form-control' placeholder='CC' value={idEmpleado} onChange={(e) => setIdEmpleado(e.target.value)} style={{ marginRight: '10px' }}></input>
+                <span className='input-group-text'><FontAwesomeIcon icon={faUser} /></span>
+                <input type='text' id='nombreEmpleado' className='form-control' placeholder='Nombre' value={nombreEmpleado} onChange={(e) => setNombreEmpleado(e.target.value)}></input>
+              </div>
+              <div className='input-group mb-3'>
+                <span className='input-group-text'><FontAwesomeIcon icon={faLocationDot} /></span>
+                <input type='text' id='direccionEmpleado' className='form-control' placeholder='Dirección' value={direccionEmpleado} onChange={(e) => setDireccionEmpleado(e.target.value)} style={{ marginRight: '10px' }} ></input>
+                <span className='input-group-text'><FontAwesomeIcon icon={faPhone} /></span>
+                <input type='text' id='telefonoEmpleado' className='form-control' placeholder='Teléfono' value={telefonoEmpleado} onChange={(e) => setTelefonoEmpleado(e.target.value)}></input>
+              </div>
+              <div className='input-group mb-3'>
+                <span className='input-group-text'><FontAwesomeIcon icon={faEnvelope} /></span>
+                <input type='text' id='correoEmpleado' className='form-control' placeholder='Correo' value={correoEmpleado} onChange={(e) => setCorreoEmpleado(e.target.value)} style={{ marginRight: '10px' }}></input>
+                <span className='input-group-text'><FontAwesomeIcon icon={faLock} /></span>
+                <input type='text' id='contrasena' className='form-control' placeholder='Contraseña' value={contrasena} onChange={(e) => setContrasena(e.target.value)}></input>
+              </div>
+              <div className='input-group mb-3'>
+                <span className='input-group-text'><FontAwesomeIcon icon={faUserGear} /></span>
+                <select id='roles_idRol' className='form-select' value={roles_idRol} onChange={(e) => setRoles_idRol(e.target.value)} style={{ marginRight: '12px' }}>
+                  <option value='' disabled>Rol</option>
+                  {roles.map((rol) => (
+                    <option key={rol.idRol} value={rol.idRol}>{rol.nombre}</option>
+                  ))}
+                </select>
+                
+                <button   onClick={() => { window.location.href = '/Configuracion/rol'; }} className='botones-azules'>
+                  <FontAwesomeIcon icon={faPlusCircle} /> Añadir
+                </button>
+                
+              </div>
+              <div className='d-grid col-6 mx-auto'>
+                <button onClick={() => validar()} className='botones-azules'>
+                  <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
+                </button>
+              </div>
             </div>
+          </div>
         </div>
-    </div>
-</div>
+      </div>
 
 
 
