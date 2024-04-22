@@ -51,7 +51,7 @@ const GraficaProductos = () => {
             cx="50%"
             cy="50%"
             outerRadius={80}
-            fill="blue"
+            fill="pink"
             label
           />
           <Tooltip />
