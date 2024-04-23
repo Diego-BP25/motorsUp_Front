@@ -433,7 +433,7 @@ const Agendamiento = () => {
                           <option key={v.placa} value={v.placa}>{v.placa}</option>
                         ))}
                       </select>
-                      <button className='botones-azules'>
+                      <button onClick={() => { window.location.href = '/Servicios/Vehiculo'; }} className='botones-azules'>
                         <FontAwesomeIcon icon={faPlusCircle} /> Añadir
                       </button>
                     </div>
@@ -486,10 +486,10 @@ const Agendamiento = () => {
                   <section className="col-md-6" >
 
 
-                    <div style={{ maxWidth: '135%', maxHeight: '200%', padding: '3%', overflow: 'auto' }}>
+                    <div style={{ maxWidth: '135%', maxHeight: '200px', padding: '3%', overflow: 'scroll' }}>
                       <h4>Servicios Agregados</h4>
                       <table className='table'>
-                        <thead style={{ position: 'center', top: 0, backgroundColor: 'white' }} >
+                        <thead style={{ position: 'sticky',top: 0, backgroundColor: 'white' }} >
                           <tr >
 
                             <th>Servicio</th>

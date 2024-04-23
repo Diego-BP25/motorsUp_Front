@@ -40,6 +40,7 @@ const Compras = () => {
   //detalle de la compra
   const [detalleCompraSeleccionada, setDetalleCompraSeleccionada] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  
   //buscador
   const [busqueda, setBusqueda] = useState("");
 

@@ -284,7 +284,7 @@ const Servicios = () => {
                                             <td>
                                                 <span className={!s.estado ? 'estado-inactivo' : 'estado-activo'}>{!s.estado ? 'Inactivo' : 'Activo'}</span></td>
                                             <td>
-                                                <button onClick={() => openModal(2, s.idServicio, s.idServicio, s.descripcion, s.estado)} className='btn btn-warning' data-bs-toggle='modal' data-bs-target='#modalServicioEditar'>
+                                                <button onClick={() => openModal(2, s.idServicio, s.nombreServicio, s.descripcion, s.estado)} className='btn btn-warning' data-bs-toggle='modal' data-bs-target='#modalServicioEditar'>
                                                     <FontAwesomeIcon icon={faEdit} />
                                                 </button>
                                                 &nbsp;
