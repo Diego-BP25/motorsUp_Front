@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faFloppyDisk, faCalendar, faToggleOff, faTag, faFileText, faHashtag, faBagShopping, faDollar, faUser, faTools } from '@fortawesome/free-solid-svg-icons'
+import {  faTrash, faFloppyDisk, faCalendar, faTag, faFileText, faHashtag, faBagShopping, faDollar, faUser, faTools } from '@fortawesome/free-solid-svg-icons'
+import { formatDate } from '../funcionesExtras.proyecto';
 
 const AgregarVenta = () => {
     // API URL
@@ -128,6 +129,7 @@ const AgregarVenta = () => {
         try {
             const response = await axios.get('http://localhost:8081/api/productos');
             setProductos(response.data);
+            setFechaVenta(formatDate(new Date()))
         } catch (error) {
             console.error('Error al obtener los productos:', error.message);
         }
@@ -266,12 +268,17 @@ const AgregarVenta = () => {
 
                                     <div className='input-group mb-3' >
                                         <label htmlFor='fechaVenta' className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></label>
-                                        <input type='datetime-local' id='fechaVenta' placeholder='Fecha' className="form-control" value={fechaVenta} onChange={(e) => setFechaVenta(e.target.value)} />
+                                        <input type='datetime-local' id='fechaVenta' className="form-control" value={fechaVenta} readOnly={true} onChange={(e) => setFechaVenta(e.target.value)} />
                                     </div>
 
                                     <div className='input-group mb-3' >
                                         <label htmlFor='metodoPago' className='input-group-text'><FontAwesomeIcon icon={faDollar} /></label>
-                                        <input type='text' id='metodoPago' placeholder='Metodo Pago' className="form-control" value={metodoPago} onChange={(e) => setMetodoPago(e.target.value)} />
+                                        <select type='text' id='metodoPago' placeholder='Metodo Pago' className="form-control" value={metodoPago} onChange={(e) => setMetodoPago(e.target.value)} >
+                                        <option value='Efectivo'>Efectivo</option>
+                                        <option value='Transferencia'>Transeferencia</option>
+                                        <option value='Tarjeta de credito'>Tarjeta de credito</option>
+
+                                        </select>
                                     </div>
 
                                     <h4
@@ -295,7 +302,7 @@ const AgregarVenta = () => {
                                                         <option key={pro.idEmpleado} value={pro.idEmpleado}>{pro.nombreEmpleado}</option>
                                                     ))}
                                                 </select>
-                                            </div>
+                                            </div> 
                                             <div className='input-group mb-3' >
                                                 <label htmlFor='vehiculos_placa' className='input-group-text'><FontAwesomeIcon icon={faUser} /></label>
                                                 <select id='vehiculos_placa' className="form-control" value={vehiculos_placa} onChange={(e) => setplaca(e.target.value)}>
@@ -376,7 +383,7 @@ const AgregarVenta = () => {
                                     )}
 
                                 </div>
-                                <div className='input-group mb-3' style={{ marginTop: '-8.5%', marginLeft: '65.8%', maxHeight: '35px', marginBottom: '35px' }}>
+                                <div className='input-group mb-3' style={{ marginTop: '-8.5%', marginLeft: '64.4%', maxHeight: '35px', marginBottom: '35px' }}>
                                     <label htmlFor='total' className='input-group-text'><FontAwesomeIcon icon={faDollar} /></label>
                                     <input type='number' className="form-control" id='total' value={venta} />
                                 </div>
@@ -384,9 +391,9 @@ const AgregarVenta = () => {
 
                             <div className="col">
 
-                                <div id='container1' style={{ maxWidth: '135%', maxHeight: '70%', marginLeft: '-40%', padding: '3%', overflow: 'scroll' }}>
+                                <div id='container1' style={{ maxWidth: '135%', maxHeight: '360px', marginLeft: '-40%', padding: '3%', overflowY: 'auto' }}>
                                     <h4>Venta</h4>
-                                    <table className='table'>
+                                    <table className='table' style={{ width: '100%' }}>
                                         <thead style={{ position: 'sticky', top: 0, backgroundColor: 'white' }}>
                                             <tr >
                                                 <th>Id</th>

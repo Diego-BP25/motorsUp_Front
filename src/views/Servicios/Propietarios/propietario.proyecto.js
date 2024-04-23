@@ -7,7 +7,7 @@ import { CRow } from '@coreui/react'
 import { show_alerta } from 'src/fuctions.proyecto'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faToggleOff, faIdCardClip, faUser, faPhone, faEnvelope, faSearch } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faToggleOff, faCaretDown, faIdCardClip, faUser, faPhone, faEnvelope, faSearch } from '@fortawesome/free-solid-svg-icons'
 import { CSmartPagination } from '@coreui/react-pro'
 
 const Propietarios = () => {
@@ -17,36 +17,57 @@ const Propietarios = () => {
   const [nombrePropietario, setNombre] = useState('')
   const [telefonoPropietario, setTelefono] = useState('')
   const [correoPropietario, setCorreo] = useState('')
-  const [estadoPropietario, setEstado] = useState('')
+  const [estadoPropietario, setEstadoPropietario] = useState('')
   const [operation, setOperation] = useState(1)
   const [title, setTitle] = useState('')
   const [actualizacion, setActualizacion] = useState(false)
   const [busqueda, setBusqueda] = useState("");
   const [currentPage, setCurrentPage] = useState(1)
+  const [filtradoPorEstado, setFiltradoPorEstado] = useState(false);
+  const [estadoFiltrado, setEstadoFiltrado] = useState(true);
+  //tipo de modal
+  const [modalType, setModalType] = useState('add');
 
   //detalle servicio
 
   useEffect(() => {
     getPropietarios()
     setActualizacion(false)
-  }, [actualizacion ? propietario : null])
+  }, [actualizacion ? propietario : null]);
+
+  useEffect(() =>{
+    getPropietarios()
+  }, [filtradoPorEstado, estadoFiltrado])
 
   const getPropietarios = async () => {
     try {
       const respuesta = await axios.get(url, {})
-      setPropietario(await respuesta.data)
+      let propietariosData = respuesta.data.filter(pro => pro.estadoPropietario === true); // Filtrar propietarios con estado true
+      if (filtradoPorEstado && !estadoFiltrado) {
+        propietariosData = respuesta.data.filter(pro => pro.estadoPropietario === false); // Filtrar propietarios con estado false si está activado el filtro por estado inactivo
+      }
+      setPropietario(propietariosData)
     } catch (error) {
       console.error('Error al obtener los Empleados:', error.message)
     }
   }
+
+  const filtroEstado = () => {
+    setFiltradoPorEstado(!filtradoPorEstado);
+    // Si ya está filtrado por estado, alternar entre true y false
+    if (filtradoPorEstado) {
+      setEstadoFiltrado(!estadoFiltrado);
+    }
+  };
 
   const openModal = (op, idPropietario, nombrePropietario, telefonoPropietario, correoPropietario, estadoPropietario) => {
     setIdPropietario('');
     setNombre('');
     setTelefono('');
     setCorreo('');
-    setEstado('');
-
+    setEstadoPropietario('');
+    setOperation('');
+    setModalType(op === 1 ? 'add' : 'edit'); // Establecer el tipo de modal
     if (op === 1) {
       setTitle('Registrar propietario')
     }
@@ -56,7 +77,8 @@ const Propietarios = () => {
       setNombre(nombrePropietario);
       setTelefono(telefonoPropietario);
       setCorreo(correoPropietario);
-      setEstado(estadoPropietario);
+      setEstadoPropietario(estadoPropietario);
+      setOperation('');
     }
 
     setOperation(op)
@@ -70,9 +92,9 @@ const Propietarios = () => {
     var metodo;
 
     if (operation === 1) {
-      console.log(idPropietario)
-      parametros = { idPropietario: idPropietario, nombrePropietario: nombrePropietario, telefonoPropietario: telefonoPropietario, correoPropietario: correoPropietario, estadoPropietario: estadoPropietario };
+      parametros = { idPropietario: idPropietario, nombrePropietario: nombrePropietario, telefonoPropietario: telefonoPropietario, correoPropietario: correoPropietario, estadoPropietario: "true" };
       metodo = 'POST';
+      console.log(parametros)
     } else {
       parametros = { idPropietario: idPropietario, nombrePropietario: nombrePropietario, telefonoPropietario: telefonoPropietario, correoPropietario: correoPropietario, estadoPropietario: estadoPropietario }
       metodo = 'PUT';
@@ -163,11 +185,72 @@ const Propietarios = () => {
     setPropietario(resultadosBusqueda);
   };
   // Función para obtener los propietarios de la página actual
-const getCurrentPagePropietarios = () => {
-  const startIndex = (currentPage - 1) * 5;
-  const endIndex = startIndex + 5;
-  return propietario.slice(startIndex, endIndex);
-}
+  const getCurrentPagePropietarios = () => {
+    const startIndex = (currentPage - 1) * 5;
+    const endIndex = startIndex + 5;
+    return propietario.slice(startIndex, endIndex);
+  }
+
+  const inputsAgregar = (
+    <div className='modal-body'>
+      <input type='hidden' id='id' ></input>
+      <div className='input-group mb-3'>
+        <span className='input-group-text'><FontAwesomeIcon icon={faIdCardClip} /></span>
+        <input type='text' id='Cedula' className='form-control' placeholder='Cedula' value={idPropietario} onChange={(e) => setIdPropietario(e.target.value)}></input>
+      </div>
+      <div className='input-group mb-3'>
+        <span className='input-group-text'><FontAwesomeIcon icon={faUser} /></span>
+        <input type='text' id='nombre' className='form-control' placeholder='Nombre Propietario' value={nombrePropietario} onChange={(e) => setNombre(e.target.value)}></input>
+      </div>
+      <div className='input-group mb-3'>
+        <span className='input-group-text'><FontAwesomeIcon icon={faPhone} /></span>
+        <input type='text' id='telefono' className='form-control' placeholder='Telefono Propietario' value={telefonoPropietario} onChange={(e) => setTelefono(e.target.value)}></input>
+      </div>
+      <div className='input-group mb-3'>
+        <span className='input-group-text'><FontAwesomeIcon icon={faEnvelope} /></span>
+        <input type='text' id='correo' className='form-control' placeholder='Correo Propietario' value={correoPropietario} onChange={(e) => setCorreo(e.target.value)}></input>
+      </div>
+
+      <div className='d-grid col-6 mx-auto'>
+        <button onClick={() => validar()} className='botones-azules'>
+          <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
+        </button>
+      </div>
+    </div>
+
+  )
+
+  const inputsEditar = (
+    <div className='modal-body'>
+      <input type='hidden' id='id' ></input>
+      <div className='input-group mb-3'>
+        <span className='input-group-text'><FontAwesomeIcon icon={faIdCardClip} /></span>
+        <input type='text' id='Cedula' className='form-control' placeholder='Cedula' value={idPropietario} onChange={(e) => setIdPropietario(e.target.value)}></input>
+      </div>
+      <div className='input-group mb-3'>
+        <span className='input-group-text'><FontAwesomeIcon icon={faUser} /></span>
+        <input type='text' id='nombre' className='form-control' placeholder='Nombre Propietario' value={nombrePropietario} onChange={(e) => setNombre(e.target.value)}></input>
+      </div>
+      <div className='input-group mb-3'>
+        <span className='input-group-text'><FontAwesomeIcon icon={faPhone} /></span>
+        <input type='text' id='telefono' className='form-control' placeholder='Telefono Propietario' value={telefonoPropietario} onChange={(e) => setTelefono(e.target.value)}></input>
+      </div>
+      <div className='input-group mb-3'>
+        <span className='input-group-text'><FontAwesomeIcon icon={faEnvelope} /></span>
+        <input type='text' id='correo' className='form-control' placeholder='Correo Propietario' value={correoPropietario} onChange={(e) => setCorreo(e.target.value)}></input>
+      </div>
+      <div className='input-group mb-3'>
+        <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
+        <input type='text' id='estado' className='form-control' placeholder='Estado Propietario' value={estadoPropietario} onChange={(e) => setEstadoPropietario(e.target.value)}></input>
+      </div>
+      <div className='d-grid col-6 mx-auto'>
+        <button onClick={() => validar()} className='botones-azules'>
+          <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
+        </button>
+      </div>
+    </div>
+
+  )
 
   return (
 
@@ -190,52 +273,57 @@ const getCurrentPagePropietarios = () => {
             </div>
           </div>
 
-            <button className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalPropietarios' onClick={() => [openModal(1)]} >
-                <FontAwesomeIcon icon={faPlusCircle} /> Añadir
-              </button>
+          <button className='botones-azules' data-bs-toggle='modal' data-bs-target='#modalPropietarios' onClick={() => openModal(1)} >
+            <FontAwesomeIcon icon={faPlusCircle} /> Añadir
+          </button>
         </div>
         <div className='row mt-3'>
 
-            <div className='table-responsive' style={{ maxWidth: '100%', margin: '0 auto' }}>
-              
-              
+          <div className='table-responsive' style={{ maxWidth: '100%', margin: '0 auto' }}>
 
-                <table className='table table-striped' style={{ width: '100%' }}>
 
-                  <thead>
-                    <tr>
-                      <th>Id</th>
-                      <th>Nombre</th>
-                      <th>Telefono</th>
-                      <th>Correo</th>
-                      <th>Estado</th>
-                      <th>Acciones</th>
 
-                    </tr>
-                  </thead>
-                  <tbody className='table-group-divider'>
-                    {getCurrentPagePropietarios().map((r) => (
-                      <tr key={r.idPropietario}>
-                        <td>{r.idPropietario}</td>
-                        <td>{r.nombrePropietario}</td>
-                        <td>{r.telefonoPropietario}</td>
-                        <td>{r.correoPropietario}</td>
-                        <td>{r.estadoPropietario ? 'true' : 'false'}</td>
-                        <td>
-                          <button onClick={() => openModal(2, r.idPropietario, r.nombrePropietario, r.telefonoPropietario, r.correoPropietario, r.estadoPropietario)} className='btn btn-warning'
-                            data-bs-toggle='modal' data-bs-target='#modalPropietarios'>
-                            <FontAwesomeIcon icon={faEdit} />
-                          </button>
-                          &nbsp;
-                          <button onClick={() => deletePropietario(r.idPropietario)} className='btn btn-danger'>
-                            <FontAwesomeIcon icon={faTrash} />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+            <table className='table table-striped' style={{ width: '100%' }}>
+
+              <thead>
+                <tr>
+                  <th>Id</th>
+                  <th>Nombre</th>
+                  <th>Telefono</th>
+                  <th>Correo</th>
+                  <th onClick={filtroEstado} title="Haz clic para filtrar por estado" style={{ cursor: 'pointer' }}>
+                    Estado
+                    <FontAwesomeIcon icon={faCaretDown} style={{ marginLeft: '8px' }} />
+                  </th>
+                  <th>Acciones</th>
+
+                </tr>
+              </thead>
+              <tbody className='table-group-divider'>
+                {getCurrentPagePropietarios().map((r) => (
+                  <tr key={r.idPropietario}>
+                    <td>{r.idPropietario}</td>
+                    <td>{r.nombrePropietario}</td>
+                    <td>{r.telefonoPropietario}</td>
+                    <td>{r.correoPropietario}</td>
+                    <td>
+                      <span className={!r.estadoPropietario ? 'estado-inactivo' : 'estado-activo'}>{!r.estadoPropietario ? 'Inactivo' : 'Activo'}</span>
+                    </td>
+                    <td>
+                      <button onClick={() => openModal(2, r.idPropietario, r.nombrePropietario, r.telefonoPropietario, r.correoPropietario, r.estadoPropietario)} className='btn btn-warning'
+                        data-bs-toggle='modal' data-bs-target='#modalPropietarios'>
+                        <FontAwesomeIcon icon={faEdit} />
+                      </button>
+                      &nbsp;
+                      <button onClick={() => deletePropietario(r.idPropietario)} className='btn btn-danger'>
+                        <FontAwesomeIcon icon={faTrash} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
         {/* Paginación */}
         <div className='row mt-3'>
@@ -248,46 +336,23 @@ const getCurrentPagePropietarios = () => {
             />
           </div>
         </div>
-      </div>
-      <div id='modalPropietarios' className='modal fade' aria-hidden='true'>
-        <div className='modal-dialog'>
-          <div className='modal-content'>
-            <div className='modal-header'>
-              <label className='h5'>{title}</label>
-              <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='close' id='btnCerrar'></button>
-            </div>
-            <div className='modal-body'>
-              <input type='hidden' id='id' ></input>
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faIdCardClip} /></span>
-                <input type='text' id='Cedula' className='form-control' placeholder='Cedula' value={idPropietario} onChange={(e) => setIdPropietario(e.target.value)}></input>
-              </div>
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faUser} /></span>
-                <input type='text' id='nombre' className='form-control' placeholder='Nombre Propietario' value={nombrePropietario} onChange={(e) => setNombre(e.target.value)}></input>
-              </div>
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faPhone} /></span>
-                <input type='text' id='telefono' className='form-control' placeholder='Telefono Propietario' value={telefonoPropietario} onChange={(e) => setTelefono(e.target.value)}></input>
-              </div>
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faEnvelope} /></span>
-                <input type='text' id='correo' className='form-control' placeholder='Correo Propietario' value={correoPropietario} onChange={(e) => setCorreo(e.target.value)}></input>
-              </div>
-              <div className='input-group mb-3'>
-                <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
-                <input type='text' id='estado' className='form-control' placeholder='Estado Propietario' value={estadoPropietario} onChange={(e) => setEstado(e.target.value)}></input>
-              </div>
-              <div className='d-grid col-6 mx-auto'>
-                <button onClick={() => validar()} className='btn btn-success'>
-                  <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
-                </button>
-              </div>
-            </div>
 
+        <div id='modalPropietarios' className='modal fade' aria-hidden='true' data-bs-backdrop='static' data-bs-keyboard='false'>
+          <div className='modal-dialog modal-dialog-centered'>
+            <div className='modal-content'>
+              <div className='modal-header'>
+                <label className='h5'>{title}</label>
+                <button type='button' className='btn-close' data-bs-dismiss='modal' aria-label='close' id='btnCerrar'></button>
+              </div>
+              <div className='modal-body' >
+                {modalType === 'add' ? inputsAgregar : inputsEditar}
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+
     </div>
   )
 }

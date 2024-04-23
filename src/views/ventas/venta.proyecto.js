@@ -150,6 +150,47 @@ const Ventas = () => {
     setVenta(resultadosBusqueda);
   };
 
+  // const generarPDF = async (idVenta) => {
+  //   try {
+  //     const response = await axios.get(`http://localhost:8081/api/ventas/${idVenta}`);
+  //     const detalleVenta = response.data.venta;
+  //     const productosAsociados = response.data.detalleVenta;
+
+  //     const doc = new jsPDF();
+
+  //     // Título del PDF
+  //     doc.setFontSize(18);
+  //     doc.text("Detalles de la venta", 14, 15);
+
+  //     // Datos de la compra
+  //     doc.setFontSize(12);
+  //     doc.text(`ID Compra: ${detalleVenta.idCompra}`, 14, 30);
+  //     doc.text(`Descripción: ${detalleVenta.descripcionCompra}`, 14, 40);
+  //     doc.text(`Estado: ${detalleVenta.estadoCompra ? 'Activo' : 'Suspendido'}`, 14, 50);
+  //     doc.text(`Fecha Compra: ${fecha2(detalleVenta.fechaCompra)}`, 14, 60);
+  //     doc.text(`Proveedor: ${proveedores[detalleVenta.proveedores_idProveedor]}`, 14, 70);
+  //     doc.text(`Total compra: ${detalleVenta.total}`, 14, 80);
+
+  //     // Tabla de productos asociados
+  //     const productosData = productosAsociados.map((producto) => [
+  //       productosName[producto.productos_idProducto],
+  //       producto.preciocompra,
+  //       producto.cantidad,
+  //       producto.subtotal
+  //     ]);
+
+  //     doc.autoTable({
+  //       startY: 90,
+  //       head: [['Producto', 'Valor unitario', 'Cantidad', 'Total']],
+  //       body: productosData,
+  //     });
+
+  //     // Guardar o descargar el PDF
+  //     doc.save("detalle_compra.pdf");
+  //   } catch (error) {
+  //     console.error('Error al generar el PDF:', error.message);
+  //   }
+  // };
   // Función para obtener las ventas de la página actual
   const getCurrentPageVentas = () => {
     const startIndex = (currentPage - 1) * 5;
