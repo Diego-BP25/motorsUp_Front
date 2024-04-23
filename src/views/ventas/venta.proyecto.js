@@ -7,7 +7,7 @@ import { CNavGroupItems, CRow } from '@coreui/react'
 import { show_alerta } from 'src/fuctions.proyecto'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlusCircle, faFloppyDisk, faSearch, faCloudDownload, faToggleOff, faHashtag, faCalendarDays, faDollar, faCreditCard, faEye, faBan } from '@fortawesome/free-solid-svg-icons'
+import { faPlusCircle, faFloppyDisk, faSearch, faCaretDown, faCloudDownload, faToggleOff, faHashtag, faCalendarDays, faDollar, faCreditCard, faEye, faBan } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom';
 import { CSmartPagination } from '@coreui/react-pro'
 import { fecha2 } from 'src/views/funcionesExtras.proyecto'
@@ -29,6 +29,9 @@ const Ventas = () => {
   const [estadoModal, setEstadoModal] = useState(true)
   const [busqueda, setBusqueda] = useState("");
   const [currentPage, setCurrentPage] = useState(1)
+  const [filtradoPorEstado, setFiltradoPorEstado] = useState(false);
+  const [estadoFiltrado, setEstadoFiltrado] = useState(true);
+
 
   //estado para el boton info
   const [ventasAsociadas, setVentasAsociadas] = useState([]);
@@ -49,10 +52,18 @@ const Ventas = () => {
     setActualizacion(false)
   }, [actualizacion ? venta : null])
 
+  useEffect(() => {
+    getVentas()
+  }, [filtradoPorEstado, estadoFiltrado])
+
   const getVentas = async () => {
     try {
       const respuesta = await axios.get(url, {})
-      setVenta(await respuesta.data)
+      let ventasData = respuesta.data.filter(pro => pro.estado === true); // Filtrar propietarios con estado true
+      if (filtradoPorEstado && !estadoFiltrado) {
+        ventasData = respuesta.data.filter(pro => pro.estado === false); // Filtrar propietarios con estado false si está activado el filtro por estado inactivo
+      }
+      setVenta(ventasData)
     } catch (error) {
       console.error('Error al obtener los Empleados:', error.message)
     }
@@ -198,6 +209,14 @@ const Ventas = () => {
     return venta.slice(startIndex, endIndex);
   };
 
+  const filtroEstado = () => {
+    setFiltradoPorEstado(!filtradoPorEstado);
+    // Si ya está filtrado por estado, alternar entre true y false
+    if (filtradoPorEstado) {
+      setEstadoFiltrado(!estadoFiltrado);
+    }
+  };
+
   const getVentasAsociadas = async (idVenta, valor) => {
     try {
       const response = await axios.get(`http://localhost:8081/api/ventas/${idVenta}`);
@@ -258,7 +277,10 @@ const Ventas = () => {
                   <th>Id</th>
                   <th>Fecha</th>
                   <th>Metodo pago</th>
-                  <th>Estado</th>
+                  <th onClick={filtroEstado} title="Haz clic para filtrar por estado" style={{ cursor: 'pointer' }}>
+                    Estado
+                    <FontAwesomeIcon icon={faCaretDown} style={{ marginLeft: '8px' }} />
+                  </th>
                   <th>Total</th>
                   <th>Acciones</th>
 
@@ -271,7 +293,9 @@ const Ventas = () => {
                     <td>{r.idVenta}</td>
                     <td>{fecha2(r.fecha)}</td>
                     <td>{r.metodoPago}</td>
-                    <td>{r.estado ? 'true' : 'false'}</td>
+                    <td>
+                      <span className={!r.estado ? 'estado-inactivo' : 'estado-activo'}>{!r.estado ? 'Inactivo' : 'Activo'}</span>
+                    </td>
                     <td>{r.total}</td>
 
 

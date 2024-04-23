@@ -273,7 +273,8 @@ const AgregarVenta = () => {
 
                                     <div className='input-group mb-3' >
                                         <label htmlFor='metodoPago' className='input-group-text'><FontAwesomeIcon icon={faDollar} /></label>
-                                        <select type='text' id='metodoPago' placeholder='Metodo Pago' className="form-control" value={metodoPago} onChange={(e) => setMetodoPago(e.target.value)} >
+                                        <select type='text' id='metodoPago'  className="form-control" value={metodoPago} onChange={(e) => setMetodoPago(e.target.value)} >
+                                        <option>Metodo Pago</option>
                                         <option value='Efectivo'>Efectivo</option>
                                         <option value='Transferencia'>Transeferencia</option>
                                         <option value='Tarjeta de credito'>Tarjeta de credito</option>
