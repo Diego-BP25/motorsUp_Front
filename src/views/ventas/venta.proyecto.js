@@ -260,7 +260,7 @@ const Ventas = () => {
             </div>
           </div>
 
-          <Link to="/Ventas/agregarServ">
+          <Link to='/Ventas/agregarVentas'>
             <button className='botones-azules'>
               <FontAwesomeIcon icon={faPlusCircle} /> Añadir
             </button>
