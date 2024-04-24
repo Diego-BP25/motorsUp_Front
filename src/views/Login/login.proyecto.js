@@ -193,16 +193,16 @@ const Login = () => {
     <>
       <div className="divPrincipalLogin">
         <div className='divSecundarioLogin flex'>
-          <div className="imageBackground">
-            <img
-              src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExa25yZnMwYXljNDM1d3c3eGFhZnV3ZWdpYnV2ajV5MmlrM3k2MWgydiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/RRJCGAfbPW1kZzFNSu/giphy.gif"
+          <div>
+            <img className="imageBackground"
+              src="https://i.pinimg.com/564x/35/60/43/356043497043eb4a11a9b94ccdb63651.jpg"
               alt=""
             />
           </div>
           <div className="card-inner">
             <div className="containerRegister">
               <form onSubmit={validarDatos}>
-                <h1 className="text-center" style={{ color: "#007bff" }}>Motors Up</h1>
+                <h1 className="text-center">Motors Up</h1>
 
                 <div className="inputs">
                   <label>Correo</label>

@@ -39,6 +39,9 @@ background-color: transparentize($color: #ffffffb3, $amount: 0);
 .input-group {
   width: 300px; /* Ajusta el ancho del buscador según tu preferencia */
 }
+#inputEmpleado{
+  width: 90%;
+}
 
 .icon-container {
   position: absolute;
@@ -80,9 +83,9 @@ background-color: transparentize($color: #ffffffb3, $amount: 0);
   font-weight: bold;
 }
 
-.modal-content{
-  width: auto;
-}
+// .modal-content{
+//   width: auto;
+// }
 
 
 .titulo {

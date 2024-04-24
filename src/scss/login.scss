@@ -33,6 +33,12 @@
               inset -31px -31px 62px #0095ff;
 }
 
+.text-center{
+  
+    color: #007bff;
+    margin-bottom: 25px;
+
+}
 
 .divSecundarioLogin{
   margin: 45px 38px ;
@@ -52,8 +58,9 @@
 }
 
 .imageBackground{
-  flex: 1;
-}
+  width: 500px;
+  height: 500px;
+} 
 
 .otp_inputs{
   width: 320px;
@@ -144,7 +151,7 @@
 }
 .inputs {
   padding: 10px;
-  
+  margin-top: 10px;
   
 }
 
@@ -222,6 +229,7 @@
   background: #007bff;
   transition: 0.5s ease;
   user-select: none;
+  margin-top: 40px;
 }
 
 #btn1:hover {
@@ -233,6 +241,7 @@
 .textLoginAndRegister {
   color: #007bff;
   transition-duration: 0.4s;
+  margin-top: 20px
 }
 
 .textLoginAndRegister:hover {
