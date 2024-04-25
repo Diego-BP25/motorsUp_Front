@@ -123,6 +123,18 @@ background-color: transparentize($color: #ffffffb3, $amount: 0);
   opacity: 0.5;
 }
 
+.container-clock {
+  text-align: center;
+}
 
+.container-clock h1 {
+  font-size: 10rem;
+  font-weight: 400;
+}
+
+.container-clock p {
+  font-size: 2.5rem;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
 
 

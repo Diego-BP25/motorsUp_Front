@@ -104,6 +104,12 @@ if (roles_idRol == 1) {
       to: '/Ventas/venta',
       icon: <CIcon icon={cilCreditCard} customClassName='nav-icon' />,
     },
+    {
+      component: CNavItem,
+      name: 'Inicio',
+      to: '/Inicio',
+      icon: <CIcon icon={cilHome} customClassName='nav-icon' />,
+    },
   ]
 } else if (roles_idRol == 2) {
   _nav = [
