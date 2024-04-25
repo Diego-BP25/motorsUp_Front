@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { HashRouter, Route, Routes } from 'react-router-dom'
 import './scss/style.scss'
 import ProtectedRoute from './views/Login/ProtectedRoute.proyecto.js'
 
@@ -21,7 +21,7 @@ const Cotizacion = React.lazy(() => import('./views/cotizaciones/cotizaciones.pr
 class App extends Component {
   render() {
     return (
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
           <Route exact path="/login" name="Login Page" element={<Login />} />
           <Route element={<ProtectedRoute canActivate={false} />}>
@@ -31,7 +31,7 @@ class App extends Component {
           <Route exact path="/500" name="Page 500" element={<Page500 />} />
           <Route path="*" name="Home" element={<DefaultLayout />} />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     )
   }
 }

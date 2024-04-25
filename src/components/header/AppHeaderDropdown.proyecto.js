@@ -46,7 +46,7 @@ const AppHeaderDropdown = () => {
 
     localStorage.removeItem('Empleado');
 
-    window.location.href = '/login';
+    window.location.href = '/#/login';
   };
 
   const perfilEmpleado = () => {
@@ -140,7 +140,7 @@ const AppHeaderDropdown = () => {
         }, 1500);
         setTimeout(() => {
           localStorage.removeItem('Empleado');
-          window.location.href = '/login';
+          window.Location.href = "/#/login";
         }, 4000)
         //document.getElementById('btn-close').click();
       }
