@@ -118,7 +118,7 @@ const Login = () => {
   };
 
   if (isLoggedIn) {
-    return <Navigate to={"/dashboard"} />
+    return <Navigate to={"/#/dashboard"} />
   }
 
   const openModal = (op, correoRecuperacion, contrasenaNueva, codigo) => {
