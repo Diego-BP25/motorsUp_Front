@@ -73,7 +73,7 @@ const Login = () => {
       
       setTimeout(() => {
         localStorage.setItem('Empleado',JSON.stringify(response.data.token))
-        window.location.href = '/dashboard';
+        window.location.href = '/#/dashboard';
       }, 1500);
     } catch (error) {
       console.error('Error al iniciar sesión:', error.response.data.msg);
@@ -118,7 +118,7 @@ const Login = () => {
   };
 
   if (isLoggedIn) {
-    return <Navigate to={"/dashboard"} />
+    return <Navigate to={"/#/dashboard"} />
   }
 
   const openModal = (op, correoRecuperacion, contrasenaNueva, codigo) => {

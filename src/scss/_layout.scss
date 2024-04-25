@@ -120,6 +120,15 @@ background-color: transparentize($color: #ffffffb3, $amount: 0);
   opacity: 0.5;
 }
 
+.input-error {
+  border-color: red;
+  /* Otros estilos visuales para indicar el error */
+}
+
+.error-message {
+  color: red;
+  font-size: 0.8em;
+}
 
 
 
