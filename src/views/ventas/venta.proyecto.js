@@ -274,7 +274,7 @@ const Ventas = () => {
             <table className='table table-striped' style={{ width: '100%' }}>
               <thead>
                 <tr>
-                  <th>Id</th>
+                  <th>N° Venta</th>
                   <th>Fecha</th>
                   <th>Metodo pago</th>
                   <th onClick={filtroEstado} title="Haz clic para filtrar por estado" style={{ cursor: 'pointer' }}>
@@ -407,7 +407,7 @@ const Ventas = () => {
           <table className='table table-striped'>
             <thead>
               <tr>
-                <th>ID</th>
+                <th>N° Venta</th>
                 <th>Tipo</th>
                 <th>Precio</th>
                 <th>Cantidad</th>

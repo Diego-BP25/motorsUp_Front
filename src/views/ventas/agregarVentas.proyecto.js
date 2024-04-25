@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTrash, faFloppyDisk, faCalendar, faTag, faFileText, faHashtag, faBagShopping, faDollar, faUser, faTools } from '@fortawesome/free-solid-svg-icons'
+import { faTrash, faFloppyDisk, faCalendar, faTag, faFileText, faHashtag, faBagShopping, faDollar, faUser, faList } from '@fortawesome/free-solid-svg-icons'
 import { formatDate } from '../funcionesExtras.proyecto';
 
 const AgregarVenta = () => {
@@ -39,6 +39,13 @@ const AgregarVenta = () => {
     const [cantidad, setCantidad] = useState('');
     const [precioVenta, setPrecio] = useState('');
     const [productosVenta, setProductosVenta] = useState([]);
+
+
+
+    // Agregar un nuevo estado para los productos asociados a la categoría seleccionada
+    const [productosPorCategoria, setProductosPorCategoria] = useState([]);
+    const [productoSeleccionado, setProductoSeleccionado] = useState('');
+
 
     const toggleMostrarServicios = () => {
         setMostrarServicios(true);
@@ -135,6 +142,21 @@ const AgregarVenta = () => {
         }
     };
 
+    const productodId = async (idProducto) => {
+        try {
+            const response = await axios.get(`http://localhost:8081/api/productos/${idProducto}`);
+            const dataP = response.data;
+    
+            if (dataP && dataP.precioVenta) {
+                setPrecio(dataP.precioVenta); // Actualiza el estado de precioVenta
+            }
+        } catch (error) {
+            console.error('Error al obtener el producto:', error.message);
+        }
+    };
+    
+
+
     // Obtener lista de empleados
     const getEmpleados = async () => {
         try {
@@ -191,7 +213,7 @@ const AgregarVenta = () => {
             setCantidad('');
             setPrecio('');
             setIdProducto('');
-
+            setProductoSeleccionado('');
             calcularTotal([...productosVenta, nuevoProducto]);
         } else {
             Swal.fire({
@@ -252,6 +274,19 @@ const AgregarVenta = () => {
         }
     };
 
+    const filtrarProductosPorCategoria = (categoriaId) => {
+        // Convertir categoriaId a número si es necesario
+        const categoriaIdNumero = parseInt(categoriaId);
+
+        // Filtrar productos por la categoría seleccionada
+        const productosFiltrados = productos.filter(producto => producto.categoriaProducto_idCategoriaProducto === categoriaIdNumero);
+
+        console.log(productosFiltrados);
+        console.log(categoriaIdNumero);
+
+        setProductosPorCategoria(productosFiltrados);
+    };
+
     return (
         <div className='App' >
             <div className='container mt-5' >
@@ -270,7 +305,7 @@ const AgregarVenta = () => {
 
                                     <div className='input-group mb-3' >
                                         <label htmlFor='metodoPago' className='input-group-text'><FontAwesomeIcon icon={faDollar} /></label>
-                                        <select type='text' id='metodoPago'  className="form-control" value={metodoPago} onChange={(e) => setMetodoPago(e.target.value)} >
+                                        <select type='text' id='metodoPago' className="form-control" value={metodoPago} onChange={(e) => setMetodoPago(e.target.value)} >
                                             <option value="" disabled> método de pago</option><option value='Efectivo'>Efectivo</option>
                                             <option value='Transferencia'>Transeferencia</option>
                                             <option value='Tarjeta de credito'>Tarjeta de credito</option>
@@ -293,7 +328,7 @@ const AgregarVenta = () => {
                                             <div className='input-group mb-3' >
                                                 <label htmlFor='empleados_idEmpleado' className='input-group-text'><FontAwesomeIcon icon={faUser} /></label>
                                                 <select id='empleados_idEmpleado' className="form-control" value={empleados_idEmpleado} onChange={(e) => setIdEmpleado(e.target.value)}>
-                                                    <option value=''disabled>Empleado relacionado</option>
+                                                    <option value='' disabled>Empleado relacionado</option>
                                                     {empleados.map((pro) => (
                                                         <option key={pro.idEmpleado} value={pro.idEmpleado}>{pro.nombreEmpleado}</option>
                                                     ))}
@@ -302,7 +337,7 @@ const AgregarVenta = () => {
                                             <div className='input-group mb-3' >
                                                 <label htmlFor='vehiculos_placa' className='input-group-text'><FontAwesomeIcon icon={faUser} /></label>
                                                 <select id='vehiculos_placa' className="form-control" value={vehiculos_placa} onChange={(e) => setplaca(e.target.value)}>
-                                                    <option value=''disabled> vehiculo</option>
+                                                    <option value='' disabled> vehiculo</option>
                                                     {vehiculo.map((pro) => (
                                                         <option key={pro.placa} value={pro.placa}>{pro.placa}</option>
                                                     ))}
@@ -312,7 +347,7 @@ const AgregarVenta = () => {
                                             <div className='input-group mb-3' >
                                                 <label htmlFor='servicios_idServicio' className='input-group-text'><FontAwesomeIcon icon={faBagShopping} /></label>
                                                 <select id='servicios_idServicio' className="form-control" value={servicios_idServicio} onChange={(e) => setIdServicio(e.target.value)}>
-                                                    <option value=''disabled>Seleccione un servicio</option>
+                                                    <option value='' disabled>Seleccione un servicio</option>
                                                     {servicios.map((pro) => (
                                                         <option key={pro.idServicio} value={pro.idServicio}>{pro.nombreServicio}</option>
                                                     ))}
@@ -337,22 +372,30 @@ const AgregarVenta = () => {
 
 
                                             <div className='input-group mb-3' >
-                                                <label htmlFor='idCategoriaProducto' className='input-group-text'><FontAwesomeIcon icon={faBagShopping} /></label>
-                                                <select id='idCategoriaProducto' className="form-control" value={idCategoriaProducto} onChange={(e) => setIdCategoriaProducto(e.target.value)}>
+                                                <label htmlFor='idCategoriaProducto' className='input-group-text'><FontAwesomeIcon icon={faList} /></label>
+                                                <select id='idCategoriaProducto' className="form-control" value={idCategoriaProducto} onChange={(e) => { setIdCategoriaProducto(e.target.value); filtrarProductosPorCategoria(e.target.value); }}>
                                                     <option value=''>Seleccione una categoria</option>
                                                     {categoriaProductos.map((pro) => (
                                                         <option key={pro.idCategoriaProducto} value={pro.idCategoriaProducto}>{pro.nombreCategoria}</option>
                                                     ))}
                                                 </select>
-
                                             </div>
 
                                             <div className='input-group mb-3' >
-                                                <label htmlFor='productos_idProducto' className='input-group-text'><FontAwesomeIcon icon={faTools} /></label>
-                                                <select id='productos_idProducto' className="form-control" value={productos_idProducto} onChange={(e) => setIdProducto(e.target.value)}>
+                                                <label htmlFor='idProducto' className='input-group-text'><FontAwesomeIcon icon={faBagShopping} /></label>
+                                                <select
+                                                    id='productos'
+                                                    className="form-control"
+                                                    value={productoSeleccionado}
+                                                    onChange={(e) => {
+                                                        setProductoSeleccionado(e.target.value);
+                                                        setIdProducto(e.target.value);
+                                                        productodId(e.target.value); // Llama a la función productodId aquí
+                                                    }}
+                                                >
                                                     <option value=''>Seleccione un producto</option>
-                                                    {productos.map((pro) => (
-                                                        <option key={pro.idProducto} value={pro.idProducto}>{pro.nombreProducto}</option>
+                                                    {productosPorCategoria.map((producto) => (
+                                                        <option key={producto.idProducto} value={producto.idProducto}>{producto.nombreProducto}</option>
                                                     ))}
                                                 </select>
 
@@ -360,12 +403,21 @@ const AgregarVenta = () => {
 
                                             <div className='input-group mb-3' >
                                                 <label htmlFor='cantidad' className='input-group-text'><FontAwesomeIcon icon={faHashtag} /></label>
-                                                <input type='number' className="form-control" id='cantidad' placeholder='Cantidad' value={cantidad} onChange={(e) => setCantidad(e.target.value)} />
+                                                <input  type='number' className="form-control" id='cantidad' placeholder='Cantidad' value={cantidad} onChange={(e) => setCantidad(e.target.value)} />
                                             </div>
 
-                                            <div className='input-group mb-3' >
+                                            <div className='input-group mb-3'>
                                                 <label htmlFor='precioVenta' className='input-group-text'><FontAwesomeIcon icon={faTag} /></label>
-                                                <input type='number' className="form-control" id='precioVenta' placeholder='precioVenta' value={precioVenta} onChange={(e) => setPrecio(e.target.value)} />
+                                                <input
+                                                disabled
+                                                    type='number'
+                                                    className="form-control"
+                                                    id='precioVenta'
+                                                    placeholder='precioVenta'
+                                                    value={precioVenta} // Ajusta aquí el nombre de tu estado de precio
+                                                    onChange={(e) => setPrecio(e.target.value)} // Ajusta aquí el nombre de tu función para actualizar el precio
+                                                />
+
                                             </div>
 
 
@@ -402,7 +454,7 @@ const AgregarVenta = () => {
                             <table className='table' style={{ width: '100%' }}>
                                 <thead style={{ position: 'sticky', top: 0, backgroundColor: 'white' }}>
                                     <tr >
-                                        <th>Id</th>
+                                        <th>Nombre</th>
                                         <th>Tipo</th>
                                         <th>Precio</th>
                                         <th>cantidad</th>
