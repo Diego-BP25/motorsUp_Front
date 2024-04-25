@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef  } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { Navigate } from 'react-router-dom'
 import { show_alerta } from 'src/fuctions.proyecto';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck, faEnvelope, faPaperPlane, faLock } from '@fortawesome/free-solid-svg-icons'
-
+import { jwtDecode } from 'jwt-decode';
 
 const Login = () => {
   const [correo, setCorreo] = useState('');
@@ -17,7 +17,7 @@ const Login = () => {
   const [mensaje, setMensaje] = useState('');
   const [codigo, setCodigo] = useState('')
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+  const inputs = useRef([]); 
 
   useEffect(() => {
 
@@ -70,10 +70,22 @@ const Login = () => {
         icon: "success",
         title: "Bienvenido.."
       });;
-      
+
       setTimeout(() => {
-        localStorage.setItem('Empleado',JSON.stringify(response.data.token))
-        window.location.href = '/dashboard';
+        localStorage.setItem('Empleado', JSON.stringify(response.data.token))
+        const token = localStorage.getItem('Empleado');
+        if (token) {
+          const decodedToken = jwtDecode(token);
+          const idRol = decodedToken.empleado.roles_idRol
+          if (idRol === 1) {
+            window.location.href = '/dashboard';
+          } else if (idRol === 2) {
+            window.location.href = '/Servicios/agendamiento';
+          }
+        }
+
+
+
       }, 1500);
     } catch (error) {
       console.error('Error al iniciar sesión:', error.response.data.msg);
@@ -121,16 +133,15 @@ const Login = () => {
     return <Navigate to={"/dashboard"} />
   }
 
-  const openModal = (op, correoRecuperacion, contrasenaNueva, codigo) => {
+  const openModal = (op) => {
     setCorreoRecuperacion('');
     setContrasenaNueva('');
-    setCodigo('');
 
     if (op === 1) {
       setTitle('Recuperar Contraseña')
 
     }
-    else if (op == 2) {
+    else if (op === 2) {
       setTitle('Codigo de Verificacion')
       setMensaje('Se ha enviado un código de verificación a tu correo electrónico.');
     }
@@ -140,10 +151,7 @@ const Login = () => {
     }
     setOperation(op);
 
-    if (op !== 1 && (correoRecuperacion === '')) {
-      console.log('correo vacio')
-      return;
-    }
+
     window.setTimeout(function () {
       document.getElementById('correo').focus();
     }, 500);
@@ -162,6 +170,8 @@ const Login = () => {
       parametros = { token: codigo };
       metodo = 'POST';
       url = 'http://localhost:8081/api/recuperar/validarCodigo'
+      console.log(codigo)
+
     } else if (operation === 3) {
       parametros = { token: codigo, nuevaContrasena: contrasenaNueva };
       metodo = 'POST';
@@ -173,7 +183,7 @@ const Login = () => {
 
   const enviarSolicitud = async (metodo, parametros, url) => {
     await axios({ method: metodo, url: url, data: parametros }).then(function (respuesta) {
-      if (operation == 1) {
+      if (operation === 1) {
         console.log('Correo ENVIADO')
 
       } else if (operation == 2) {
@@ -188,6 +198,15 @@ const Login = () => {
       });
   }
 
+  const inputCodigo = (index, value) => {
+    const newCodigo = codigo.split('');
+    newCodigo[index] = value;
+    setCodigo(newCodigo.join(''));
+
+    if (value && index < inputs.current.length - 1) {
+      inputs.current[index + 1].focus();
+    }
+  };
 
   return (
     <>
@@ -275,25 +294,25 @@ const Login = () => {
               </div>
               <div className='modal-body'>
                 <p>{mensaje}</p>
-                <input type='hidden' id='id' />
                 <div className='input-group mb-3 justify-content-center align-items-center'>
                   <div className='otp_inputs'>
-                    <input type="text" placeholder='' maxLength='1' className='otp_input' />
-                    <input type="text" placeholder='' maxLength='1' className='otp_input' />
-                    <input type="text" placeholder='' maxLength='1' className='otp_input' />
-                    <input type="text" placeholder='' maxLength='1' className='otp_input' />
-                    <input type="text" placeholder='' maxLength='1' className='otp_input' />
-                    <input type="text" placeholder='' maxLength='1' className='otp_input' />
+                    {[0, 1, 2, 3, 4, 5].map(index => (
+                      <input
+                        key={index}
+                        ref={el => (inputs.current[index] = el)} // Asignar la referencia al input
+                        type="text"
+                        placeholder=''
+                        maxLength='1'
+                        className='otp_input'
+                        value={codigo[index] || ''}
+                        onChange={(e) => inputCodigo(index, e.target.value)}
+                      />
+                    ))}
                   </div>
                 </div>
+
                 <div className='d-grid col-6 mx-auto'>
                   <button onClick={() => {
-                    const otpInputs = document.querySelectorAll('.otp_input');
-                    let codigo = '';
-                    otpInputs.forEach(input => {
-                      codigo += input.value;
-                    });
-                    setCodigo(codigo); // Actualizar el estado 'codigo'
                     validar();
                     openModal(3);
                   }} data-bs-toggle='modal' data-bs-target='#modalContrasena' className='botones-azules'>

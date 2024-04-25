@@ -15,8 +15,6 @@ const Vehiculo = React.lazy(() => import('./views/Servicios/vehiculos/vehiculos.
 const AgregarCotizacion = React.lazy(() =>
   import('./views/cotizaciones/agregarCotizacion.proyecto'),
 )
-const Inicio = React.lazy(() => import('./views/dashboard/InicioE.proyecto'))
-
 const Agendamiento = React.lazy(() =>
   import('./views/Servicios/agendamiento/agendamiento.proyecto'),
 )
@@ -55,7 +53,6 @@ const routes = [
   { path: '/Ventas/agregarServ', name: 'agregar venta servicio', element: agregarserv },
   { path: '/Servicios/GestionServicio', name: 'Servicios', element: Servicios, exact: true },
   { path: '/Servicios/Vehiculo', name: 'Vehiculos', element: Vehiculo, exact: true },
-  { path: '/Inicio', name: 'Inicio', element: Inicio },
 ]
 
 export default routes
