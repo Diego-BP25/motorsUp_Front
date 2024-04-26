@@ -15,7 +15,6 @@ const Vehiculo = React.lazy(() => import('./views/Servicios/vehiculos/vehiculos.
 const AgregarCotizacion = React.lazy(() =>
   import('./views/cotizaciones/agregarCotizacion.proyecto'),
 )
-
 const Agendamiento = React.lazy(() =>
   import('./views/Servicios/agendamiento/agendamiento.proyecto'),
 )
