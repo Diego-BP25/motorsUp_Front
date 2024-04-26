@@ -123,18 +123,16 @@ background-color: transparentize($color: #ffffffb3, $amount: 0);
   opacity: 0.5;
 }
 
-.container-clock {
-  text-align: center;
+.input-error {
+  border-color: red;
+  /* Otros estilos visuales para indicar el error */
 }
 
-.container-clock h1 {
-  font-size: 10rem;
-  font-weight: 400;
+.error-message {
+  color: red;
+  font-size: 0.8em;
+
 }
 
-.container-clock p {
-  font-size: 2.5rem;
-  font-family: Verdana, Geneva, Tahoma, sans-serif;
-}
 
 
