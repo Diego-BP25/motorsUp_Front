@@ -78,14 +78,11 @@ const Login = () => {
           const decodedToken = jwtDecode(token);
           const idRol = decodedToken.empleado.roles_idRol
           if (idRol === 1) {
-            window.location.href = '/dashboard';
+             window.location.href = '/#/dashboard';
           } else if (idRol === 2) {
-            window.location.href = '/Servicios/agendamiento';
+            window.location.href = '/#/Servicios/agendamiento';
           }
         }
-
-
-
       }, 1500);
     } catch (error) {
       console.error('Error al iniciar sesión:', error.response.data.msg);
@@ -130,7 +127,7 @@ const Login = () => {
   };
 
   if (isLoggedIn) {
-    return <Navigate to={"/dashboard"} />
+    return <Navigate to={"/#/dashboard"} />
   }
 
   const openModal = (op) => {

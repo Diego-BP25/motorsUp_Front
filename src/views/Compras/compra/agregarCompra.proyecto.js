@@ -283,7 +283,7 @@ const AgregarCompra = () => {
 
                                     <div className='input-group mb-3' >
                                         <label htmlFor='preciocompra' className='input-group-text'><FontAwesomeIcon icon={faCartArrowDown} /></label>
-                                        <input type='number' className="form-control" id='preciocompra' placeholder='Precio compra' value={preciocompra} onChange={(e) => setPreciocompra(e.target.value)} />
+                                        <input type='number' className="form-control" id='preciocompra' placeholder='Valor unitario' value={preciocompra} onChange={(e) => setPreciocompra(e.target.value)} />
                                     </div>
 
                                     <div className='input-group mb-3' >
