@@ -8,7 +8,7 @@ import GraficaProductos from './graficaProductos.proyecto';
 import GraficaCitas from './graficaCitas.proyecto';
 const Dashboard = () => {
 
-// JUANES ES MUY GAY
+
   return (
     <>
       <div className="row" style={{ marginBottom: '4%' }}>
