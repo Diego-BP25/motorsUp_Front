@@ -10,7 +10,7 @@ if (token) {
   roles_idRol = decodedToken.empleado.roles_idRol
 }
 let _nav = []
-if (roles_idRol == 1) {
+if (roles_idRol === 1) {
   _nav = [
     {
       component: CNavItem,
@@ -105,7 +105,7 @@ if (roles_idRol == 1) {
       icon: <CIcon icon={cilCreditCard} customClassName='nav-icon' />,
     },
   ]
-} else if (roles_idRol == 2) {
+} else if (roles_idRol === 2) {
   _nav = [
     {
       component: CNavGroup,
