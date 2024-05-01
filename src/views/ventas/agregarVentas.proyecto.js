@@ -142,19 +142,20 @@ const AgregarVenta = () => {
         }
     };
 
+    // traer el precio del producto
     const productodId = async (idProducto) => {
         try {
             const response = await axios.get(`http://localhost:8081/api/productos/${idProducto}`);
             const dataP = response.data;
-    
+
             if (dataP && dataP.precioVenta) {
-                setPrecio(dataP.precioVenta); // Actualiza el estado de precioVenta
+                setPrecio(dataP.precioVenta);
             }
         } catch (error) {
             console.error('Error al obtener el producto:', error.message);
         }
     };
-    
+
 
 
     // Obtener lista de empleados
@@ -251,10 +252,21 @@ const AgregarVenta = () => {
             console.log(nuevaVenta)
             await axios.post(url, nuevaVenta);
 
-            Swal.fire({
-                icon: 'success',
-                text: 'Venta agregada con éxito',
-            });
+            const Toast = Swal.mixin({
+                toast: true,
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                  toast.onmouseenter = Swal.stopTimer;
+                  toast.onmouseleave = Swal.resumeTimer;
+                }
+              });
+              Toast.fire({
+                icon: "success",
+                title: "Venta agregado con exito"
+              });
 
             // Limpiar formulario después de guardar
             setFechaVenta('');
@@ -403,19 +415,19 @@ const AgregarVenta = () => {
 
                                             <div className='input-group mb-3' >
                                                 <label htmlFor='cantidad' className='input-group-text'><FontAwesomeIcon icon={faHashtag} /></label>
-                                                <input  type='number' className="form-control" id='cantidad' placeholder='Cantidad' value={cantidad} onChange={(e) => setCantidad(e.target.value)} />
+                                                <input type='number' className="form-control" id='cantidad' placeholder='Cantidad' value={cantidad} onChange={(e) => setCantidad(e.target.value)} />
                                             </div>
 
                                             <div className='input-group mb-3'>
                                                 <label htmlFor='precioVenta' className='input-group-text'><FontAwesomeIcon icon={faTag} /></label>
                                                 <input
-                                                disabled
+
                                                     type='number'
                                                     className="form-control"
                                                     id='precioVenta'
                                                     placeholder='precioVenta'
-                                                    value={precioVenta} // Ajusta aquí el nombre de tu estado de precio
-                                                    onChange={(e) => setPrecio(e.target.value)} // Ajusta aquí el nombre de tu función para actualizar el precio
+                                                    value={precioVenta}
+                                                    onChange={(e) => setPrecio(e.target.value)}
                                                 />
 
                                             </div>
@@ -454,8 +466,8 @@ const AgregarVenta = () => {
                             <table className='table' style={{ width: '100%' }}>
                                 <thead style={{ position: 'sticky', top: 0, backgroundColor: 'white' }}>
                                     <tr >
-                                        <th>Nombre</th>
                                         <th>Tipo</th>
+                                        <th>Producto/servicio</th>
                                         <th>Precio</th>
                                         <th>cantidad</th>
                                         <th>Total</th>
@@ -466,8 +478,12 @@ const AgregarVenta = () => {
                                     {serviciosVenta.concat(productosVenta).map((venta, index) => (
 
                                         <tr key={index} >
-                                            <td>{venta.tipo === 'servicio' ? venta.servicios_idServicio : venta.productos_idProducto}</td>
                                             <td>{venta.tipo}</td>
+                                            <td>
+                                                {venta.tipo === 'servicio'
+                                                    ? servicios.find(servicio => servicio.idServicio === parseInt(venta.servicios_idServicio))?.nombreServicio
+                                                    : productos.find(producto => producto.idProducto === parseInt(venta.productos_idProducto))?.nombreProducto}
+                                            </td>
                                             <td>{venta.tipo === 'servicio' ? venta.valorManoObra : venta.precioVenta}</td>
                                             <td>{venta.tipo === 'servicio' ? "1" : venta.cantidad}</td>
                                             <td>{venta.total}</td>

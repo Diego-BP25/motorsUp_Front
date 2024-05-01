@@ -317,7 +317,7 @@ const Compras = () => {
     });
     setCompra(resultadosBusqueda);
   }
-
+ 
   const generarPDF = async (idCompra) => {
     try {
       const response = await axios.get(`http://localhost:8081/api/compras/${idCompra}`);

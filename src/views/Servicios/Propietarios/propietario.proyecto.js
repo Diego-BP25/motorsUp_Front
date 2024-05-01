@@ -103,43 +103,76 @@ const Propietarios = () => {
   }
 
   const enviarSolicitud = async (metodo, parametros) => {
-    await axios({ method: metodo, url: url, data: parametros }).then(function (respuesta) {
+    try {
+      const respuesta = await axios({ method: metodo, url: url, data: parametros });
       var tipo = respuesta.data[0];
+
       if (metodo === 'POST') {
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Propietario agregado con exito",
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
           showConfirmButton: false,
-          timer: 1500
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
+        });
+        Toast.fire({
+          icon: "success",
+          title: "Propietario agregado con exito"
         });
         document.getElementById('btnCerrar').click();
       } else if (metodo === 'PUT') {
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Propietario editado con exito",
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
           showConfirmButton: false,
-          timer: 1500
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
+        });
+        Toast.fire({
+          icon: "success",
+          title: "Propietario editado con exito"
+        });
+        document.getElementById('btn-close').click();
+      } else if (metodo === 'DELETE') {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
+        });
+        Toast.fire({
+          icon: "success",
+          title: "Propietario eliminado con exito"
         });
         document.getElementById('btnCerrar').click();
       }
-      if (metodo === 'DELETE') {
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Propietario eliminado con exito",
-          showConfirmButton: false,
-          timer: 1500
-        });
+
+      setActualizacion(true);
+
+      if (tipo === 'success') {
         document.getElementById('btnCerrar').click();
       }
-      setActualizacion(true)
-    })
-      .catch(function (error) {
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        Swal.fire("No se puede eliminar un propietario que tenga un vehiculo asociado");
+      } else {
         show_alerta('Error en la solicitud', 'error');
-        console.log(error);
-      })
+        console.error('Error en la solicitud:', error.message);
+      }
+    }
   }
 
   const deletePropietario = (idPropietario) => {
@@ -154,12 +187,13 @@ const Propietarios = () => {
         setIdPropietario(idPropietario);
         enviarSolicitud('DELETE', { idPropietario: idPropietario });
       } else {
-        show_alerta('El propietario no fue eliminad0', 'info')
+        show_alerta('El propietario no fue eliminado', 'info')
       }
     });
 
   }
 
+  
   const handleChange = (e) => {
     const valor = e.target.value;
     setBusqueda(valor); // Actualizar el estado de búsqueda
