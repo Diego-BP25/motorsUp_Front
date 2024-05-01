@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEdit, faTrash, faSearch, faPlusCircle, faFloppyDisk, faCalendar, faToggleOff, faIdCardClip, faBagShopping } from '@fortawesome/free-solid-svg-icons'
 import { CSmartPagination } from '@coreui/react-pro';
 import { validarCamposObligatorios } from 'src/validaciones.proyecto';
+import Modal from 'react-bootstrap/Modal';
 
 const Productos = () => {
   //api de productos
@@ -27,7 +28,7 @@ const Productos = () => {
   const [operation, setOperation] = useState(1)
   const [actualizacion, setActualizacion] = useState(false)
   const [consecutivo, setConsecutivo] = useState(0);
-
+  const [showModal, setShowModal] = useState(false);
   //tipo de modal
   const [modalType, setModalType] = useState('add');
 
@@ -54,6 +55,15 @@ const Productos = () => {
       obtenerIdConsecutivo();
     }
   }, [operation]);
+
+  //variables para error
+  const [errores, setErrores] = useState({
+    nombreProducto: { error: false, mensaje: '' },
+    stockMaximo: { error: false, mensaje: '' },
+    stockMinimo: { error: false, mensaje: '' },
+    categoriaProducto_idCategoriaProducto: { error: false, mensaje: '' },
+  });
+
 
 
   const obtenerIdConsecutivo = async () => {
@@ -94,7 +104,7 @@ const Productos = () => {
     setModalType(op === 1 ? 'add' : 'edit'); // Establecer el tipo de modal
     if (op === 1) {
       setErrores({
-        nombreProducto: { error: false, mensaje: 'El nombre del producto es obligatorio' },
+        nombreProducto: { error: false, mensaje: '' },
         stockMaximo: { error: false, mensaje: '' },
         stockMinimo: { error: false, mensaje: '' },
         categoriaProducto_idCategoriaProducto: { error: false, mensaje: '' },
@@ -103,6 +113,12 @@ const Productos = () => {
       obtenerIdConsecutivo();
     }
     else if (op === 2) {
+      setErrores({
+        nombreProducto: { error: false, mensaje: '' },
+        stockMaximo: { error: false, mensaje: '' },
+        stockMinimo: { error: false, mensaje: '' },
+        categoriaProducto_idCategoriaProducto: { error: false, mensaje: '' },
+      });
       setTitle('Editar producto')
       setIdProducto(idProducto);
       setNombreProducto(nombreProducto);
@@ -124,35 +140,43 @@ const Productos = () => {
   const validar = () => {
     var parametros;
     var metodo;
+    var nuevosErrores = {}
 
-    if (!nombreProducto, !stockMaximo, !stockMinimo, !categoriaProducto_idCategoriaProducto) {
+    if (operation == 2 || operation == 1) {
       // Actualizar estado de errores
-      const nuevosErrores = {
+      nuevosErrores = {
         nombreProducto: {
-          error: nombreProducto.length > 1 && nombreProducto.length < 3 || !nombreProducto || nombreProducto.trim() !== nombreProducto || /\d/.test(nombreProducto),
-          mensaje: nombreProducto.length > 1 && nombreProducto.length < 3 ? 'El nombre del producto debe tener entre 3 y 50 caracteres' : !nombreProducto ? 'El nombre del producto es obligatorio' : nombreProducto.trim() !== nombreProducto ? 'El nombre del producto no puede contener espacios al inicio o al final' : /\d/.test(nombreProducto) ? 'El nombre del producto no puede contener números' : '',
+          error: nombreProducto.length > 1 && nombreProducto.length < 3 || !nombreProducto || nombreProducto.trim() !== nombreProducto || !/^[a-zA-Z0-9\s]+$/.test(nombreProducto),
+          mensaje: nombreProducto.length > 1 && nombreProducto.length < 3 ? 'El nombre del producto debe tener entre 3 y 50 caracteres' : !nombreProducto ? 'El nombre del producto es obligatorio' : nombreProducto.trim() !== nombreProducto ? 'El nombre del producto no puede contener espacios al inicio o al final' : !/^[a-zA-Z0-9\s]+$/.test(nombreProducto) ? 'El nombre del producto no puede contener caracteres especiales' : '',
         },
         stockMaximo: {
-          error: !stockMaximo || !/^\d+$/.test(stockMaximo || parseFloat(stockMaximo) < 0),
+          error: !stockMaximo || parseFloat(stockMaximo) < 0,
           mensaje: !stockMaximo ? 'El stock máximo es obligatorio' : parseFloat(stockMaximo) < 0 ? 'El stock máximo no puede ser negativo' : ''
         },
-        stockMinimo: { error: !stockMinimo, mensaje: 'El stock mínimo es obligatorio' },
-        categoriaProducto_idCategoriaProducto: { error: !categoriaProducto_idCategoriaProducto, mensaje: 'La categoría del producto es obligatoria' },
+        stockMinimo: {
+          error: !stockMinimo || parseFloat(stockMinimo) < 0,
+          mensaje: !stockMinimo ? 'El stock mínimo es obligatorio' : parseFloat(stockMinimo) < 0 ? 'El stock minimo no puede ser negativo' : ''
+        },
+        categoriaProducto_idCategoriaProducto: {
+          error: !categoriaProducto_idCategoriaProducto,
+          mensaje: !categoriaProducto_idCategoriaProducto ? 'La categoría del producto es obligatoria' : ''
+        },
       };
+
+      if (nuevosErrores.nombreProducto.error == '' && nuevosErrores.stockMaximo.error == '' && nuevosErrores.stockMinimo.error == '' && nuevosErrores.categoriaProducto_idCategoriaProducto.error == '') {
+        if (operation === 1) {
+          parametros = { idProducto: consecutivo, estadoProducto: true, nombreProducto: nombreProducto, precioCompra: "0", precioVenta: "0", saldoExistencias: "0", stockMaximo: stockMaximo, stockMinimo: stockMinimo, categoriaProducto_idCategoriaProducto: categoriaProducto_idCategoriaProducto };
+          metodo = 'POST';
+          console.log(parametros)
+        } else {
+          parametros = { idProducto: idProducto, estadoProducto: (estadoProducto === 0 ? 'false' : 'true'), nombreProducto: nombreProducto, precioCompra: precioCompra, precioVenta: precioVenta, saldoExistencias: saldoExistencias, stockMaximo: stockMaximo, stockMinimo: stockMinimo, categoriaProducto_idCategoriaProducto: categoriaProducto_idCategoriaProducto };
+          metodo = 'PUT';
+        }
+        enviarSolicitud(metodo, parametros);
+      }
       setErrores(nuevosErrores);
-      return;;
+      return;
     }
-
-
-    if (operation === 1) {
-      parametros = { idProducto: consecutivo, estadoProducto: true, nombreProducto: nombreProducto, precioCompra: "0", precioVenta: "0", saldoExistencias: "0", stockMaximo: stockMaximo, stockMinimo: stockMinimo, categoriaProducto_idCategoriaProducto: categoriaProducto_idCategoriaProducto };
-      metodo = 'POST';
-      console.log(parametros)
-    } else {
-      parametros = { idProducto: idProducto, estadoProducto: (estadoProducto === 0 ? 'false' : 'true'), nombreProducto: nombreProducto, precioCompra: precioCompra, precioVenta: precioVenta, saldoExistencias: saldoExistencias, stockMaximo: stockMaximo, stockMinimo: stockMinimo, categoriaProducto_idCategoriaProducto: categoriaProducto_idCategoriaProducto };
-      metodo = 'PUT';
-    }
-    enviarSolicitud(metodo, parametros);
 
   }
 
@@ -172,7 +196,7 @@ const Productos = () => {
         Swal.fire({
           position: "center",
           icon: "success",
-          title: "Producto editada con exito",
+          title: "Producto editado con exito",
           showConfirmButton: false,
           timer: 1500
         });
@@ -189,7 +213,6 @@ const Productos = () => {
         document.getElementById('btnCerrar').click();
 
       }
-
       setActualizacion(true)
 
     })
@@ -270,83 +293,7 @@ const Productos = () => {
     return productos.slice(startIndex, endIndex);
   }
 
-  //variables para error
-  const [errores, setErrores] = useState({
-    nombreProducto: { error: false, mensaje: '' },
-    stockMaximo: { error: false, mensaje: '' },
-    stockMinimo: { error: false, mensaje: '' },
-    categoriaProducto_idCategoriaProducto: { error: false, mensaje: '' },
-  });
 
-  const inputsAgregar = (
-    <>
-
-    </>
-  );
-
-  const inputsEditar = (
-    <>
-      <div className='input-group mb-3'  >
-        <input type='hidden' id='id' ></input>
-        <div className='input-group mb-3'>
-          <span className='input-group-text'><FontAwesomeIcon icon={faIdCardClip} /></span>
-          <input type='number' id='idProductos' className='form-control' placeholder='id' value={operation === 1 ? consecutivo : idProducto} />
-        </div>
-
-        <div className='input-group mb-3'>
-          <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
-          <input type='text' id='estadoProducto' className='form-control' placeholder='Estado' value={estadoProducto} onChange={(e) => setEstadoProducto(e.target.value)}></input>
-        </div>
-
-        <div className='input-group mb-3'>
-          <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
-          <input required type='text' id='nombreProducto' className='form-control' placeholder='Nombre' value={nombreProducto} onChange={(e) => setNombreProducto(e.target.value)}></input>
-        </div>
-
-        <div className='input-group mb-3'>
-          <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
-          <input type='text' id='precioCompra' className='form-control' placeholder='Precio compra' value={precioCompra} onChange={(e) => setPrecioCompra(e.target.value)}></input>
-        </div>
-
-        <div className='input-group mb-3'>
-          <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
-          <input type='text' id='precioVenta' className='form-control' placeholder='Precio venta' value={precioVenta} onChange={(e) => setPrecioVenta(e.target.value)}></input>
-        </div>
-
-        <div className='input-group mb-3'>
-          <label>Saldo Existencias</label>
-          <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
-          <input type='text' id='saldoExistencias' className='form-control' placeholder='Existencias' value={saldoExistencias} onChange={(e) => setSaldoExistencias(e.target.value)}></input>
-        </div>
-
-        <div className='input-group mb-3'>
-          <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
-          <input type='text' id='stockMaximo' className='form-control' placeholder='Stock maximo' value={stockMaximo} onChange={(e) => setStockMaximo(e.target.value)}></input>
-        </div>
-
-        <div className='input-group mb-3'>
-          <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
-          <input type='text' id='stockMinimo' className='form-control' placeholder='Stock minimo' value={stockMinimo} onChange={(e) => setStockMinimo(e.target.value)}></input>
-        </div>
-
-        <div className='input-group mb-3' >
-          <label htmlFor='categoriaProducto_idCategoriaProducto' className='input-group-text'><FontAwesomeIcon icon={faBagShopping} /></label>
-          <select id='categoriaProducto_idCategoriaProducto' className="form-control" value={categoriaProducto_idCategoriaProducto} onChange={(e) => setCategoriaProducto_idCategoriaProducto(e.target.value)}>
-            <option value=''>Seleccione una categoria</option>
-            {categoriaProductos.map((pro) => (
-              <option key={pro.idCategoriaProducto} value={pro.idCategoriaProducto}>{pro.nombreCategoria}</option>
-            ))}
-          </select>
-        </div>
-
-        <div className='d-grid col-6 mx-auto' style={{ display: 'flex', alignContent: 'center' }} >
-          <button onClick={() => validar()} className='botones-azules'>
-            <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
-          </button>
-        </div>
-      </div>
-    </>
-  );
 
 
   return (
@@ -434,24 +381,24 @@ const Productos = () => {
       </div>
 
       <div id='modalProductos' className="modal fade" >
-        <div className='modal-dialog' >
-          <div className='modal-content' style={{ width: '140%' }}>
+        <div className='modal-dialog modal-dialog-centered ' style={{ display: 'flex', justifyContent: 'center' }}>
+          <div className='modal-content' >
             <div className='modal-header'>
               <h5 className='modal-title'>{title}</h5>
               <button type="button" id="btnCerrar" className="btn-close" data-bs-dismiss='modal'></button>
             </div>
-            <div className='modal-body' style={{ display: 'flex', justifyContent: 'center'}}>
-              <div className='input-group mb-3'>
-
-                <input type='hidden' id='id'></input>
-                <div  style={{ display: 'flex', justifyContent: 'space-around'}}>
-
-                  <div className='input-group mb-3'>
+            <div className='modal-body' >
+              <div style={{ display: 'flex', padding: '2%', alignContent: 'center' }} >
+                <div style={{ flex: 1 }} >
+                  <input type='hidden' id='id'></input>
+                  <label htmlFor='idProductos' className='form-label'>Id producto</label>
+                  <div className='input-group mb-3' style={{ maxWidth: '90%' }}>
                     <span className='input-group-text'><FontAwesomeIcon icon={faIdCardClip} /></span>
                     <input type='number' id='idProductos' className='form-control' placeholder='Id' value={operation === 1 ? consecutivo : idProducto} />
                   </div>
 
-                  <div className='input-group mb-3'>
+                  <label htmlFor='nombreProducto' className='form-label'>Nombre</label>
+                  <div className='input-group mb-3' style={{ maxWidth: '90%' }}>
                     <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
                     <input type='text' id='nombreProducto' className={`form-control ${errores.nombreProducto.error ? 'is-invalid' : ''}`} placeholder='Nombre' value={nombreProducto} onChange={(e) => setNombreProducto(e.target.value)}></input>
                     {errores.nombreProducto.error && (
@@ -460,55 +407,63 @@ const Productos = () => {
                       </div>
                     )}
                   </div>
-                </div>
 
-
-                <div className='input-group mb-3'>
-                  <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
-                  <input type='number' id='stockMaximo' className={`form-control ${errores.stockMaximo.error ? 'is-invalid' : ''}`} placeholder='Stock maximo' value={stockMaximo} onChange={(e) => setStockMaximo(e.target.value)}></input>
-                  {errores.stockMaximo.error && (
-                    <div className="invalid-feedback">
-                      {errores.stockMaximo.mensaje}
+                  <div style={{ marginRight: '-50%' , marginLeft: '50%'}}>
+                    <label htmlFor='stockMaximo' className='form-label'>Stock maximo</label>
+                    <div className='input-group mb-3' style={{ maxWidth: '90%' }}>
+                      <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
+                      <input type='number' min={1} id='stockMaximo' className={`form-control ${errores.stockMaximo.error ? 'is-invalid' : ''}`} placeholder='Stock maximo' value={stockMaximo} onChange={(e) => setStockMaximo(e.target.value)}></input>
+                      {errores.stockMaximo.error && (
+                        <div className="invalid-feedback">
+                          {errores.stockMaximo.mensaje}
+                        </div>
+                      )}
                     </div>
-                  )}
+
+                  </div>
                 </div>
 
-                <div className='input-group mb-3'>
-                  <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
-                  <input type='number' id='stockMinimo' className={`form-control ${errores.stockMinimo.error ? 'is-invalid' : ''}`} placeholder='Stock minimo' value={stockMinimo} onChange={(e) => setStockMinimo(e.target.value)}></input>
-                  {errores.stockMinimo.error && (
-                    <div className="invalid-feedback">
-                      {errores.stockMinimo.mensaje}
-                    </div>
-                  )}
+                <div >
+                  <label htmlFor='stockMinimo' className='form-label'>Stock minimo</label>
+                  <div className='input-group mb-3' style={{ maxWidth: '90%' }}>
+                    <span className='input-group-text'><FontAwesomeIcon icon={faCalendar} /></span>
+                    <input type='number' min={1} id='stockMinimo' className={`form-control ${errores.stockMinimo.error ? 'is-invalid' : ''}`} placeholder='Stock minimo' value={stockMinimo} onChange={(e) => setStockMinimo(e.target.value)}></input>
+                    {errores.stockMinimo.error && (
+                      <div className="invalid-feedback">
+                        {errores.stockMinimo.mensaje}
+                      </div>
+                    )}
+                  </div>
+
+                  <label htmlFor='categoriaProducto_idCategoriaProducto' className='form-label'>Categoria</label>
+                  <div className='input-group mb-3' style={{ maxWidth: '90%' }}>
+                    <label htmlFor='categoriaProducto_idCategoriaProducto' className='input-group-text'><FontAwesomeIcon icon={faBagShopping} /></label>
+                    <select id='categoriaProducto_idCategoriaProducto' className={`form-control ${errores.categoriaProducto_idCategoriaProducto.error ? 'is-invalid' : ''}`} value={categoriaProducto_idCategoriaProducto} onChange={(e) => setCategoriaProducto_idCategoriaProducto(e.target.value)}>
+                      <option value=''>Seleccione una categoria</option>
+                      {categoriaProductos.map((pro) => (
+                        <option key={pro.idCategoriaProducto} value={pro.idCategoriaProducto}>{pro.nombreCategoria}</option>
+                      ))}
+                    </select>
+                    {errores.categoriaProducto_idCategoriaProducto.error && (
+                      <div className="invalid-feedback">
+                        {errores.categoriaProducto_idCategoriaProducto.mensaje}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className='input-group mb-3' >
-                  <label htmlFor='categoriaProducto_idCategoriaProducto' className='input-group-text'><FontAwesomeIcon icon={faBagShopping} /></label>
-                  <select id='categoriaProducto_idCategoriaProducto' className={`form-control ${errores.categoriaProducto_idCategoriaProducto.error ? 'is-invalid' : ''}`} value={categoriaProducto_idCategoriaProducto} onChange={(e) => setCategoriaProducto_idCategoriaProducto(e.target.value)}>
-                    <option value=''>Seleccione una categoria</option>
-                    {categoriaProductos.map((pro) => (
-                      <option key={pro.idCategoriaProducto} value={pro.idCategoriaProducto}>{pro.nombreCategoria}</option>
-                    ))}
-                  </select>
-                  {errores.categoriaProducto_idCategoriaProducto.error && (
-                    <div className="invalid-feedback">
-                      {errores.categoriaProducto_idCategoriaProducto.mensaje}
-                    </div>
-                  )}
-                </div>
 
-                <div className='d-grid col-6 mx-auto'  >
-                  <button onClick={() => validar()} className='botones-azules'>
-                    <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
-                  </button>
-                </div>
+              </div>
+              <div className='d-grid col-6 mx-auto'  >
+                <button onClick={() => validar()} className='botones-azules'>
+                  <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
+                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </div >
   )
 }
 
