@@ -6,6 +6,7 @@ import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 import { jsPDF } from "jspdf";
 import "jspdf-autotable";
 
+
 import { show_alerta } from 'src/fuctions.proyecto'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -20,7 +21,9 @@ import Button from 'react-bootstrap/Button';
 
 const Compras = () => {
   //api de compras
-  const url = 'http://localhost:8081/api/compras'
+  var apiUrl = process.env.REACT_APP_API_URL;
+  console.log(apiUrl)
+  const url = `${apiUrl}/api/compras`
   const [compra, setCompra] = useState([])
   const [id, setIdCompra] = useState('')
   const [descripcion, setDescripcionCompra] = useState('')
@@ -40,7 +43,7 @@ const Compras = () => {
   //detalle de la compra
   const [detalleCompraSeleccionada, setDetalleCompraSeleccionada] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  
+
   //buscador
   const [busqueda, setBusqueda] = useState("");
 
@@ -92,7 +95,7 @@ const Compras = () => {
 
   const getProveedores = async () => {
     try {
-      const respuesta = await axios.get('http://localhost:8081/api/proveedores');
+      const respuesta = await axios.get(`${apiUrl}/api/proveedores`);
       const datosProveedores = respuesta.data.reduce((acc, proveedor) => {
         acc[proveedor.idProveedor] = proveedor.nombreProveedor; // Almacenar el nombre
         return acc;
@@ -105,9 +108,9 @@ const Compras = () => {
 
   const getProductosName = async () => {
     try {
-      const respuesta = await axios.get('http://localhost:8081/api/productos');
+      const respuesta = await axios.get(`${apiUrl}/api/productos`);
       const datosProductos = respuesta.data.reduce((acc, producto) => {
-        acc[producto.idProducto] = producto.nombreProducto; 
+        acc[producto.idProducto] = producto.nombreProducto;
         return acc;
       }, {});
       setProductosName(datosProductos);
@@ -118,7 +121,7 @@ const Compras = () => {
 
   const getProductos = async () => {
     try {
-      const respuesta = await axios.get('http://localhost:8081/api/productos', {})
+      const respuesta = await axios.get(`${apiUrl}/api/productos`, {})
       setProducto(await respuesta.data)
     } catch (error) {
       console.error('Error al obtener los productos:', error.message)
@@ -157,7 +160,7 @@ const Compras = () => {
 
   const getProductosAsociados = async (idCompra, valor) => {
     try {
-      const response = await axios.get(`http://localhost:8081/api/compras/${idCompra}`);
+      const response = await axios.get(`${apiUrl}/api/compras/${idCompra}`);
       setProductosAsociados(response.data.detallesCompra);
       setDetalleCompraSeleccionada(response.data.compra); // Establecer los detalles de la compra seleccionada
       if (valor == 1) {
@@ -170,8 +173,8 @@ const Compras = () => {
 
   // Función para obtener los roles de la página actual
   const getCurrentPageCompras = () => {
-    const startIndex = (currentPage - 1) * 5;
-    const endIndex = startIndex + 5;
+    const startIndex = (currentPage - 1) * 6;
+    const endIndex = startIndex + 6;
     return compra.slice(startIndex, endIndex);
   }
 
@@ -320,7 +323,8 @@ const Compras = () => {
 
   const generarPDF = async (idCompra) => {
     try {
-      const response = await axios.get(`http://localhost:8081/api/compras/${idCompra}`);
+      const response = await axios.get(`${apiUrl}/api/compras/${idCompra}`);
+
       const detalleCompra = response.data.compra;
       const productosAsociados = response.data.detallesCompra;
 
@@ -437,7 +441,7 @@ const Compras = () => {
           <div className='col-12 col-lg-8 offset-0 offset-lg-2'>
             <CSmartPagination
               activePage={currentPage}
-              pages={Math.ceil(compra.length / 5)}
+              pages={Math.ceil(compra.length / 6)}
               onActivePageChange={setCurrentPage}
             />
           </div>
@@ -515,7 +519,8 @@ const Compras = () => {
               <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
             </button>
           </div>,
-        ]} widthContents='630px' />
+        ]} widthContents='630px'
+        />
 
 
       <div id='modalProductos' className='modal fade' aria-hidden='true'>

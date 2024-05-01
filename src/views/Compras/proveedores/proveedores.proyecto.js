@@ -311,7 +311,7 @@ const Proveedores = () => {
 
               <div className='input-group mb-3'>
                 <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
-                <input type='text' id='telefonoProveedor' className='form-control' placeholder='Telefono' value={telefonoProveedor} onChange={(e) => setTelefonoProveedor(e.target.value)}></input>
+                <input type='text' min={0} id='telefonoProveedor' className='form-control' placeholder='Telefono' value={telefonoProveedor} onChange={(e) => setTelefonoProveedor(e.target.value)}></input>
               </div>
 
               <div className='input-group mb-3'>

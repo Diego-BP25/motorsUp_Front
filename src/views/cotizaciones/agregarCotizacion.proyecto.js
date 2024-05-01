@@ -279,7 +279,7 @@ const AgregarCotizacion = () => {
 
                                     <div className='input-group mb-3' >
                                         <label htmlFor='valorCotizacion' className='input-group-text'><FontAwesomeIcon icon={faDollar} /></label>
-                                        <input type='text' id='valorCotizacion' placeholder='valor cotizacion' className="form-control" value={valorCotizacion} onChange={(e) => setValorCotizacion(e.target.value)} />
+                                        <input type='text' min={0} id='valorCotizacion' placeholder='valor cotizacion' className="form-control" value={valorCotizacion} onChange={(e) => setValorCotizacion(e.target.value)} />
                                     </div>
 
                                     <h4
@@ -326,7 +326,7 @@ const AgregarCotizacion = () => {
 
                                             <div className='input-group mb-3' >
                                                 <label htmlFor='valorManoObra' className='input-group-text'><FontAwesomeIcon icon={faDollar} /></label>
-                                                <input type='number' className="form-control" id='valorManoObra' placeholder='Valor mano obra' value={valorManoObra} onChange={(e) => setValorManoObra(e.target.value)} />
+                                                <input type='number' min={0} className="form-control" id='valorManoObra' placeholder='Valor mano obra' value={valorManoObra} onChange={(e) => setValorManoObra(e.target.value)} />
                                             </div>
 
                                             <div key={"buttonGuardar"} className='d-grid col-6 mx-auto' style={{ width: '70%' }} >
@@ -365,12 +365,12 @@ const AgregarCotizacion = () => {
 
                                             <div className='input-group mb-3' >
                                                 <label htmlFor='cantidad' className='input-group-text'><FontAwesomeIcon icon={faHashtag} /></label>
-                                                <input type='number' className="form-control" id='cantidad' placeholder='Cantidad' value={cantidad} onChange={(e) => setCantidad(e.target.value)} />
+                                                <input type='number' min={0} className="form-control" id='cantidad' placeholder='Cantidad' value={cantidad} onChange={(e) => setCantidad(e.target.value)} />
                                             </div>
 
                                             <div className='input-group mb-3' >
                                                 <label htmlFor='precioVenta' className='input-group-text'><FontAwesomeIcon icon={faTag} /></label>
-                                                <input type='number' className="form-control" id='precioVenta' placeholder='precioVenta' value={precioVenta} onChange={(e) => setPrecio(e.target.value)} />
+                                                <input type='number' min={0} className="form-control" id='precioVenta' placeholder='precioVenta' value={precioVenta} onChange={(e) => setPrecio(e.target.value)} />
                                             </div>
 
 
@@ -393,7 +393,7 @@ const AgregarCotizacion = () => {
 
                             <div className='input-group mb-3' style={{ marginTop: '-9.5%', marginLeft: '65.8%', maxHeight: '35px', marginBottom: '35px' }}>
                                 <label htmlFor='total' className='input-group-text'><FontAwesomeIcon icon={faDollar} /></label>
-                                <input type='number' className="form-control" id='total' value={total} />
+                                <input type='number' min={0} className="form-control" id='total' value={total} />
                             </div>
                         </form>
                     </div>
