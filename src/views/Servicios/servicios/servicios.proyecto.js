@@ -3,7 +3,7 @@ import axios from 'axios'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faComment, faSearch, faCaretDown } from '@fortawesome/free-solid-svg-icons'
+import { faEdit, faTrash, faPlusCircle, faFloppyDisk, faScrewdriverWrench, faSearch, faPowerOff, faCaretDown } from '@fortawesome/free-solid-svg-icons'
 import { CSmartPagination } from '@coreui/react-pro'
 import { show_alerta } from 'src/fuctions.proyecto'
 
@@ -38,17 +38,17 @@ const Servicios = () => {
 
 
     const getServicios = async () => {
-    try {
-      const respuesta = await axios.get(url, {});
-      let serviciosData = respuesta.data.filter(ser => ser.estado === true); // Filtrar vehículos con estado true
-      if (filtradoPorEstado && !estadoFiltrado) {
-        serviciosData = respuesta.data.filter(ser => ser.estado === false); // Filtrar vehículos con estado false si está activado el filtro por estado inactivo
-      }
-      setServicio(serviciosData);
-    } catch (error) {
-      console.error('Error al obtener los servicios:', error.message);
-    }
-  };
+        try {
+            const respuesta = await axios.get(url, {});
+            let serviciosData = respuesta.data.filter(ser => ser.estado === true); // Filtrar vehículos con estado true
+            if (filtradoPorEstado && !estadoFiltrado) {
+                serviciosData = respuesta.data.filter(ser => ser.estado === false); // Filtrar vehículos con estado false si está activado el filtro por estado inactivo
+            }
+            setServicio(serviciosData);
+        } catch (error) {
+            console.error('Error al obtener los servicios:', error.message);
+        }
+    };
 
     const filtroEstado = () => {
         setFiltradoPorEstado(!filtradoPorEstado);
@@ -267,7 +267,7 @@ const Servicios = () => {
                                         <th>ID</th>
                                         <th>Nombre</th>
                                         <th>Descripcion</th>
-                                        <th onClick={filtroEstado} title="Haz clic para filtrar por estado"  style={{ cursor: 'pointer' }}>
+                                        <th onClick={filtroEstado} title="Haz clic para filtrar por estado" style={{ cursor: 'pointer' }}>
                                             Estado
                                             <FontAwesomeIcon icon={faCaretDown} style={{ marginLeft: '8px' }} />
                                         </th>
@@ -323,18 +323,26 @@ const Servicios = () => {
                         <div className='modal-body'>
 
                             <div className='input-group mb-3'>
-                                <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
-                                <input type='text' id='nombreServicio' className='form-control' placeholder='Nombre Servicio' value={nombreServicio} onChange={(e) => { setNombreServicio(e.target.value) }}></input>
+                                <div className="d-flex flex-column" style={{ marginRight: '10px' }}>
+                                    <label htmlFor='nombreServicio' className='form-label'>Nombre Servicio</label>
+                                    <div className='input-group mb-3' style={{ maxWidth: '100%' }}>
+                                        <span className='input-group-text'><FontAwesomeIcon icon={faScrewdriverWrench} /></span>
+                                        <input type='text' id='nombreServicio' className='form-control' placeholder='Aceite' value={nombreServicio} onChange={(e) => { setNombreServicio(e.target.value) }}></input>
+                                    </div>
+                                </div>
                             </div>
                             <div className='input-group mb-3'>
-                                <textarea
-                                    className="form-control"
-                                    rows="3"
-                                    value={descripcion}
-                                    onChange={(e) => setDescripcion(e.target.value)}
+                                <div className="d-flex flex-column" style={{ marginRight: '10px' }}>
+                                    <label htmlFor='descripcion' className='form-label'>Descripción</label>
+                                    <textarea
+                                        className="form-control"
+                                        rows="3"
+                                        value={descripcion}
+                                        onChange={(e) => setDescripcion(e.target.value)}
 
-                                    style={{ resize: 'none' }}
-                                ></textarea>
+                                        style={{ resize: 'none' }}
+                                    ></textarea>
+                                </div>
                             </div>
                             <div className='d-grid col-6 mx-auto'>
                                 <button onClick={() => validar()} className='botones-azules'>
@@ -357,25 +365,38 @@ const Servicios = () => {
                         <div className='modal-body'>
 
                             <div className='input-group mb-3'>
-                                <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
-                                <input type='text' id='nombreServicio' className='form-control' placeholder='Nombre Servicio' value={nombreServicio} onChange={(e) => { setNombreServicio(e.target.value) }}></input>
+                                <div className="d-flex flex-column" style={{ marginRight: '10px' }}>
+                                    <label htmlFor='nombreServicio' className='form-label'>Nombre Servicio</label>
+                                    <div className='input-group mb-3' style={{ maxWidth: '100%' }}>
+                                        <span className='input-group-text'><FontAwesomeIcon icon={faScrewdriverWrench} /></span>
+                                        <input type='text' id='nombreServicio' className='form-control' placeholder='Aceite' value={nombreServicio} onChange={(e) => { setNombreServicio(e.target.value) }}></input>
+                                    </div>
+                                </div>
                             </div>
                             <div className='input-group mb-3'>
-                                <textarea
-                                    className="form-control"
-                                    rows="3"
-                                    value={descripcion}
-                                    onChange={(e) => setDescripcion(e.target.value)}
-                                    style={{ resize: 'none' }}
-                                    placeholder="Descripcion"
-                                ></textarea>
+                                <div className="d-flex flex-column" style={{ marginRight: '10px' }}>
+                                    <label htmlFor='descripcion' className='form-label'>Descripción</label>
+                                    <textarea
+                                        className="form-control"
+                                        rows="3"
+                                        value={descripcion}
+                                        onChange={(e) => setDescripcion(e.target.value)}
+
+                                        style={{ resize: 'none' }}
+                                    ></textarea>
+                                </div>
                             </div>
                             <div className='input-group mb-3'>
-                                <span className='input-group-text'><FontAwesomeIcon icon={faComment} /></span>
-                                <select id='estado' className='form-select' value={estado} onChange={(e) => setEstado(e.target.value)} >
-                                    <option value={true}>Activo</option>
-                                    <option value={false}>Inactivo</option>
-                                </select>
+                                <div className="d-flex flex-column" style={{ marginRight: '10px' }}>
+                                    <label htmlFor='idEmpleado' className='form-label'>Estado</label>
+                                    <div className='input-group mb-3' style={{ maxWidth: '100%' }}>
+                                        <span className='input-group-text'><FontAwesomeIcon icon={faPowerOff} /></span>
+                                        <select id='estado' className='form-select' value={estado} onChange={(e) => setEstado(e.target.value)} >
+                                            <option value={true}>Activo</option>
+                                            <option value={false}>Inactivo</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                             <div className='d-grid col-6 mx-auto'>
                                 <button onClick={() => validar()} className='botones-azules'>

@@ -1,5 +1,5 @@
 import React from 'react'
-
+import { jwtDecode } from 'jwt-decode'
 const Dashboard = React.lazy(() => import('./views/dashboard/Dashboard.proyecto'))
 const Compras = React.lazy(() => import('./views/Compras/compra/compra.proyecto'))
 const AgregarCompra = React.lazy(() => import('./views/Compras/compra/agregarCompra.proyecto'))
@@ -23,36 +23,56 @@ const CategoriaProducto = React.lazy(() =>
 )
 const Proveedores = React.lazy(() => import('./views/Compras/proveedores/proveedores.proyecto'))
 
-const routes = [
-  { path: '/', exact: true, name: 'Home' },
-  { path: '/dashboard', name: 'Dashboard', element: Dashboard },
-  { path: '/Configuracion/rol', name: 'Rol', element: Rol, exact: true },
-  { path: '/Configuracion/empleado', name: 'Empleado', element: Empleado, exact: true },
-  { path: '/compras', name: 'Compras', element: Compras, exact: true },
-  { path: '/cotizacion', name: 'Cotizacion', element: cotizaciones, exact: true },
-  { path: '/compras/compra', name: 'Gestion compras', element: Compras },
-  { path: '/compras/agregar', name: 'Agregar compra', element: AgregarCompra },
-  { path: '/cotizacio/cotizaciones', name: 'Cotizaciones', element: cotizaciones, exact: true },
-  {
-    path: '/cotizacion/agregar',
-    name: 'Agregar cotizacion',
-    element: AgregarCotizacion,
-    exact: true,
-  },
-  { path: '/compras/productos', name: 'Productos', element: Productos, exact: true },
-  {
-    path: '/compras/categoriaProductos',
-    name: 'CategoriaProductos',
-    element: CategoriaProducto,
-    exact: true,
-  },
-  { path: '/compras/proveedores', name: 'Proveedores', element: Proveedores, exact: true },
-  { path: '/Servicios/propietario', name: 'Propietario', element: Propietarios },
-  { path: '/Ventas/venta', name: 'Gestion Ventas', element: Ventas },
-  { path: '/Servicios/agendamiento', name: 'Agendamiento', element: Agendamiento },
-  { path: '/Ventas/agregarServ', name: 'agregar venta servicio', element: agregarserv },
-  { path: '/Servicios/GestionServicio', name: 'Servicios', element: Servicios, exact: true },
-  { path: '/Servicios/Vehiculo', name: 'Vehiculos', element: Vehiculo, exact: true },
-]
+const token = localStorage.getItem('Empleado')
+let roles_idRol = 0
+if (token) {
+  const decodedToken = jwtDecode(token)
+  roles_idRol = decodedToken.empleado.roles_idRol
+}
+
+let routes = []
+
+if (roles_idRol === 1) {
+  routes = [
+    { path: '/', exact: true, name: 'Home' },
+    { path: '/dashboard', name: 'Dashboard', element: Dashboard },
+    { path: '/Configuracion/rol', name: 'Rol', element: Rol, exact: true },
+    { path: '/Configuracion/empleado', name: 'Empleado', element: Empleado, exact: true },
+    { path: '/compras', name: 'Compras', element: Compras, exact: true },
+    { path: '/cotizacion', name: 'Cotizacion', element: cotizaciones, exact: true },
+    { path: '/compras/compra', name: 'Gestion compras', element: Compras },
+    { path: '/compras/agregar', name: 'Agregar compra', element: AgregarCompra },
+    { path: '/cotizacio/cotizaciones', name: 'Cotizaciones', element: cotizaciones, exact: true },
+    {
+      path: '/cotizacion/agregar',
+      name: 'Agregar cotizacion',
+      element: AgregarCotizacion,
+      exact: true,
+    },
+    { path: '/compras/productos', name: 'Productos', element: Productos, exact: true },
+    {
+      path: '/compras/categoriaProductos',
+      name: 'CategoriaProductos',
+      element: CategoriaProducto,
+      exact: true,
+    },
+    { path: '/compras/proveedores', name: 'Proveedores', element: Proveedores, exact: true },
+    { path: '/Servicios/propietario', name: 'Propietario', element: Propietarios },
+    { path: '/Ventas/venta', name: 'Gestion Ventas', element: Ventas },
+    { path: '/Servicios/agendamiento', name: 'Agendamiento', element: Agendamiento },
+    { path: '/Ventas/agregarServ', name: 'agregar venta servicio', element: agregarserv },
+    { path: '/Servicios/GestionServicio', name: 'Servicios', element: Servicios, exact: true },
+    { path: '/Servicios/Vehiculo', name: 'Vehiculos', element: Vehiculo, exact: true },
+  ]
+} else if (roles_idRol === 2) {
+  routes = [
+    { path: '/Servicios/propietario', name: 'Propietario', element: Propietarios },
+    { path: '/Ventas/venta', name: 'Gestion Ventas', element: Ventas },
+    { path: '/Servicios/agendamiento', name: 'Agendamiento', element: Agendamiento },
+    { path: '/Ventas/agregarServ', name: 'agregar venta servicio', element: agregarserv },
+    { path: '/Servicios/GestionServicio', name: 'Servicios', element: Servicios, exact: true },
+    { path: '/Servicios/Vehiculo', name: 'Vehiculos', element: Vehiculo, exact: true },
+  ]
+}
 
 export default routes
