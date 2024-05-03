@@ -35,7 +35,7 @@ const Propietarios = () => {
     setActualizacion(false)
   }, [actualizacion ? propietario : null]);
 
-  useEffect(() =>{
+  useEffect(() => {
     getPropietarios()
   }, [filtradoPorEstado, estadoFiltrado])
 
@@ -193,7 +193,7 @@ const Propietarios = () => {
 
   }
 
-  
+
   const handleChange = (e) => {
     const valor = e.target.value;
     setBusqueda(valor); // Actualizar el estado de búsqueda
@@ -226,31 +226,51 @@ const Propietarios = () => {
   }
 
   const inputsAgregar = (
-    <div className='modal-body'>
-      <input type='hidden' id='id' ></input>
-      <div className='input-group mb-3'>
-        <span className='input-group-text'><FontAwesomeIcon icon={faIdCardClip} /></span>
-        <input type='text' id='Cedula' className='form-control' placeholder='Cedula' value={idPropietario} onChange={(e) => setIdPropietario(e.target.value)}></input>
-      </div>
-      <div className='input-group mb-3'>
-        <span className='input-group-text'><FontAwesomeIcon icon={faUser} /></span>
-        <input type='text' id='nombre' className='form-control' placeholder='Nombre Propietario' value={nombrePropietario} onChange={(e) => setNombre(e.target.value)}></input>
-      </div>
-      <div className='input-group mb-3'>
-        <span className='input-group-text'><FontAwesomeIcon icon={faPhone} /></span>
-        <input type='text' id='telefono' className='form-control' placeholder='Telefono Propietario' value={telefonoPropietario} onChange={(e) => setTelefono(e.target.value)}></input>
-      </div>
-      <div className='input-group mb-3'>
-        <span className='input-group-text'><FontAwesomeIcon icon={faEnvelope} /></span>
-        <input type='text' id='correo' className='form-control' placeholder='Correo Propietario' value={correoPropietario} onChange={(e) => setCorreo(e.target.value)}></input>
-      </div>
+    
+        <div  className='modal-header'>
+          
+          <div className='modal-body'>
+            <div style={{ display: 'flex', padding: '2%', alignContent: 'center' }} >
+            <div style={{ flex: 1, marginTop: '-7%'}} >
+              <input type='hidden' id='id' ></input>
+              <label htmlFor='Cedula' className='form-label'>Cedula</label>
+              <div className='input-group mb-3' style={{ maxWidth: '90%' }}>
+                <span className='input-group-text'><FontAwesomeIcon icon={faIdCardClip} /></span>
+                <input type='text' id='Cedula' className='form-control' placeholder='1015187101' value={idPropietario} onChange={(e) => setIdPropietario(e.target.value)}></input>
+              </div>
 
-      <div className='d-grid col-6 mx-auto'>
-        <button onClick={() => validar()} className='botones-azules'>
-          <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
-        </button>
-      </div>
-    </div>
+              <label htmlFor='nombre' className='form-label'>Nombre propietario</label>
+              <div className='input-group mb-3' style={{ maxWidth: '90%' }}>
+                <span className='input-group-text'><FontAwesomeIcon icon={faUser} /></span>
+                <input type='text' id='nombre' className='form-control' placeholder='Diego Alejandro' value={nombrePropietario} onChange={(e) => setNombre(e.target.value)}></input>
+              </div>
+              </div>
+
+              <div style={{marginTop:'-7%'}}>
+              <label htmlFor='telefono' className='form-label'>Telefono Propietario</label>
+              <div className='input-group mb-3' style={{ maxWidth: '90%' }}>
+                <span className='input-group-text'><FontAwesomeIcon icon={faPhone} /></span>
+                <input type='text' id='telefono' className='form-control' placeholder='3126257999' value={telefonoPropietario} onChange={(e) => setTelefono(e.target.value)}></input>
+              </div>
+
+              <label htmlFor='correo' className='form-label'>Correo Propietario</label>
+              <div className='input-group mb-3'  style={{ maxWidth: '90%' }}>
+                <span className='input-group-text'><FontAwesomeIcon icon={faEnvelope} /></span>
+                <input type='text' id='correo' className='form-control' placeholder='alejandro123@gmail.com' value={correoPropietario} onChange={(e) => setCorreo(e.target.value)}></input>
+              </div>
+              </div>
+              </div>
+              <div className='d-grid col-6 mx-auto'>
+                <button onClick={() => validar()} className='botones-azules'>
+                  <FontAwesomeIcon icon={faFloppyDisk} /> Guardar
+                </button>
+              </div>
+            
+          </div>
+        </div>
+      
+    
+
 
   )
 
@@ -321,7 +341,7 @@ const Propietarios = () => {
 
               <thead>
                 <tr>
-                  <th>Id</th>
+                  <th>Cedula</th>
                   <th>Nombre</th>
                   <th>Telefono</th>
                   <th>Correo</th>
