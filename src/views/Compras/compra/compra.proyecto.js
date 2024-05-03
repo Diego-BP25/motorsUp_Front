@@ -320,7 +320,7 @@ const Compras = () => {
     });
     setCompra(resultadosBusqueda);
   }
-
+ 
   const generarPDF = async (idCompra) => {
     try {
       const response = await axios.get(`${apiUrl}/api/compras/${idCompra}`);

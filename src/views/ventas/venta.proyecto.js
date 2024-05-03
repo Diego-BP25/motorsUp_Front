@@ -7,11 +7,13 @@ import { CNavGroupItems, CRow } from '@coreui/react'
 import { show_alerta } from 'src/fuctions.proyecto'
 import '@fortawesome/fontawesome-free'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlusCircle, faFloppyDisk, faSearch, faCloudDownload, faToggleOff, faHashtag, faCalendarDays, faDollar, faCreditCard, faEye, faBan } from '@fortawesome/free-solid-svg-icons'
+import { faPlusCircle, faFloppyDisk, faSearch, faCaretDown, faCloudDownload, faToggleOff, faHashtag, faCalendarDays, faDollar, faCreditCard, faEye, faBan } from '@fortawesome/free-solid-svg-icons'
 import { Link } from 'react-router-dom';
 import { CSmartPagination } from '@coreui/react-pro'
 import { fecha2 } from 'src/views/funcionesExtras.proyecto'
 import Modal from 'react-bootstrap/Modal';
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
 
 
 
@@ -29,6 +31,11 @@ const Ventas = () => {
   const [estadoModal, setEstadoModal] = useState(true)
   const [busqueda, setBusqueda] = useState("");
   const [currentPage, setCurrentPage] = useState(1)
+  const [filtradoPorEstado, setFiltradoPorEstado] = useState(false);
+  const [estadoFiltrado, setEstadoFiltrado] = useState(true);
+
+  const [productosName, setProductosName] = useState({});
+  const [serviciosName, setServiciosName] = useState({});
 
   //estado para el boton info
   const [ventasAsociadas, setVentasAsociadas] = useState([]);
@@ -45,14 +52,25 @@ const Ventas = () => {
 
 
   useEffect(() => {
+    console.log(process.env.REACT_APP_DIEGO)
     getVentas()
+    getProductosName()
+    getServiciosName()
     setActualizacion(false)
   }, [actualizacion ? venta : null])
+
+  useEffect(() => {
+    getVentas()
+  }, [filtradoPorEstado, estadoFiltrado])
 
   const getVentas = async () => {
     try {
       const respuesta = await axios.get(url, {})
-      setVenta(await respuesta.data)
+      let ventasData = respuesta.data.filter(pro => pro.estado === true); // Filtrar propietarios con estado true
+      if (filtradoPorEstado && !estadoFiltrado) {
+        ventasData = respuesta.data.filter(pro => pro.estado === false); // Filtrar propietarios con estado false si está activado el filtro por estado inactivo
+      }
+      setVenta(ventasData)
     } catch (error) {
       console.error('Error al obtener los Empleados:', error.message)
     }
@@ -75,44 +93,42 @@ const Ventas = () => {
   }
 
   const enviarSolicitud = async (metodo, parametros) => {
-    await axios({ method: metodo, url: url, data: parametros }).then(function (respuesta) {
+    try {
+      const respuesta = await axios({ method: metodo, url: url, data: parametros });
       var tipo = respuesta.data[0];
-      if (metodo === 'POST') {
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Venta agregada con exito",
+
+         if (metodo === 'DELETE') {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
           showConfirmButton: false,
-          timer: 1500
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
+        });
+        Toast.fire({
+          icon: "success",
+          title: "Venta anulada con exito"
         });
         document.getElementById('btnCerrar').click();
-      } else if (metodo === 'PUT') {
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Venta editada con exito",
-          showConfirmButton: false,
-          timer: 1500
-        });
+      }
+
+      setActualizacion(true);
+
+      if (tipo === 'success') {
         document.getElementById('btnCerrar').click();
-      } if (metodo === 'DELETE') {
-        Swal.fire({
-          position: "center",
-          icon: "success",
-          title: "Venta eliminada con exito",
-          showConfirmButton: false,
-          timer: 1500
-        });
-        document.getElementById('btnCerrar').click();
-      };
-    })
+      }
+    }finally{} 
   }
 
   const deleteVenta = (idVenta) => {
 
     const MySwal = withReactContent(Swal);
     MySwal.fire({
-      title: '¿Seguro de eliminar esta venta?',
+      title: '¿Seguro de anular esta venta?',
       icon: 'question', text: 'No podra activar nuevamente esta venta',
       showCancelButton: true, confirmButtonText: 'Aceptar', cancelButtonText: 'Cancelar'
     }).then((result) => {
@@ -150,11 +166,86 @@ const Ventas = () => {
     setVenta(resultadosBusqueda);
   };
 
+  const getProductosName = async () => {
+    try {
+      const respuesta = await axios.get('http://localhost:8081/api/productos');
+      const datosProductos = respuesta.data.reduce((acc, producto) => {
+        acc[producto.idProducto] = producto.nombreProducto; 
+        return acc;
+      }, {});
+      setProductosName(datosProductos);
+    } catch (error) {
+      console.error('Error al obtener el nombre de los productos', error.message);
+    }
+  };
+
+  const getServiciosName = async () => {
+    try {
+      const respuesta = await axios.get('http://localhost:8081/api/servicio');
+      const datosServicios = respuesta.data.reduce((acc, servicio) => {
+        acc[servicio.idServicio] = servicio.nombreServicio; 
+        return acc;
+      }, {});
+      setServiciosName(datosServicios);
+    } catch (error) {
+      console.error('Error al obtener el nombre de los servicios', error.message);
+    }
+  };
+
+  const generarPDF = async (idVenta) => {
+    try {
+      const response = await axios.get(`http://localhost:8081/api/ventas/${idVenta}`);
+      const detalleVenta = response.data.venta;
+      const ventasAsociadas = response.data.detalleVenta;
+
+      const doc = new jsPDF();
+
+      // Título del PDF
+      doc.setFontSize(18);
+      doc.text("Detalles de la venta", 14, 15);
+
+      // Datos de la venta
+      doc.setFontSize(12);
+      doc.text(`ID Venta: ${detalleVenta.idVenta}`, 14, 30);
+      doc.text(`Fecha Compra: ${fecha2(detalleVenta.fecha)}`, 14, 40);
+      doc.text(`Metodo de pago: ${detalleVenta.metodoPago}`, 14, 50);
+      doc.text(`Total venta: ${detalleVenta.total}`, 14, 60);
+
+      // Tabla de productos asociados
+      const productosData =ventasAsociadas.map((ventas) => [
+        productosName[ventas.productos_idProducto] || serviciosName[ventas.servicios_idServicio],
+        ventas.idDetalleVentaProducto ? "Servicio" : "Producto",
+        ventas.valorManoObra || ventas.precioVenta,
+        ventas.cantidad || "1",
+        ventas.total
+
+      ]);
+
+      doc.autoTable({
+        startY: 70,
+        head: [['Nombre', 'Tipo', 'Precio', 'Cantidad', 'Total']],
+        body: productosData,
+      });
+
+      // Guardar o descargar el PDF
+      doc.save("detalle_venta.pdf");
+    } catch (error) {
+      console.error('Error al generar el PDF:', error.message);
+    }
+  };
   // Función para obtener las ventas de la página actual
   const getCurrentPageVentas = () => {
     const startIndex = (currentPage - 1) * 5;
     const endIndex = startIndex + 5;
     return venta.slice(startIndex, endIndex);
+  };
+
+  const filtroEstado = () => {
+    setFiltradoPorEstado(!filtradoPorEstado);
+    // Si ya está filtrado por estado, alternar entre true y false
+    if (filtradoPorEstado) {
+      setEstadoFiltrado(!estadoFiltrado);
+    }
   };
 
   const getVentasAsociadas = async (idVenta, valor) => {
@@ -200,7 +291,7 @@ const Ventas = () => {
             </div>
           </div>
 
-          <Link to="/Ventas/agregarServ">
+          <Link to='/Ventas/agregarVentas'>
             <button className='botones-azules'>
               <FontAwesomeIcon icon={faPlusCircle} /> Añadir
             </button>
@@ -214,10 +305,13 @@ const Ventas = () => {
             <table className='table table-striped' style={{ width: '100%' }}>
               <thead>
                 <tr>
-                  <th>Id</th>
+                  <th>N° Venta</th>
                   <th>Fecha</th>
                   <th>Metodo pago</th>
-                  <th>Estado</th>
+                  <th onClick={filtroEstado} title="Haz clic para filtrar por estado" style={{ cursor: 'pointer' }}>
+                    Estado
+                    <FontAwesomeIcon icon={faCaretDown} style={{ marginLeft: '8px' }} />
+                  </th>
                   <th>Total</th>
                   <th>Acciones</th>
 
@@ -230,7 +324,9 @@ const Ventas = () => {
                     <td>{r.idVenta}</td>
                     <td>{fecha2(r.fecha)}</td>
                     <td>{r.metodoPago}</td>
-                    <td>{r.estado ? 'true' : 'false'}</td>
+                    <td>
+                      <span className={!r.estado ? 'estado-inactivo' : 'estado-activo'}>{!r.estado ? 'Inactivo' : 'Activo'}</span>
+                    </td>
                     <td>{r.total}</td>
 
 
@@ -239,8 +335,7 @@ const Ventas = () => {
                         <FontAwesomeIcon icon={faEye} />
                       </button>
                       &nbsp;
-                      <button className='btn btn-success'
-                        data-bs-toggle='modal' data-bs-target='#modalCompras'>
+                      <button className='btn btn-success' onClick={() => generarPDF(r.idVenta)}>
                         <FontAwesomeIcon icon={faCloudDownload} />
                       </button>
                       &nbsp;
@@ -342,8 +437,8 @@ const Ventas = () => {
           <table className='table table-striped'>
             <thead>
               <tr>
-                <th>ID</th>
                 <th>Tipo</th>
+                <th>Producto/servicio</th>
                 <th>Precio</th>
                 <th>Cantidad</th>
                 <th>Total</th>
@@ -351,10 +446,10 @@ const Ventas = () => {
               </tr>
             </thead>
             <tbody>
-              {Array.isArray(ventasAsociadas) && ventasAsociadas.map((ventas) => (
+              {ventasAsociadas.map((ventas) => (
                 <tr key={ventas.idDetalleVentaProducto || ventas.idDetalleVentaServicio}>
-                  <td>{ventas.idDetalleVentaProducto || ventas.idDetalleVentaServicio}</td>
-                  <td>{ventas.Array === ventas.idDetalleVentaProducto ? "Servicio" : "Producto"}</td>
+                  <td>{ventas.idDetalleVentaProducto ? "Servicio" : "Producto"}</td>
+                  <td>{productosName[ventas.productos_idProducto] || serviciosName[ventas.servicios_idServicio]}</td>
                   <td>{ventas.valorManoObra || ventas.precioVenta}</td>
                   <td>{ventas.cantidad || "1"}</td>
                   <td>{ventas.total}</td>
