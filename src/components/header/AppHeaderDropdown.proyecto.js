@@ -42,7 +42,7 @@ const AppHeaderDropdown = () => {
   }, []);
 
 
-  const handleLogout = () => {
+  const cerrarSesion = () => {
 
     localStorage.removeItem('Empleado');
 
@@ -175,12 +175,12 @@ const AppHeaderDropdown = () => {
           <FontAwesomeIcon icon={faCaretDown} style={{ marginLeft: '8px' }} />
         </CDropdownToggle>
         <CDropdownMenu className="pt-0" placement="bottom-end">
-          <CDropdownItem onClick={perfilEmpleado}>
+          <CDropdownItem onClick={perfilEmpleado} style={{cursor: 'pointer'}}>
 
-            <FontAwesomeIcon icon={faUser} style={{ marginRight: '10px' }} />
-            Perfil
+            <FontAwesomeIcon icon={faUser} style={{ marginRight: '10px'}} />
+            Perfil 
           </CDropdownItem>
-          <CDropdownItem onClick={handleLogout}>
+          <CDropdownItem onClick={cerrarSesion} style={{cursor: 'pointer'}}>
             <FontAwesomeIcon icon={faRightToBracket} style={{ marginRight: '10px' }} />
             Cerrar Sesión
           </CDropdownItem>
@@ -203,7 +203,7 @@ const AppHeaderDropdown = () => {
               right: 0
             }}
           >
-            <div className='modal-dialog modal-dialog-centered'>
+            <div className='modal-dialog modal-lg modal-dialog-centered'>
               <div className='modal-content'>
                 <div className='modal-header'>
                   <label className='h5'>Editar Perfil</label>
@@ -216,30 +216,91 @@ const AppHeaderDropdown = () => {
                 <div className='modal-body' >
 
 
-                  <input type='hidden' id='id' ></input>
 
-                  <div className='input-group mb-3'>
-                    <span className='input-group-text'><FontAwesomeIcon icon={faAddressCard} /></span>
 
-                    <input type='text' id='idEmpleado' className='form-control' placeholder='CC' value={idEmpleado} onChange={(e) => setIdEmpleado(e.target.value)} style={{ marginRight: '10px' }} disabled></input>
-                    <span className='input-group-text'><FontAwesomeIcon icon={faUser} /></span>
-                    <input type='text' id='nombreEmpleado' className='form-control' placeholder='Nombre' value={nombreEmpleado} onChange={(e) =>
-                      setNombreEmpleado(e.target.value)}></input>
+                  <div className='input-group mb-3' id='inputEmpleado'>
+                    <div className="d-flex flex-column" style={{ marginRight: '10px' }}>
+                      <label htmlFor='idEmpleado' className='form-label'>Cedula</label>
+                      <div className='input-group mb-3' style={{ maxWidth: '100%' }}>
+                        <span className='input-group-text'><FontAwesomeIcon icon={faAddressCard} /></span>
+                        <input
+                          type='text'
+                          id='idEmpleado'
+                          className='form-control'
+                          placeholder='1023625286'
+                          value={idEmpleado}
+                          onChange={(e) => setIdEmpleado(e.target.value)}
+
+                        />
+                      </div>
+                    </div>
+                    <div className="d-flex flex-column">
+                      <label htmlFor='nombreEmpleado' className='form-label'>Nombre</label>
+                      <div className='input-group mb-3' style={{ maxWidth: '100%' }}>
+                        <span className='input-group-text'><FontAwesomeIcon icon={faUser} /></span>
+                        <input
+                          type='text'
+                          id='nombreEmpleado'
+                          className='form-control'
+                          placeholder='Emanuel'
+                          value={nombreEmpleado}
+                          onChange={(e) => setNombreEmpleado(e.target.value)}
+
+                        />
+                      </div>
+                    </div>
                   </div>
 
-                  <div className='input-group mb-3'>
-                    <span className='input-group-text'><FontAwesomeIcon icon={faLocationDot} /></span>
-                    <input type='text' id='direccionEmpleado' className='form-control' placeholder='Dirección' value={direccionEmpleado} onChange={(e) =>
-                      setDireccionEmpleado(e.target.value)} style={{ marginRight: '10px' }} ></input>
-                    <span className='input-group-text'><FontAwesomeIcon icon={faPhone} /></span>
-                    <input type='text' id='telefonoEmpleado' className='form-control' placeholder='Teléfono' value={telefonoEmpleado} onChange={(e) => setTelefonoEmpleado(e.target.value)}></input>
+                  <div className='input-group mb-3' id='inputEmpleado'>
+                    <div className="d-flex flex-column" style={{ marginRight: '10px' }}>
+                      <label htmlFor='direccionEmpleado' className='form-label'>Direccion</label>
+                      <div className='input-group mb-3' style={{ maxWidth: '100%' }}>
+                        <span className='input-group-text'><FontAwesomeIcon icon={faLocationDot} /></span>
+                        <input
+                          type='text'
+                          id='direccionEmpleado'
+                          className='form-control'
+                          placeholder='Calle 77C'
+                          value={direccionEmpleado}
+                          onChange={(e) => setDireccionEmpleado(e.target.value)}
+
+                        />
+                      </div>
+                    </div>
+                    <div className="d-flex flex-column">
+                      <label htmlFor='telefonoEmpleado' className='form-label'>Telefono</label>
+                      <div className='input-group mb-3' style={{ maxWidth: '100%' }}>
+                        <span className='input-group-text'><FontAwesomeIcon icon={faPhone} /></span>
+                        <input
+                          type='text'
+                          id='telefonoEmpleado'
+                          className='form-control'
+                          placeholder='12345'
+                          value={telefonoEmpleado}
+                          onChange={(e) => setTelefonoEmpleado(e.target.value)}
+
+                        />
+                      </div>
+                    </div>
                   </div>
 
-                  <div className='input-group mb-3'>
-                    {/* <span className='input-group-text'><FontAwesomeIcon icon={faToggleOff} /></span>
-                <input type='text' id='estado' className='form-control' placeholder='Estado' value={estado} onChange={(e) => setEstado(e.target.value)}></input> */}
-                    <span className='input-group-text'><FontAwesomeIcon icon={faEnvelope} /></span>
-                    <input type='text' id='correoEmpleado' className='form-control' placeholder='Correo' value={correoEmpleado} onChange={(e) => setCorreoEmpleado(e.target.value)} style={{ marginRight: '10px' }}></input>
+                  <div className='input-group mb-3' id='inputEmpleado' style={{ marginLeft: '25%' }} >
+                    <div className="d-flex flex-column" style={{ marginRight: '10px' }}>
+                      <label htmlFor='correoEmpleado' className='form-label'>Correo</label>
+                      <div className='input-group mb-3' style={{ maxWidth: '100%' }}>
+                        <span className='input-group-text'><FontAwesomeIcon icon={faEnvelope} /></span>
+                        <input
+                          type='text'
+                          id='correoEmpleado'
+                          className='form-control'
+                          placeholder='Calle 77C'
+                          value={correoEmpleado}
+                          onChange={(e) => setCorreoEmpleado(e.target.value)}
+
+                        />
+                      </div>
+                    </div>
+            
                   </div>
 
 
