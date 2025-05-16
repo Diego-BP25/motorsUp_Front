@@ -14,7 +14,6 @@ const Servicios = React.lazy(() => import('./views/Servicios/servicios/servicios
 const Vehiculo = React.lazy(() => import('./views/Servicios/vehiculos/vehiculos.proyecto'))
 const agregarserv = React.lazy(() => import('./views/Servicios/servicios/servicios.proyecto'))
 
-
 const AgregarCotizacion = React.lazy(() =>
   import('./views/cotizaciones/agregarCotizacion.proyecto'),
 )
