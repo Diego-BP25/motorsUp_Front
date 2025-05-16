@@ -12,6 +12,9 @@ const Ventas = React.lazy(() => import('./views/ventas/venta.proyecto'))
 const agregarVentas = React.lazy(() => import('./views/ventas/agregarVentas.proyecto'))
 const Servicios = React.lazy(() => import('./views/Servicios/servicios/servicios.proyecto'))
 const Vehiculo = React.lazy(() => import('./views/Servicios/vehiculos/vehiculos.proyecto'))
+const agregarserv = React.lazy(() => import('./views/Servicios/servicios/servicios.proyecto'))
+
+
 const AgregarCotizacion = React.lazy(() =>
   import('./views/cotizaciones/agregarCotizacion.proyecto'),
 )
